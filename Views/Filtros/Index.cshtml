@@ -1,0 +1,41 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Unidad>
+
+@{
+    ViewData["Title"] = "Filtrar Unidades";
+}
+
+<h1>Filtrar Unidades por Capacidad</h1>
+
+<form asp-action="Index" method="get">
+    <label for="capacidadKg">Filtrar por capacidad de carga (kg):</label>
+    <select name="capacidadKg" id="capacidadKg" class="form-control">
+        <option value="">Todos</option>
+        <option value="2000">2T</option>
+        <option value="5000">5T</option>
+        <option value="10000">10T</option>
+    </select>
+    <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
+</form>
+
+<h2>Unidades Disponibles</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Placa</th>
+            <th>Tipo</th>
+            <th>Capacidad (kg)</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var unidad in Model)
+        {
+            <tr>
+                <td>@unidad.Placa</td>
+                <td>@unidad.Tipo</td>
+                <td>@unidad.CapacidadKg</td>
+                <td>@unidad.EstadoOperativo</td>
+            </tr>
+        }
+    </tbody>
+</table>

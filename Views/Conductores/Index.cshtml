@@ -1,0 +1,41 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Conductor>
+
+@{
+    ViewData["Title"] = "Conductores";
+}
+
+<h1>Conductores</h1>
+
+<p>
+    <a href="@Url.Action("Create")" class="btn btn-primary">Registrar Nuevo Conductor</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>DNI</th>
+            <th>Nombre</th>
+            <th>Licencia</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var conductor in Model)
+        {
+            <tr>
+                <td>@conductor.Dni</td>
+                <td>@conductor.Nombres @conductor.Apellidos</td>
+                <td>@conductor.NumeroLicencia</td>
+                <td>@conductor.EstadoOperativo</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = conductor.Id })" class="btn btn-warning">Editar</a>
+                    <form method="post" action="@Url.Action("Delete", new { id = conductor.Id })" style="display:inline;">
+                        @Html.AntiForgeryToken()  <!-- Protección contra CSRF -->
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este conductor?');">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

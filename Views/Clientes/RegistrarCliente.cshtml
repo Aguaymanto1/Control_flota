@@ -1,0 +1,37 @@
+@model Control_flota.Models.Operaciones.Cliente
+
+@{
+    ViewBag.Title = "Registrar Cliente";
+}
+
+<h2>Registrar Nuevo Cliente</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="ruc">RUC:</label>
+        <input type="text" name="Ruc" class="form-control" maxlength="11" required />
+        <span asp-validation-for="Ruc" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="nombre">Razón Social:</label>
+        <input type="text" name="Nombre" class="form-control" required />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="direccion">Dirección:</label>
+        <input type="text" name="Direccion" class="form-control" required />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="telefono">Teléfono:</label>
+        <input type="text" name="Telefono" class="form-control" required />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+
+  
+
+    <button type="submit" class="btn btn-success">Registrar Cliente</button>
+</form>
