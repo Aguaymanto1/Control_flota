@@ -1,0 +1,47 @@
+@{
+    var conductores = ViewBag.Conductores;
+    var unidades = ViewBag.Unidades;
+}
+
+<h2>Asignar Flota</h2>
+
+<form method="post">
+
+    <input type="hidden" name="SolicitudId" value="@ViewBag.SolicitudId" />
+
+    <div class="mb-3">
+        <label>Conductor</label>
+
+        <select name="ConductorId" class="form-control">
+            <option value="">Seleccione conductor</option>
+
+            @foreach (var conductor in conductores)
+            {
+                <option value="@conductor.Id">
+                    @conductor.Nombres - @conductor.NumeroLicencia
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Unidad</label>
+
+        <select name="UnidadId" class="form-control">
+            <option value="">Seleccione unidad</option>
+
+            @foreach (var unidad in unidades)
+            {
+                <option value="@unidad.Id">
+                    @unidad.Placa
+                </option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Asignar Flota
+    </button>
+    
+
+</form>

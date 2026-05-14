@@ -126,4 +126,65 @@ public async Task<IActionResult> Eliminar(int id)
     // Redirigir de vuelta a la lista de solicitudes
     return RedirectToAction(nameof(Index));
 }
+[HttpGet]
+public IActionResult AsignarFlota(int id)
+{
+    // Obtener la solicitud actual
+    var solicitud = _context.SolicitudesServicio.Find(id);
+
+    if (solicitud == null)
+    {
+        return NotFound();
+    }
+
+    // CONDUCTORES DISPONIBLES
+    var conductores = _context.Conductores
+        .Where(c => c.Actividad == "Libre")
+        .ToList();
+
+    // UNIDADES DISPONIBLES
+    var unidades = _context.Unidades
+        .Where(u =>
+            u.Actividad == "Libre"      // Solo libres
+            && u.EstadoOperativo == "Activo"    // No mantenimiento
+            && u.CapacidadKg >= (decimal)solicitud.PesoKg// Soporta peso
+        )
+        .ToList();
+
+    ViewBag.Conductores = conductores;
+    ViewBag.Unidades = unidades;
+    ViewBag.SolicitudId = id;
+
+    return View();
+}
+[HttpPost]
+public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId)
+{
+    var solicitud = _context.SolicitudesServicio.Find(SolicitudId);
+
+    var conductor = _context.Conductores.Find(ConductorId);
+
+    var unidad = _context.Unidades.Find(UnidadId);
+
+    if (solicitud == null || conductor == null || unidad == null)
+    {
+        return NotFound();
+    }
+
+    // CAMBIAR ESTADO DE LA SOLICITUD
+    solicitud.EstadoSolicitud = "Asignado";
+
+    // CAMBIAR ACTIVIDAD DEL CONDUCTOR
+    conductor.Actividad = "Ocupado";
+
+    // CAMBIAR ACTIVIDAD DE LA UNIDAD
+    unidad.Actividad = "Ocupado";
+
+    // GUARDAR FECHA Y HORA
+    solicitud.FechaDespacho = DateTime.Now;
+
+    _context.SaveChanges();
+
+    return RedirectToAction("Index");
+}
 }

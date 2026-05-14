@@ -17,6 +17,7 @@
             <th>Nombre</th>
             <th>Licencia</th>
             <th>Estado</th>
+            <th>Actividad</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -28,6 +29,7 @@
                 <td>@conductor.Nombres @conductor.Apellidos</td>
                 <td>@conductor.NumeroLicencia</td>
                 <td>@conductor.EstadoOperativo</td>
+                <td>@conductor.Actividad</td>
                 <td>
                     <a href="@Url.Action("Edit", new { id = conductor.Id })" class="btn btn-warning">Editar</a>
                     <form method="post" action="@Url.Action("Delete", new { id = conductor.Id })" style="display:inline;">
