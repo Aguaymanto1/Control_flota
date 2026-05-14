@@ -40,6 +40,9 @@
                 <td>@solicitud.Destino</td>
                 <td>@solicitud.EstadoSolicitud</td>
                 <td>
+                    <a asp-action="AsignarFlota"
+                        asp-route-id="@solicitud.Id"
+                            class="btn btn-primary btn-sm">Asignar Flota</a>
                     <a href="@Url.Action("Details", new { id = solicitud.Id })" class="btn btn-info">Ver Detalles</a>
 
                     <form method="post" asp-action="Eliminar" asp-route-id="@solicitud.Id" style="display:inline;">

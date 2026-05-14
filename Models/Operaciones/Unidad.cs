@@ -40,4 +40,6 @@ public class Unidad
     public bool IsDeleted { get; set; }
 
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
+
+    public string Actividad { get; set; } = "Libre";
 }
