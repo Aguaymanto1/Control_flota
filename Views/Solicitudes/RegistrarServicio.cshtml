@@ -1,0 +1,67 @@
+@model Control_flota.Models.Operaciones.SolicitudServicio
+
+@{
+    ViewData["Title"] = "Registrar Nuevo Servicio";
+}
+
+<h2>Registrar Nuevo Servicio</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="clienteId">Cliente:</label>
+        <select name="ClienteId" class="form-control" required>
+            <option value="">Seleccione un cliente</option> <!-- Añadimos una opción vacía -->
+            @foreach (var cliente in ViewBag.Clientes)
+            {
+                <option value="@cliente.Id">@cliente.Nombre</option>
+            }
+        </select>
+        <span asp-validation-for="ClienteId" class="text-danger"></span>
+    </div>
+
+
+
+    <div class="form-group">
+        <label for="origen">Origen:</label>
+        <input type="text" name="Origen" class="form-control" required />
+        <span asp-validation-for="Origen" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="destino">Destino:</label>
+        <input type="text" name="Destino" class="form-control" required />
+        <span asp-validation-for="Destino" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="pesoKg">Peso (Kg):</label>
+        <input type="number" step="0.01" name="PesoKg" class="form-control" required />
+        <span asp-validation-for="PesoKg" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="TipoCarga">Tipo de Carga:</label>
+        <select name="TipoCarga" class="form-control" required>
+            <option value="">Seleccione el tipo de carga</option>
+            @foreach (var tipo in ViewBag.TipoCargaOptions)
+            {
+                <option value="@tipo">@tipo</option>
+            }
+        </select>
+        <span asp-validation-for="TipoCarga" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}

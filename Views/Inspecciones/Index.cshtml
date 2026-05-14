@@ -1,0 +1,53 @@
+@model List<Control_flota.Models.Operaciones.Unidad>
+
+<h2 class="mb-4">Control de Inspecciones SST</h2>
+
+<table class="table table-hover table-striped">
+
+    <thead>
+        <tr>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+
+            <td>@item.Placa</td>
+            <td>@item.Marca</td>
+            <td>@item.EstadoOperativo</td>
+
+            <td>
+
+                <a class="btn btn-primary btn-sm"
+                   asp-controller="Inspecciones"
+                   asp-action="Create"
+                   asp-route-placa="@item.Placa">
+
+                    Revisar
+
+                </a>
+
+                <a class="btn btn-success btn-sm"
+                   asp-controller="Inspecciones"
+                   asp-action="Details"
+                   asp-route-placa="@item.Placa">
+
+                    Detalles
+
+                </a>
+
+            </td>
+
+        </tr>
+    }
+
+    </tbody>
+
+</table>

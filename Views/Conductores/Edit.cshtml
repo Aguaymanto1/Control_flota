@@ -1,0 +1,57 @@
+@model Control_flota.Models.Operaciones.Conductor
+
+@{
+    ViewData["Title"] = "Editar Conductor";
+}
+
+<h1>Editar Conductor</h1>
+
+<form asp-action="Edit" method="post">
+    <div class="form-group">
+        <label for="Dni">DNI</label>
+        <input type="text" asp-for="Dni" class="form-control" readonly />
+        <span asp-validation-for="Dni" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Nombres">Nombres</label>
+        <input type="text" asp-for="Nombres" class="form-control" />
+        <span asp-validation-for="Nombres" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Apellidos">Apellidos</label>
+        <input type="text" asp-for="Apellidos" class="form-control" />
+        <span asp-validation-for="Apellidos" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Celular">Celular</label>
+        <input type="text" asp-for="Celular" class="form-control" />
+        <span asp-validation-for="Celular" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="NumeroLicencia">Número de Licencia</label>
+        <input type="text" asp-for="NumeroLicencia" class="form-control" />
+        <span asp-validation-for="NumeroLicencia" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="CategoriaLicencia">Categoría de Licencia</label>
+        <select asp-for="CategoriaLicencia" class="form-control">
+            <option value="A-IIb" selected="@Model.CategoriaLicencia == "A-IIb"">A-IIb</option>
+            <option value="A-IIIb" selected="@Model.CategoriaLicencia == "A-IIIb"">A-IIIb</option>
+            <option value="A-IIIc" selected="@Model.CategoriaLicencia == "A-IIIc"">A-IIIc</option>
+        </select>
+        <span asp-validation-for="CategoriaLicencia" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="VencimientoLicencia">Vencimiento Licencia</label>
+        <input type="date" asp-for="VencimientoLicencia" class="form-control" />
+        <span asp-validation-for="VencimientoLicencia" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+</form>

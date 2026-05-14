@@ -1,0 +1,31 @@
+@model Control_flota.Models.Operaciones.SolicitudServicio
+
+@{
+    ViewData["Title"] = "Detalles de Solicitud";
+}
+
+<h1>Detalles de Solicitud</h1>
+
+<div>
+    <strong>Código:</strong> @Model.Codigo
+</div>
+<div>
+    <strong>Cliente:</strong> @Model.Cliente.Nombre
+</div>
+<div>
+    <strong>Origen:</strong> @Model.Origen
+</div>
+<div>
+    <strong>Destino:</strong> @Model.Destino
+</div>
+<div>
+    <strong>Tipo de Carga:</strong> @Model.TipoCarga
+</div>
+<div>
+    <strong>Peso (kg):</strong> @Model.PesoKg
+</div>
+<div>
+    <strong>Estado:</strong> @Model.EstadoSolicitud
+</div>
+
+<a href="@Url.Action("Index")" class="btn btn-secondary">Volver</a>

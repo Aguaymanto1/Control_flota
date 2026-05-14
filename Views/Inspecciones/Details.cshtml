@@ -1,0 +1,32 @@
+@model List<Control_flota.Models.Operaciones.Inspeccion>
+
+<h2>Historial de Inspecciones</h2>
+
+<h4>Vehículo: @ViewBag.Placa</h4>
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+
+        <tr>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Fecha</td>
+                <td>@item.Estado</td>
+                <td>@item.Observaciones</td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>

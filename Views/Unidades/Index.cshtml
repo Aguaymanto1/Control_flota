@@ -1,0 +1,49 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Unidad>
+
+@{
+    ViewData["Title"] = "Unidades";
+}
+
+<h1>Unidades de Flota</h1>
+
+<p>
+    <a href="@Url.Action("Create")" class="btn btn-primary">Registrar Nueva Unidad</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Placa</th>
+            <th>Tipo</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Año</th>
+            <th>Capacidad (kg)</th>
+            <th>Estado</th>
+            <th>Actividad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var unidad in Model)
+        {
+            <tr>
+                <td>@unidad.Placa</td>
+                <td>@unidad.Tipo</td>
+                <td>@unidad.Marca</td>
+                <td>@unidad.Modelo</td>
+                <td>@unidad.Anio</td>
+                <td>@unidad.CapacidadKg</td>
+                <td>@unidad.EstadoOperativo</td>
+                <td>@unidad.Actividad</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = unidad.Id })" class="btn btn-warning">Editar</a>
+                     <form method="post" action="@Url.Action("Delete", new { id = unidad.Id })" style="display:inline;">
+                        @Html.AntiForgeryToken() <!-- Agregar el token de validación CSRF -->
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta unidad?');">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

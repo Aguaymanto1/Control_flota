@@ -1,0 +1,38 @@
+@model Control_flota.Models.Operaciones.Inspeccion
+
+<h2>Formulario de Inspección</h2>
+
+<h4>Vehículo: @Model.Placa</h4>
+
+<form asp-action="Create" method="post">
+
+    <input type="hidden" asp-for="Placa" />
+
+    <div class="mb-3">
+
+        <label>Estado</label>
+
+        <select asp-for="Estado" class="form-control">
+
+            <option>Apto</option>
+            <option>Mantenimiento</option>
+
+        </select>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Observaciones</label>
+
+        <textarea asp-for="Observaciones" class="form-control"></textarea>
+
+    </div>
+
+    <button type="submit" class="btn btn-success">
+
+        Guardar Inspección
+
+    </button>
+
+</form>
