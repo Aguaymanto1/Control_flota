@@ -1,0 +1,100 @@
+@page
+@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.RegisterModel
+@{
+    ViewData["Title"] = "Registro";
+}
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <h2 class="register-title">Crear nueva cuenta</h2>
+        <p class="text-muted mb-4">Ingresa tus datos para registrarte en el sistema</p>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <div class="form-group mb-3 text-start">
+                <label class="form-label fw-bold">Correo Electrónico:</label>
+                <input name="Input.Email" class="form-control custom-input" autocomplete="username" placeholder="ejemplo@correo.com" required />
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group mb-3 text-start">
+                <label class="form-label fw-bold">Contraseña:</label>
+                <input name="Input.Password" type="password" class="form-control custom-input" autocomplete="new-password" placeholder="Mínimo 6 caracteres" required />
+                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group mb-4 text-start">
+                <label class="form-label fw-bold">Confirmar Contraseña:</label>
+                <input name="Input.ConfirmPassword" type="password" class="form-control custom-input" autocomplete="new-password" placeholder="Repite tu contraseña" required />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="btn-registrar">Registrar Usuario</button>
+            
+            <div class="mt-3">
+                <a asp-page="./Login" class="text-decoration-none small">¿Ya tienes cuenta? Inicia sesión aquí</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .register-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 0;
+    }
+
+    .register-card {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 30px; /* Mantener la estética del login */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+        border: 1px solid #f0f0f0;
+    }
+
+    .register-title {
+        color: #1a73e8;
+        font-weight: 500;
+        margin-bottom: 10px;
+        font-size: 1.6rem;
+    }
+
+    .form-label {
+        color: #444;
+        font-size: 0.9rem;
+    }
+
+    .custom-input {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 10px;
+        background-color: #fdfdfd;
+    }
+
+    .btn-registrar {
+        background-color: #0d47a1; /* Azul corporativo */
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        transition: background 0.3s;
+        cursor: pointer;
+    }
+
+    .btn-registrar:hover {
+        background-color: #08306b;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

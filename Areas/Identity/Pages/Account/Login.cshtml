@@ -1,0 +1,95 @@
+@page
+@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.LoginModel
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2 class="login-title">De La Sota - Iniciar Sesión</h2>
+
+        <form id="account" method="post">
+            @* Este div maneja los errores como "Credenciales incorrectas" *@
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <div class="form-group mb-3 text-start">
+                <label class="form-label">Correo:</label>
+                <input name="Input.Email" class="form-control custom-input" placeholder="correo@ejemplo.com" required />
+            </div>
+
+            <div class="form-group mb-4 text-start">
+                <label class="form-label">Contraseña:</label>
+                <input name="Input.Password" type="password" class="form-control custom-input" placeholder="********" required />
+            </div>
+
+            <button type="submit" class="btn-ingresar">Ingresar</button>
+
+            @* Mensaje de error visual si falla *@
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="error-msg">Credenciales incorrectas</div>
+            }
+        </form>
+    </div>
+</div>
+
+<style>
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 60px 0;
+    }
+
+    .login-card {
+        background: #ffffff;
+        padding: 45px;
+        border-radius: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+        border: 1px solid #f0f0f0;
+    }
+
+    .login-title {
+        color: #1a73e8;
+        font-weight: 500;
+        margin-bottom: 35px;
+        font-size: 1.6rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #444;
+        font-size: 0.9rem;
+    }
+
+    .custom-input {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 12px;
+    }
+
+    .btn-ingresar {
+        background-color: #0d47a1;
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .btn-ingresar:hover {
+        background-color: #08306b;
+    }
+
+    .error-msg {
+        color: #e57373;
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+</style>
