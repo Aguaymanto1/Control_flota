@@ -3565,19 +3565,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Fiorella\\.nuget\\packages\\": {}
+    "C:\\Users\\corre\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Fiorella\\Desktop\\control soft ver 2\\Control_flota\\Control_flota.csproj",
+      "projectUniqueName": "C:\\Users\\corre\\OneDrive\\Escritorio\\iniciodiseño\\Control_flota\\Control_flota.csproj",
       "projectName": "Control_flota",
-      "projectPath": "C:\\Users\\Fiorella\\Desktop\\control soft ver 2\\Control_flota\\Control_flota.csproj",
-      "packagesPath": "C:\\Users\\Fiorella\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Fiorella\\Desktop\\control soft ver 2\\Control_flota\\obj\\",
+      "projectPath": "C:\\Users\\corre\\OneDrive\\Escritorio\\iniciodiseño\\Control_flota\\Control_flota.csproj",
+      "packagesPath": "C:\\Users\\corre\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\corre\\OneDrive\\Escritorio\\iniciodiseño\\Control_flota\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Fiorella\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\corre\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -3647,7 +3647,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.303/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

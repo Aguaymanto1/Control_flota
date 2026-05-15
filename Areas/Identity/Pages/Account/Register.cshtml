@@ -4,97 +4,315 @@
     ViewData["Title"] = "Registro";
 }
 
-<div class="register-wrapper">
-    <div class="register-card">
-        <h2 class="register-title">Crear nueva cuenta</h2>
-        <p class="text-muted mb-4">Ingresa tus datos para registrarte en el sistema</p>
 
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+<div class="register-page">
+    <div class="register-container">
 
-            <div class="form-group mb-3 text-start">
-                <label class="form-label fw-bold">Correo Electrónico:</label>
-                <input name="Input.Email" class="form-control custom-input" autocomplete="username" placeholder="ejemplo@correo.com" required />
-                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+        <!-- LADO IZQUIERDO -->
+        <div class="register-left">
+
+            <div class="brand">
+                <div class="brand-dot"></div>
+                <span>De La Sota</span>
             </div>
 
-            <div class="form-group mb-3 text-start">
-                <label class="form-label fw-bold">Contraseña:</label>
-                <input name="Input.Password" type="password" class="form-control custom-input" autocomplete="new-password" placeholder="Mínimo 6 caracteres" required />
-                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            <div class="register-content">
+
+                <p class="mini-text">CREA TU CUENTA</p>
+
+                <h1 class="register-title">
+                    Regístrate en el sistema<span>.</span>
+                </h1>
+
+                <p class="register-subtitle">
+                    Completa los datos para comenzar
+                </p>
+
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                    <!-- CORREO -->
+                    <div class="input-group-custom">
+                        <label>Correo electrónico</label>
+
+                        <input asp-for="Input.Email"
+                               class="custom-input"
+                               autocomplete="username"
+                               aria-required="true"
+                               placeholder="correo@ejemplo.com" />
+
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- CONTRASEÑA -->
+                    <div class="input-group-custom">
+                        <label>Contraseña</label>
+
+                        <input asp-for="Input.Password"
+                               class="custom-input"
+                               autocomplete="new-password"
+                               aria-required="true"
+                               placeholder="********" />
+
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- REPETIR CONTRASEÑA -->
+                    <div class="input-group-custom">
+                        <label>Confirmar contraseña</label>
+
+                        <input asp-for="Input.ConfirmPassword"
+                               class="custom-input"
+                               autocomplete="new-password"
+                               aria-required="true"
+                               placeholder="********" />
+
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <button id="registerSubmit" type="submit" class="btn-register">
+                        Crear cuenta
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- LADO DERECHO -->
+        <div class="register-right">
+
+            <div class="overlay"></div>
+
+            <div class="right-content">
+                <h2>Bienvenido</h2>
+
+                <p>
+                    Crea una cuenta segura.
+                </p>
             </div>
 
-            <div class="form-group mb-4 text-start">
-                <label class="form-label fw-bold">Confirmar Contraseña:</label>
-                <input name="Input.ConfirmPassword" type="password" class="form-control custom-input" autocomplete="new-password" placeholder="Repite tu contraseña" required />
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
-            </div>
+        </div>
 
-            <button id="registerSubmit" type="submit" class="btn-registrar">Registrar Usuario</button>
-            
-            <div class="mt-3">
-                <a asp-page="./Login" class="text-decoration-none small">¿Ya tienes cuenta? Inicia sesión aquí</a>
-            </div>
-        </form>
     </div>
 </div>
-
-<style>
-    .register-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 40px 0;
-    }
-
-    .register-card {
-        background: #ffffff;
-        padding: 40px;
-        border-radius: 30px; /* Mantener la estética del login */
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        width: 100%;
-        max-width: 500px;
-        text-align: center;
-        border: 1px solid #f0f0f0;
-    }
-
-    .register-title {
-        color: #1a73e8;
-        font-weight: 500;
-        margin-bottom: 10px;
-        font-size: 1.6rem;
-    }
-
-    .form-label {
-        color: #444;
-        font-size: 0.9rem;
-    }
-
-    .custom-input {
-        border-radius: 8px;
-        border: 1px solid #ced4da;
-        padding: 10px;
-        background-color: #fdfdfd;
-    }
-
-    .btn-registrar {
-        background-color: #0d47a1; /* Azul corporativo */
-        color: white;
-        border: none;
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        font-weight: 500;
-        transition: background 0.3s;
-        cursor: pointer;
-    }
-
-    .btn-registrar:hover {
-        background-color: #08306b;
-    }
-</style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<style>
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #1c2230, #2f3548);
+        min-height: 100vh;
+    }
+
+    .register-page {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+    }
+
+    .register-container {
+        width: 100%;
+        max-width: 1200px;
+        min-height: 720px;
+        background: #141a2e;
+        border-radius: 28px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+
+    /* IZQUIERDA */
+
+    .register-left {
+        padding: 45px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: #141a2e;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .brand-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #1e88ff;
+    }
+
+    .register-content {
+        max-width: 420px;
+    }
+
+    .mini-text {
+        color: #8fa3c7;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+    }
+
+    .register-title {
+        color: white;
+        font-size: 3rem;
+        line-height: 1.2;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+        .register-title span {
+            color: #1e88ff;
+        }
+
+    .register-subtitle {
+        color: #a7b1c5;
+        margin-bottom: 35px;
+        font-size: 0.95rem;
+    }
+
+    /* INPUTS */
+
+    .input-group-custom {
+        margin-bottom: 22px;
+    }
+
+        .input-group-custom label {
+            display: block;
+            color: #c7d0df;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+    .custom-input {
+        width: 100%;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        height: 55px;
+        border-radius: 14px;
+        padding: 0 18px;
+        color: white;
+        outline: none;
+        transition: 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+        .custom-input::placeholder {
+            color: #7f8aa3;
+        }
+
+        .custom-input:focus {
+            border-color: #1e88ff;
+            box-shadow: 0 0 0 4px rgba(30,136,255,0.15);
+        }
+
+    /* BOTÓN */
+
+    .btn-register {
+        width: 100%;
+        height: 55px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1e88ff, #0066ff);
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s ease;
+    }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(30,136,255,0.25);
+        }
+
+    /* VALIDACIONES */
+
+    .text-danger {
+        color: #ff8a8a !important;
+        font-size: 0.85rem;
+    }
+
+    /* DERECHA */
+
+    .register-right {
+        position: relative;
+        background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(12, 18, 38, 0.72);
+    }
+
+    .right-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 60px;
+        color: white;
+    }
+
+        .right-content h2 {
+            font-size: 2.3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .right-content p {
+            color: #d3dbeb;
+            line-height: 1.6;
+            max-width: 420px;
+        }
+
+    /* RESPONSIVE */
+
+    @@media(max-width: 900px) {
+
+        .register-container {
+            grid-template-columns: 1fr;
+        }
+
+        .register-right {
+            display: none;
+        }
+
+        .register-left {
+            padding: 40px 30px;
+        }
+
+        .register-title {
+            font-size: 2.2rem;
+        }
+    }
+
+</style>

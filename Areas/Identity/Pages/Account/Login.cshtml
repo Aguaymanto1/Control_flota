@@ -1,95 +1,289 @@
-@page
+@page 
 @model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.LoginModel
 @{
     ViewData["Title"] = "Log in";
 }
 
-<div class="login-wrapper">
-    <div class="login-card">
-        <h2 class="login-title">De La Sota - Iniciar Sesión</h2>
+<div class="login-page">
+    <div class="login-container">
 
-        <form id="account" method="post">
-            @* Este div maneja los errores como "Credenciales incorrectas" *@
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-
-            <div class="form-group mb-3 text-start">
-                <label class="form-label">Correo:</label>
-                <input name="Input.Email" class="form-control custom-input" placeholder="correo@ejemplo.com" required />
+        <!-- LADO IZQUIERDO -->
+        <div class="login-left">
+            <div class="brand">
+                <div class="brand-dot"></div>
+                <span>De La Sota</span>
             </div>
 
-            <div class="form-group mb-4 text-start">
-                <label class="form-label">Contraseña:</label>
-                <input name="Input.Password" type="password" class="form-control custom-input" placeholder="********" required />
+            <div class="login-content">
+                <p class="mini-text">BIENVENIDO</p>
+
+                <h1 class="login-title">
+                    Inicia sesión en tu cuenta<span>.</span>
+                </h1>
+
+                <p class="login-subtitle">
+                    Ingresa tus datos para continuar
+                </p>
+
+                <form id="account" method="post">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                    <!-- CORREO -->
+                    <div class="input-group-custom">
+                        <label>Correo electrónico</label>
+                        <input name="Input.Email"
+                               type="email"
+                               class="custom-input"
+                               placeholder="correo@ejemplo.com"
+                               required />
+                    </div>
+
+                    <!-- CONTRASEÑA -->
+                    <div class="input-group-custom">
+                        <label>Contraseña</label>
+                        <input name="Input.Password"
+                               type="password"
+                               class="custom-input"
+                               placeholder="********"
+                               required />
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        Ingresar
+                    </button>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="error-msg">
+                            Credenciales incorrectas
+                        </div>
+                    }
+
+                </form>
             </div>
+        </div>
 
-            <button type="submit" class="btn-ingresar">Ingresar</button>
+        <!-- LADO DERECHO -->
+        <div class="login-right">
+            <div class="overlay"></div>
 
-            @* Mensaje de error visual si falla *@
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="error-msg">Credenciales incorrectas</div>
-            }
-        </form>
+            <div class="right-content">
+                <h2>Sistema de Control de Flota</h2>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <style>
-    .login-wrapper {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #1c2230, #2f3548);
+        min-height: 100vh;
+    }
+
+    .login-page {
+        width: 100%;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 60px 0;
+        padding: 30px;
     }
 
-    .login-card {
-        background: #ffffff;
-        padding: 45px;
-        border-radius: 30px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    .login-container {
         width: 100%;
-        max-width: 450px;
-        text-align: center;
-        border: 1px solid #f0f0f0;
+        max-width: 1200px;
+        min-height: 700px;
+        background: #141a2e;
+        border-radius: 28px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+
+    /* IZQUIERDA */
+
+    .login-left {
+        padding: 45px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: #141a2e;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .brand-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #1e88ff;
+    }
+
+    .login-content {
+        max-width: 420px;
+    }
+
+    .mini-text {
+        color: #8fa3c7;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
     }
 
     .login-title {
-        color: #1a73e8;
-        font-weight: 500;
-        margin-bottom: 35px;
-        font-size: 1.6rem;
+        color: white;
+        font-size: 3rem;
+        line-height: 1.2;
+        font-weight: 700;
+        margin-bottom: 15px;
     }
 
-    .form-label {
-        font-weight: 600;
-        color: #444;
-        font-size: 0.9rem;
+        .login-title span {
+            color: #1e88ff;
+        }
+
+    .login-subtitle {
+        color: #a7b1c5;
+        margin-bottom: 35px;
+        font-size: 0.95rem;
     }
+
+    /* INPUTS */
+
+    .input-group-custom {
+        margin-bottom: 22px;
+    }
+
+        .input-group-custom label {
+            display: block;
+            color: #c7d0df;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
 
     .custom-input {
-        border-radius: 8px;
-        border: 1px solid #ced4da;
-        padding: 12px;
-    }
-
-    .btn-ingresar {
-        background-color: #0d47a1;
-        color: white;
-        border: none;
         width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        font-weight: 500;
-        cursor: pointer;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        height: 55px;
+        border-radius: 14px;
+        padding: 0 18px;
+        color: white;
+        outline: none;
+        transition: 0.3s ease;
+        font-size: 0.95rem;
     }
 
-    .btn-ingresar:hover {
-        background-color: #08306b;
+        .custom-input::placeholder {
+            color: #7f8aa3;
+        }
+
+        .custom-input:focus {
+            border-color: #1e88ff;
+            box-shadow: 0 0 0 4px rgba(30,136,255,0.15);
+        }
+
+    /* BOTÓN */
+
+    .btn-login {
+        width: 100%;
+        height: 55px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1e88ff, #0066ff);
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s ease;
     }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(30,136,255,0.25);
+        }
 
     .error-msg {
-        color: #e57373;
         margin-top: 20px;
+        color: #ff8a8a;
         font-size: 0.9rem;
+    }
+
+    /* DERECHA */
+
+    .login-right {
+        position: relative;
+        background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(12, 18, 38, 0.72);
+    }
+
+    .right-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 60px;
+        color: white;
+    }
+
+        .right-content h2 {
+            font-size: 2.3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .right-content p {
+            color: #d3dbeb;
+            line-height: 1.6;
+            max-width: 420px;
+        }
+
+    /* RESPONSIVE */
+
+    @@media(max-width: 900px) {
+
+        .login-container {
+            grid-template-columns: 1fr;
+        }
+
+        .login-right {
+            display: none;
+        }
+
+        .login-left {
+            padding: 40px 30px;
+        }
+
+        .login-title {
+            font-size: 2.2rem;
+        }
     }
 </style>
