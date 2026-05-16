@@ -87,9 +87,19 @@ public class SolicitudesController : Controller
    public async Task<IActionResult> Index()
 {
     var solicitudes = await _context.Set<SolicitudServicio>()
-        .Include(s => s.Cliente) // ← Cargar el objeto Cliente
+        .Include(s => s.Cliente)
+        .Include(s => s.Conductor)
+        .Include(s => s.Unidad)
         .ToListAsync();
-    
+
+    // Obtener los IDs de solicitudes que ya tienen órdenes emitidas
+    var ordenesEmitidas = await _context.Ordenes
+        .Where(o => o.Estado == "Emitida")
+        .Select(o => o.SolicitudServicioId)
+        .ToListAsync();
+
+    ViewBag.OrdenesEmitidasIds = new HashSet<int>(ordenesEmitidas);
+
     return View(solicitudes);
 }
  // Acción para ver los detalles de una solicitud
@@ -105,7 +115,81 @@ public class SolicitudesController : Controller
             return NotFound();  // Si no se encuentra la solicitud, retorna 404
         }
 
+        // Buscar si ya existe una orden vinculada a esta solicitud
+        var orden = await _context.Ordenes
+            .FirstOrDefaultAsync(o => o.SolicitudServicioId == id && o.Estado == "Emitida");
+
+        ViewBag.OrdenId = orden?.Id;
+
         return View(solicitud);  // Pasa la solicitud a la vista
+    }
+
+    // Acción para generar una Orden a partir de una Solicitud asignada
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GenerarOrden(int id)
+    {
+        var solicitud = await _context.SolicitudesServicio
+            .Include(s => s.Cliente)
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (solicitud == null)
+            return NotFound();
+
+        // Solo permitir generación si la solicitud está asignada
+        if (solicitud.EstadoSolicitud != "Asignado")
+        {
+            TempData["Error"] = "La orden sólo puede generarse desde una solicitud asignada.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // Obtener datos de conductor y unidad si existen
+        string nombreConductor = string.Empty;
+        string placaCamion = string.Empty;
+
+        if (solicitud.ConductorId.HasValue)
+        {
+            var conductor = await _context.Conductores.FindAsync(solicitud.ConductorId.Value);
+            if (conductor != null)
+                nombreConductor = conductor.Nombres + " " + conductor.Apellidos;
+        }
+        if (solicitud.UnidadId.HasValue)
+        {
+            var unidad = await _context.Unidades.FindAsync(solicitud.UnidadId.Value);
+            if (unidad != null)
+                placaCamion = unidad.Placa;
+        }
+
+        // Fecha de emisión estrictamente del reloj del servidor
+        var now = DateTime.Now;
+
+        // Calcular correlativo para el mes actual
+        var year = now.Year;
+        var month = now.Month;
+        var count = await _context.Ordenes
+            .Where(o => o.FechaEmision.Year == year && o.FechaEmision.Month == month)
+            .CountAsync();
+        var correlativo = count + 1;
+        var codigo = $"ORD-{year:0000}-{month:00}-{correlativo:0000}";
+
+        var orden = new Orden
+        {
+            Codigo = codigo,
+            FechaEmision = now,
+            Estado = "Emitida",
+            ClienteId = solicitud.ClienteId,
+            Origen = solicitud.Origen,
+            Destino = solicitud.Destino,
+            NombreConductor = nombreConductor,
+            PlacaCamion = placaCamion,
+            SolicitudServicioId = solicitud.Id
+        };
+
+        _context.Ordenes.Add(orden);
+        await _context.SaveChangesAsync();
+
+        // Redirigir a la vista detalle de la orden recién creada
+        return RedirectToAction("Details", "Ordenes", new { id = orden.Id });
     }
     [HttpPost]
 [ValidateAntiForgeryToken]
@@ -173,6 +257,10 @@ public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId
 
     // CAMBIAR ESTADO DE LA SOLICITUD
     solicitud.EstadoSolicitud = "Asignado";
+
+    // Guardar relación con conductor y unidad
+    solicitud.ConductorId = ConductorId;
+    solicitud.UnidadId = UnidadId;
 
     // CAMBIAR ACTIVIDAD DEL CONDUCTOR
     conductor.Actividad = "Ocupado";

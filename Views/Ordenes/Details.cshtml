@@ -1,0 +1,52 @@
+@model Control_flota.Models.Operaciones.Orden
+
+@{
+    ViewData["Title"] = "Detalle de Orden";
+}
+
+<h1>Detalle de Orden</h1>
+
+<div>
+    <strong>Código:</strong> @Model.Codigo
+</div>
+<div>
+    <strong>Fecha Emisión:</strong> @Model.FechaEmision.ToString("g")
+</div>
+<div>
+    <strong>Estado:</strong> @Model.Estado
+</div>
+<hr />
+<h4>Datos (solo lectura)</h4>
+<div>
+    <strong>Cliente:</strong> @Model.Cliente?.Nombre
+</div>
+<div>
+    <strong>Origen:</strong> @Model.Origen
+</div>
+<div>
+    <strong>Destino:</strong> @Model.Destino
+</div>
+<h5>Conductor</h5>
+<div>
+    <strong>Nombre:</strong> @(ViewBag.Conductor != null ? (ViewBag.Conductor.Nombres + " " + ViewBag.Conductor.Apellidos) : Model.NombreConductor)
+</div>
+<div>
+    <strong>DNI:</strong> @(ViewBag.Conductor != null ? ViewBag.Conductor.Dni : "-")
+</div>
+<div>
+    <strong>Celular:</strong> @(ViewBag.Conductor != null ? ViewBag.Conductor.Celular : "-")
+</div>
+<h5>Unidad</h5>
+<div>
+    <strong>Placa:</strong> @(ViewBag.Unidad != null ? ViewBag.Unidad.Placa : Model.PlacaCamion)
+</div>
+<div>
+    <strong>Marca/Modelo:</strong> @(ViewBag.Unidad != null ? (ViewBag.Unidad.Marca + " " + ViewBag.Unidad.Modelo) : "-")
+</div>
+
+<form method="post" asp-action="Eliminar" asp-route-id="@Model.Id" onsubmit="return confirm('¿Eliminar esta orden? Esta acción no se puede deshacer.');" style="display:inline;">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">Eliminar Orden</button>
+</form>
+
+<a class="btn btn-secondary" href="@Url.Action("Index")">Volver</a>

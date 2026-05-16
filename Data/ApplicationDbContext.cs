@@ -14,6 +14,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Conductor> Conductores => Set<Conductor>();
     public DbSet<Cliente> Clientes => Set<Cliente>();
     public DbSet<SolicitudServicio> SolicitudesServicio => Set<SolicitudServicio>();
+    public DbSet<Orden> Ordenes => Set<Orden>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -36,6 +37,10 @@ public class ApplicationDbContext : IdentityDbContext
 
         builder.Entity<SolicitudServicio>()
             .HasIndex(s => s.Codigo)
+            .IsUnique();
+
+        builder.Entity<Orden>()
+            .HasIndex(o => o.Codigo)
             .IsUnique();
     }
 }

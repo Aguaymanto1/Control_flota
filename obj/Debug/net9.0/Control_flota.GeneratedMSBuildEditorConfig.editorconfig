@@ -15,111 +15,121 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v9.0
 build_property.RootNamespace = Control_flota
 build_property.RootNamespace = Control_flota
-build_property.ProjectDir = C:\Users\corre\OneDrive\Escritorio\iniciodiseño\Control_flota\
+build_property.ProjectDir = D:\PROYECTO SOFT 2 NUEVO\Control_flota\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\corre\OneDrive\Escritorio\iniciodiseño\Control_flota
+build_property.MSBuildProjectDirectory = D:\PROYECTO SOFT 2 NUEVO\Control_flota
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Areas/Identity/Pages/Account/Login.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Areas/Identity/Pages/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Areas/Identity/Pages/Account/Register.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Areas/Identity/Pages/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Areas/Identity/Pages/_ViewStart.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Areas/Identity/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Clientes/RegistrarCliente.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Clientes/RegistrarCliente.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2xpZW50ZXNcUmVnaXN0cmFyQ2xpZW50ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Conductores/Create.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Conductores/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yZXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Conductores/Edit.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Conductores/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yZXNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Conductores/Index.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Conductores/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZHVjdG9yZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Filtros/Index.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Filtros/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmlsdHJvc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Home/Index.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Home/Privacy.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Shared/Error.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Ordenes/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZW5lc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Ordenes/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZW5lc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Shared/_LoginPartial.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Shared/_LoginPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Shared/_ValidationScriptsPartial.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Solicitudes/AsignarFlota.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Solicitudes/AsignarFlota.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU29saWNpdHVkZXNcQXNpZ25hckZsb3RhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Solicitudes/Details.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Solicitudes/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU29saWNpdHVkZXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Solicitudes/Index.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Solicitudes/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU29saWNpdHVkZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Solicitudes/RegistrarServicio.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Solicitudes/RegistrarServicio.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU29saWNpdHVkZXNcUmVnaXN0cmFyU2VydmljaW8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Unidades/Create.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Unidades/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVW5pZGFkZXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Unidades/Edit.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Unidades/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVW5pZGFkZXNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Unidades/Index.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Unidades/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVW5pZGFkZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Unidades/TestIndex.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Unidades/TestIndex.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVW5pZGFkZXNcVGVzdEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/_ViewImports.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/_ViewStart.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/corre/OneDrive/Escritorio/iniciodiseño/Control_flota/Views/Shared/_Layout.cshtml]
+[D:/PROYECTO SOFT 2 NUEVO/Control_flota/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-f1k3rq2i7v

@@ -1,0 +1,41 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Orden>
+
+@{
+    ViewData["Title"] = "Órdenes";
+}
+
+<h1>Órdenes</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Fecha Emisión</th>
+            <th>Cliente</th>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var orden in Model)
+    {
+        <tr>
+            <td>@orden.Codigo</td>
+            <td>@orden.FechaEmision.ToString("g")</td>
+            <td>@orden.Cliente?.Nombre</td>
+            <td>@orden.Origen</td>
+            <td>@orden.Destino</td>
+            <td>@orden.Estado</td>
+            <td>
+                <a class="btn btn-info btn-sm" href="@Url.Action("Details", "Ordenes", new { id = orden.Id })">Ver</a>
+                <form method="post" asp-action="Eliminar" asp-route-id="@orden.Id" style="display:inline; margin-left:6px;" onsubmit="return confirm('¿Eliminar esta orden? Esta acción no se puede deshacer.');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

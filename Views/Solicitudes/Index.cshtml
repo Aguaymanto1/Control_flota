@@ -26,6 +26,9 @@
             <th>Cliente</th>
             <th>Origen</th>
             <th>Destino</th>
+            <th>Conductor</th>
+            <th>Placa</th>
+            <th>Orden Generada</th>
             <th>Estado</th>
             <th>Acciones</th>
         </tr>
@@ -35,9 +38,25 @@
         {
             <tr>
                 <td>@solicitud.Codigo</td>
-                <td>@solicitud.Cliente.Nombre</td>
+                <td>@(solicitud.Cliente?.Nombre ?? "-")</td>
                 <td>@solicitud.Origen</td>
                 <td>@solicitud.Destino</td>
+                <td>@(solicitud.Conductor != null ? (solicitud.Conductor.Nombres + " " + solicitud.Conductor.Apellidos) : "-")</td>
+                <td>@(solicitud.Unidad != null ? solicitud.Unidad.Placa : "-")</td>
+                <td>
+                    @{
+                        var ids = ViewBag.OrdenesEmitidasIds as HashSet<int>;
+                        bool tiene = ids != null && ids.Contains(solicitud.Id);
+                    }
+                    @if(tiene)
+                    {
+                        <span class="badge bg-success">Emitida</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No emitida</span>
+                    }
+                </td>
                 <td>@solicitud.EstadoSolicitud</td>
                 <td>
                     <a asp-action="AsignarFlota"
