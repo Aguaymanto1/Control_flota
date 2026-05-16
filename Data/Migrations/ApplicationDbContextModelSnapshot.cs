@@ -17,6 +17,253 @@ namespace Control_flota.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.15");
 
+            modelBuilder.Entity("Control_flota.Models.Operaciones.Cliente", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Direccion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Ruc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Telefono")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Clientes");
+                });
+
+            modelBuilder.Entity("Control_flota.Models.Operaciones.Conductor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Actividad")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Apellidos")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CategoriaLicencia")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Celular")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Dni")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EstadoOperativo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Nombres")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NumeroLicencia")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("VencimientoLicencia")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Dni")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("NumeroLicencia")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("Conductores");
+                });
+
+            modelBuilder.Entity("Control_flota.Models.Operaciones.Orden", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Destino")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NombreConductor")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Origen")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PlacaCamion")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SolicitudServicioId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
+                    b.ToTable("Ordenes");
+                });
+
+            modelBuilder.Entity("Control_flota.Models.Operaciones.SolicitudServicio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Codigo")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ConductorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Destino")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EstadoSolicitud")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaDespacho")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Origen")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("PesoKg")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("TipoCarga")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("UnidadId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
+
+                    b.HasIndex("ConductorId");
+
+                    b.HasIndex("UnidadId");
+
+                    b.ToTable("SolicitudesServicio");
+                });
+
+            modelBuilder.Entity("Control_flota.Models.Operaciones.Unidad", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Actividad")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Anio")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("CapacidadKg")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EstadoOperativo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Modelo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Placa")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("VencimientoMtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("VencimientoRevisionTecnica")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("VencimientoSoat")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Placa")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("Unidades");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -213,6 +460,40 @@ namespace Control_flota.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Control_flota.Models.Operaciones.Orden", b =>
+                {
+                    b.HasOne("Control_flota.Models.Operaciones.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+                });
+
+            modelBuilder.Entity("Control_flota.Models.Operaciones.SolicitudServicio", b =>
+                {
+                    b.HasOne("Control_flota.Models.Operaciones.Cliente", "Cliente")
+                        .WithMany("SolicitudesServicio")
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Control_flota.Models.Operaciones.Conductor", "Conductor")
+                        .WithMany()
+                        .HasForeignKey("ConductorId");
+
+                    b.HasOne("Control_flota.Models.Operaciones.Unidad", "Unidad")
+                        .WithMany()
+                        .HasForeignKey("UnidadId");
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Conductor");
+
+                    b.Navigation("Unidad");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -262,6 +543,11 @@ namespace Control_flota.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Control_flota.Models.Operaciones.Cliente", b =>
+                {
+                    b.Navigation("SolicitudesServicio");
                 });
 #pragma warning restore 612, 618
         }
