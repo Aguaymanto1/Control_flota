@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Control_flota.Models.Login;
 
 namespace Control_flota.Models.Operaciones;
 
@@ -36,4 +37,10 @@ public class Conductor
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
     public string Actividad { get; set; } = "Libre";
+
+        // Relación con ApplicationUser(Usuario)
+        public string? UserId { get; set; }
+   
+ 
+
 }

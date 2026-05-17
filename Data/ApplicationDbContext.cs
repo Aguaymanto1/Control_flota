@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Control_flota.Models.Operaciones;
+using Control_flota.Models.Login;
 
 namespace Control_flota.Data;
 
-public class ApplicationDbContext : IdentityDbContext
+public class ApplicationDbContext : IdentityDbContext<Usuario>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -42,5 +43,11 @@ public class ApplicationDbContext : IdentityDbContext
         builder.Entity<Orden>()
             .HasIndex(o => o.Codigo)
             .IsUnique();
+
+        builder.Entity<Usuario>()
+            .HasOne(u => u.Conductor)
+            .WithMany()
+            .HasForeignKey(u => u.ConductorId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

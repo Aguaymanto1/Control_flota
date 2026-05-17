@@ -1,0 +1,40 @@
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+# Archivos temporales genéricos
+*.tmp
+*.temp
+*.bak
+*.backup
+*.cache
+*.log
+*.old
+*.orig
+
+# Archivos de respaldo automáticos
+*~
+*.swp
+*.sw
+
+# C/C++
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+dist/
+build/
+out/
+release/
+debug/
+*.min.js
+*.min.css
+*.bundle.js
