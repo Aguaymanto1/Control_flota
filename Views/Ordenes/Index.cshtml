@@ -1,41 +1,315 @@
 @model IEnumerable<Control_flota.Models.Operaciones.Orden>
 
 @{
-    ViewData["Title"] = "Órdenes";
+    ViewData["Title"] = "Despacho";
 }
 
-<h1>Órdenes</h1>
+<div class="dispatch-container">
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Código</th>
-            <th>Fecha Emisión</th>
-            <th>Cliente</th>
-            <th>Origen</th>
-            <th>Destino</th>
-            <th>Estado</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach(var orden in Model)
-    {
-        <tr>
-            <td>@orden.Codigo</td>
-            <td>@orden.FechaEmision.ToString("g")</td>
-            <td>@orden.Cliente?.Nombre</td>
-            <td>@orden.Origen</td>
-            <td>@orden.Destino</td>
-            <td>@orden.Estado</td>
-            <td>
-                <a class="btn btn-info btn-sm" href="@Url.Action("Details", "Ordenes", new { id = orden.Id })">Ver</a>
-                <form method="post" asp-action="Eliminar" asp-route-id="@orden.Id" style="display:inline; margin-left:6px;" onsubmit="return confirm('¿Eliminar esta orden? Esta acción no se puede deshacer.');">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                </form>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+    <!-- HEADER -->
+    <div class="dispatch-header">
+
+        <div>
+            <h1 class="dispatch-title">
+                Centro de Despacho
+            </h1>
+
+            <p class="dispatch-subtitle">
+                Gestión de órdenes y solicitudes
+            </p>
+        </div>
+
+        <button type="button"
+                class="btn btn-success btn-lg"
+                data-bs-toggle="modal"
+                data-bs-target="#nuevaSolicitudModal">
+
+            <i class="fa-solid fa-plus"></i>
+            Nueva Solicitud
+
+        </button>
+
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filter-card">
+
+        <form method="get" class="filter-form">
+
+            <!-- BUSCADOR -->
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="text"
+                       name="buscar"
+                       class="form-control"
+                       placeholder="Buscar por cliente, origen o destino..." />
+
+            </div>
+
+            <!-- FILTROS DE PESO -->
+            <div class="weight-filters">
+
+                <button type="submit"
+                        name="peso"
+                        value=""
+                        class="weight-btn">
+
+                    Todos
+                </button>
+
+                <button type="submit"
+                        name="peso"
+                        value="2000"
+                        class="weight-btn">
+
+                    2T
+                </button>
+
+                <button type="submit"
+                        name="peso"
+                        value="5000"
+                        class="weight-btn">
+
+                    5T
+                </button>
+
+                <button type="submit"
+                        name="peso"
+                        value="10000"
+                        class="weight-btn">
+
+                    10T
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-card">
+
+        <table class="table align-middle">
+
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var orden in Model)
+                {
+                    <tr>
+
+                        <td>
+                            <strong>@orden.Codigo</strong>
+                        </td>
+
+                        <td>
+                            @orden.FechaEmision.ToString("g")
+                        </td>
+
+                        <td>
+                            @orden.Cliente?.Nombre
+                        </td>
+
+                        <td>
+                            @orden.Origen
+                        </td>
+
+                        <td>
+                            @orden.Destino
+                        </td>
+
+                        <td>
+
+                            @if (orden.Estado == "Emitida")
+                            {
+                                <span class="badge bg-success">
+                                    Emitida
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    @orden.Estado
+                                </span>
+                            }
+
+                        </td>
+
+                        <td>
+
+                            <a class="btn btn-info btn-sm"
+                               href="@Url.Action("Details", "Ordenes", new { id = orden.Id })">
+
+                                <i class="fa-solid fa-eye"></i>
+                                Ver
+
+                            </a>
+
+                            <form method="post"
+                                  asp-action="Eliminar"
+                                  asp-route-id="@orden.Id"
+                                  style="display:inline-block;">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('¿Eliminar esta orden?');">
+
+                                    <i class="fa-solid fa-trash"></i>
+
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- MODAL NUEVA SOLICITUD -->
+<div class="modal fade"
+     id="nuevaSolicitudModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Registrar Nueva Solicitud
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <form method="post"
+                  asp-controller="Solicitudes"
+                  asp-action="RegistrarServicio">
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label>Cliente</label>
+
+                        <select name="ClienteId"
+                                class="form-control"
+                                required>
+
+                            <option value="">
+                                Seleccione un cliente
+                            </option>
+
+                            @foreach (var cliente in ViewBag.Clientes)
+                            {
+                                <option value="@cliente.Id">
+                                    @cliente.Nombre
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Origen</label>
+
+                        <input type="text"
+                               name="Origen"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Destino</label>
+
+                        <input type="text"
+                               name="Destino"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Peso (Kg)</label>
+
+                        <input type="number"
+                               step="0.01"
+                               name="PesoKg"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Tipo de Carga</label>
+
+                        <select name="TipoCarga"
+                                class="form-control"
+                                required>
+
+                            <option value="">
+                                Seleccione tipo de carga
+                            </option>
+
+                            @foreach (var tipo in ViewBag.TipoCargaOptions)
+                            {
+                                <option value="@tipo">
+                                    @tipo
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Guardar Solicitud
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>

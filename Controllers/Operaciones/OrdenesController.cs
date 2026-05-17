@@ -15,6 +15,16 @@ public class OrdenesController : Controller
     // Lista general de órdenes
     public async Task<IActionResult> Index()
     {
+
+        ViewBag.Clientes = _context.Clientes.ToList();
+
+        ViewBag.TipoCargaOptions = new List<string>
+        {
+            "Carga General",
+            "Carga Refrigerada",
+            "Carga Peligrosa"
+        };
+
         var ordenes = await _context.Ordenes
             .Include(o => o.Cliente)
             .OrderByDescending(o => o.FechaEmision)

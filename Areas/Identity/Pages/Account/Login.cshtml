@@ -1,83 +1,292 @@
-﻿@page
-@model LoginModel
-
+﻿@page 
+@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.LoginModel
 @{
     ViewData["Title"] = "Log in";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+<div class="login-page">
+    <div class="login-container">
+
+        <!-- LADO IZQUIERDO -->
+        <div class="login-left">
+            <div class="brand">
+                <div class="brand-dot"></div>
+                <span>De La Sota</span>
+            </div>
+
+            <div class="login-content">
+                <p class="mini-text">BIENVENIDO</p>
+
+                <h1 class="login-title">
+                    Inicia sesión en tu cuenta<span>.</span>
+                </h1>
+
+                <p class="login-subtitle">
+                    Ingresa tus datos para continuar
+                </p>
+
+                <form id="account" method="post">
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                    <!-- CORREO -->
+                    <div class="input-group-custom">
+                        <label>Correo electrónico</label>
+                        <input name="Input.Email"
+                               type="email"
+                               class="custom-input"
+                               placeholder="correo@ejemplo.com"
+                               required />
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+
+                    <!-- CONTRASEÑA -->
+                    <div class="input-group-custom">
+                        <label>Contraseña</label>
+                        <input name="Input.Password"
+                               type="password"
+                               class="custom-input"
+                               placeholder="********"
+                               required />
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        Ingresar
+                    </button>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="error-msg">
+                            Credenciales incorrectas
                         </div>
-                    </form>
-                }
-            }
-        </section>
+                    }
+
+                </form>
+            </div>
+        </div>
+
+        <!-- LADO DERECHO -->
+        <div class="login-right">
+            <div class="overlay"></div>
+
+            <div class="right-content">
+                <h2>Sistema de Gestión</h2>
+                <p>
+                    Plataforma moderna y segura para administrar tu sistema.
+                </p>
+            </div>
+        </div>
+
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #1c2230, #2f3548);
+        min-height: 100vh;
+    }
+
+    .login-page {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 1200px;
+        min-height: 700px;
+        background: #141a2e;
+        border-radius: 28px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+
+    /* IZQUIERDA */
+
+    .login-left {
+        padding: 45px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: #141a2e;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .brand-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #1e88ff;
+    }
+
+    .login-content {
+        max-width: 420px;
+    }
+
+    .mini-text {
+        color: #8fa3c7;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+    }
+
+    .login-title {
+        color: white;
+        font-size: 3rem;
+        line-height: 1.2;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+        .login-title span {
+            color: #1e88ff;
+        }
+
+    .login-subtitle {
+        color: #a7b1c5;
+        margin-bottom: 35px;
+        font-size: 0.95rem;
+    }
+
+    /* INPUTS */
+
+    .input-group-custom {
+        margin-bottom: 22px;
+    }
+
+        .input-group-custom label {
+            display: block;
+            color: #c7d0df;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+    .custom-input {
+        width: 100%;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        height: 55px;
+        border-radius: 14px;
+        padding: 0 18px;
+        color: white;
+        outline: none;
+        transition: 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+        .custom-input::placeholder {
+            color: #7f8aa3;
+        }
+
+        .custom-input:focus {
+            border-color: #1e88ff;
+            box-shadow: 0 0 0 4px rgba(30,136,255,0.15);
+        }
+
+    /* BOTÓN */
+
+    .btn-login {
+        width: 100%;
+        height: 55px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1e88ff, #0066ff);
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s ease;
+    }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(30,136,255,0.25);
+        }
+
+    .error-msg {
+        margin-top: 20px;
+        color: #ff8a8a;
+        font-size: 0.9rem;
+    }
+
+    /* DERECHA */
+
+    .login-right {
+        position: relative;
+        background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(12, 18, 38, 0.72);
+    }
+
+    .right-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 60px;
+        color: white;
+    }
+
+        .right-content h2 {
+            font-size: 2.3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .right-content p {
+            color: #d3dbeb;
+            line-height: 1.6;
+            max-width: 420px;
+        }
+
+    /* RESPONSIVE */
+
+    @@media(max-width: 900px) {
+
+        .login-container {
+            grid-template-columns: 1fr;
+        }
+
+        .login-right {
+            display: none;
+        }
+
+        .login-left {
+            padding: 40px 30px;
+        }
+
+        .login-title {
+            font-size: 2.2rem;
+        }
+    }
+</style>

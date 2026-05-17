@@ -16,7 +16,13 @@
 <a href="@Url.Action("RegistrarCliente", "Clientes")" class="btn btn-success">Registrar Nuevo Cliente</a>
 </p>
 <p>
-    <a href="@Url.Action("RegistrarServicio", "Solicitudes")" class="btn btn-success">Registrar Nueva Solicitud</a>
+    <button type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#nuevaSolicitudModal">
+
+        Registrar Nueva Solicitud
+    </button>
 </p>
 
 <table class="table">
@@ -74,3 +80,126 @@
         }
     </tbody>
 </table>
+
+<!-- MODAL NUEVA SOLICITUD -->
+<div class="modal fade"
+     id="nuevaSolicitudModal"
+     tabindex="-1"
+     aria-labelledby="nuevaSolicitudModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="nuevaSolicitudModalLabel">
+                    Registrar Nueva Solicitud
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <form method="post"
+                  asp-controller="Solicitudes"
+                  asp-action="RegistrarServicio">
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+
+                        <select name="ClienteId" class="form-control" required>
+
+                            <option value="">
+                                Seleccione un cliente
+                            </option>
+
+                            @foreach (var cliente in ViewBag.Clientes)
+                            {
+                                <option value="@cliente.Id">
+                                    @cliente.Nombre
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Origen</label>
+
+                        <input type="text"
+                               name="Origen"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Destino</label>
+
+                        <input type="text"
+                               name="Destino"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Peso (Kg)</label>
+
+                        <input type="number"
+                               step="0.01"
+                               name="PesoKg"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Carga</label>
+
+                        <select name="TipoCarga"
+                                class="form-control"
+                                required>
+
+                            <option value="">
+                                Seleccione el tipo de carga
+                            </option>
+
+                            @foreach (var tipo in ViewBag.TipoCargaOptions)
+                            {
+                                <option value="@tipo">
+                                    @tipo
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Guardar Solicitud
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
