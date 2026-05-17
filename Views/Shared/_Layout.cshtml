@@ -4,74 +4,232 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Control_flota</title>
+
     <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Control_flota.styles.css" asp-append-version="true" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Control_flota</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <!-- Enlace a Unidades (registrar flota) -->
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Unidades" asp-action="Index">Unidades</a>
-            </li>
 
-            <!-- Enlace a Conductores (registrar conductores) -->
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Conductores" asp-action="Index">Conductores</a>
-            </li>
+    <div class="layout-wrapper">
 
-            <!-- Enlace a Solicitudes -->
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Solicitudes" asp-action="Index">Solicitudes</a>
-            </li>
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
 
-            <!-- Enlace a Órdenes -->
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Ordenes" asp-action="Index">Órdenes</a>
-            </li>
+            <div class="sidebar-top">
 
-            <!-- Enlace a Filtros -->
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Filtros" asp-action="Index">Filtros</a>
-            </li>
-                    
-                    
-                    </ul>
-                    <partial name="_LoginPartial" />
+                <div class="logo">
+                    <i class="fa-solid fa-truck"></i>
+                    <span>FleetOps Pro</span>
+                </div>
+
+                <div class="sidebar-menu">
+
+                    <!-- PANEL -->
+                    <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+                    asp-area=""
+                    asp-controller="Home"
+                    asp-action="Index">
+
+                        <div class="menu-left">
+                            <i class="fa-solid fa-table-cells-large"></i>
+                            <span>Panel</span>
+                        </div>
+                    </a>
+
+                    <!-- FLOTA -->
+                    <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Unidades" ? "active" : "")"
+                    asp-area=""
+                    asp-controller="Unidades"
+                    asp-action="Index">
+
+                        <div class="menu-left">
+                            <i class="fa-solid fa-truck"></i>
+                            <span>Flota</span>
+                        </div>
+
+                        <div class="badge-menu">3</div>
+                    </a>
+
+                    <!-- CONDUCTORES -->
+                    <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Conductores" ? "active" : "")"
+                    asp-area=""
+                    asp-controller="Conductores"
+                    asp-action="Index">
+
+                        <div class="menu-left">
+                            <i class="fa-regular fa-user"></i>
+                            <span>Conductores</span>
+                        </div>
+                    </a>
+
+                    <!-- DESPACHO -->
+                    <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Ordenes" ? "active" : "")"
+                    asp-area=""
+                    asp-controller="Ordenes"
+                    asp-action="Index">
+
+                        <div class="menu-left">
+                            <i class="fa-regular fa-paper-plane"></i>
+                            <span>Despacho</span>
+                        </div>
+
+                        <div class="badge-menu">5</div>
+                    </a>
+
+                    <!-- RASTREO -->
+                    <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Rastreo" ? "active" : "")"
+                    asp-area=""
+                    asp-controller=""
+                    asp-action="Index">
+
+                        <div class="menu-left">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>Rastreo</span>
+                        </div>
+                    </a>
+
+                    <!-- FINANZAS -->
+                    <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Finanzas" ? "active" : "")"
+                    asp-area=""
+                    asp-controller=""
+                    asp-action="Index">
+
+                        <div class="menu-left">
+                            <i class="fa-solid fa-filter"></i>
+                            <span>Finanzas</span>
+                        </div>
+
+                        <div class="badge-menu">2</div>
+                    </a>
+
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+            <div class="sidebar-bottom">
+
+                <div class="menu-item">
+                    <div class="menu-left">
+                        <i class="fa-regular fa-bell"></i>
+                        <span>Notificaciones</span>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-left">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Configuración</span>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <div class="menu-left">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span>Contraer</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </aside>
+
+        <!-- CONTENIDO -->
+        <div class="main-content">
+
+            <!-- NAVBAR ORIGINAL -->
+            <header>
+                <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                    <div class="container-fluid">
+
+                        <a class="navbar-brand"
+                        asp-area=""
+                        asp-controller="Home"
+                        asp-action="Index">
+                            Control_flota
+                        </a>
+
+                        <button class="navbar-toggler"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target=".navbar-collapse"
+                                aria-controls="navbarSupportedContent"
+                                aria-expanded="false"
+                                aria-label="Toggle navigation">
+
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                            <ul class="navbar-nav flex-grow-1">
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                    asp-area=""
+                                    asp-controller="Home"
+                                    asp-action="Index">
+                                        Home
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                    asp-area=""
+                                    asp-controller="Home"
+                                    asp-action="Privacy">
+                                        Privacy
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                            <partial name="_LoginPartial" />
+
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="container">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    &copy; 2026 - Control_flota -
+                    <a asp-area=""
+                    asp-controller="Home"
+                    asp-action="Privacy">
+                        Privacy
+                    </a>
+                </div>
+            </footer>
+
+        </div>
+
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Control_flota - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

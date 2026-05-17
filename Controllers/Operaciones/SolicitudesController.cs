@@ -84,7 +84,7 @@ public class SolicitudesController : Controller
     }
 
     // Método para mostrar la lista de solicitudes
-   public async Task<IActionResult> Index()
+public async Task<IActionResult> Index()
 {
     var solicitudes = await _context.Set<SolicitudServicio>()
         .Include(s => s.Cliente)
@@ -99,6 +99,17 @@ public class SolicitudesController : Controller
         .ToListAsync();
 
     ViewBag.OrdenesEmitidasIds = new HashSet<int>(ordenesEmitidas);
+
+    // CLIENTES PARA EL MODAL
+    ViewBag.Clientes = _context.Clientes.ToList();
+
+    // TIPOS DE CARGA PARA EL MODAL
+    ViewBag.TipoCargaOptions = new List<string>
+    {
+        "Carga General",
+        "Carga Refrigerada",
+        "Carga Peligrosa"
+    };
 
     return View(solicitudes);
 }

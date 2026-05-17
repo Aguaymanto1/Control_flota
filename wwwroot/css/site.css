@@ -1,31 +1,374 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
+/* ===== TIPOGRAFIA GENERAL ===== */
 
 body {
-  margin-bottom: 60px;
+    font-family: "Inter", sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+/* ===== LAYOUT ===== */
+
+.layout-wrapper {
+    display: flex;
+    min-height: 100vh;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* ===== SIDEBAR ===== */
+
+.sidebar {
+    width: 260px;
+    background: #f4eef1;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid #ddd;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #111;
+}
+
+.logo i {
+    background: #0d8bff;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 20px;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 12px;
+    color: #555;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.menu-item:hover {
+    background: #e5e5e5;
+    color: #111;
+}
+
+.menu-item.active {
+    background: #0d8bff;
+    color: white;
+}
+
+.menu-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+}
+
+.badge-menu {
+    background: #e5dde1;
+    color: #666;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ===== MAIN CONTENT ===== */
+
+.main-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+}
+
+/* ===== FOOTER ===== */
+
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+}
+
+/* ===== DESPACHO ===== */
+
+.dispatch-container {
+    padding: 20px;
+}
+
+/* HEADER */
+
+.dispatch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.dispatch-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 5px;
+}
+
+.dispatch-subtitle {
+    color: #6b7280;
+    font-size: 16px;
+}
+
+/* BOTON NUEVA SOLICITUD */
+
+.btn-success.btn-lg {
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* TARJETA FILTRO */
+
+.filter-card {
+    background: white;
+    border-radius: 22px;
+    padding: 22px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
+}
+
+/* BUSCADOR */
+
+.search-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-box i {
+    position: absolute;
+    top: 17px;
+    left: 16px;
+    color: #9ca3af;
+    font-size: 15px;
+}
+
+.search-box input {
+    height: 55px;
+    border-radius: 14px;
+    border: 1px solid #ddd;
+    padding-left: 45px;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.search-box input:focus {
+    border-color: #0d8bff;
+    box-shadow: 0 0 0 0.2rem rgba(13,139,255,0.15);
+}
+
+/* BOTONES FILTRO */
+
+.weight-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.weight-btn {
+    border: none;
+    background: #f3f4f6;
+    color: #374151;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.weight-btn:hover {
+    background: #0d8bff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* TABLA */
+
+.table-card {
+    background: white;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead {
+    background: #f9fafb;
+}
+
+.table thead th {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 18px;
+    font-size: 14px;
+    color: #374151;
+    font-weight: 700;
+}
+
+.table tbody td {
+    padding: 18px;
+    vertical-align: middle;
+    border-color: #f1f1f1;
+}
+
+.table tbody tr {
+    transition: 0.2s;
+}
+
+.table tbody tr:hover {
+    background: #f9fbff;
+}
+
+/* BADGES */
+
+.badge {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* BOTONES ACCIONES */
+
+.btn-info.btn-sm,
+.btn-danger.btn-sm {
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-weight: 600;
+}
+
+.btn-info.btn-sm {
+    margin-right: 5px;
+}
+
+/* MODAL */
+
+.modal-content {
+    border-radius: 22px;
+    border: none;
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid #eee;
+    padding: 20px 25px;
+}
+
+.modal-title {
+    font-weight: 700;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    border-top: 1px solid #eee;
+    padding: 20px 25px;
+}
+
+/* INPUTS MODAL */
+
+.modal .form-control {
+    border-radius: 12px;
+    height: 48px;
+}
+
+.modal select.form-control {
+    height: 48px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+
+    .dispatch-title {
+        font-size: 36px;
+    }
+
+    .dispatch-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .weight-filters {
+        width: 100%;
+    }
+
+    .weight-btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* ===== TITULOS GENERALES ===== */
+
+h1 {
+    font-size: 48px;
+    font-weight: 800;
+    color: #1f2937;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+h4, h5, h6 {
+    font-weight: 600;
+    color: #374151;
 }
