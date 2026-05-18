@@ -1,0 +1,52 @@
+@model Control_flota.Models.Operaciones.Inspeccion
+
+<h2>Inspección Técnica SST</h2>
+
+<form method="post">
+
+    <div class="mb-3">
+    <label><strong>Luces</strong></label><br />
+
+    <input type="radio" name="Luces" value="Cumple" required />
+    <label>Cumple</label>
+
+    <input type="radio" name="Luces" value="No Cumple" />
+    <label>No Cumple</label>
+</div>
+
+<div class="mb-3">
+    <label><strong>Llantas</strong></label><br />
+
+    <input type="radio" name="Llantas" value="Cumple" required />
+    <label>Cumple</label>
+
+    <input type="radio" name="Llantas" value="No Cumple" />
+    <label>No Cumple</label>
+</div>
+
+<div class="mb-3">
+    <label><strong>Frenos</strong></label><br />
+
+    <input type="radio" name="Frenos" value="Cumple" required />
+    <label>Cumple</label>
+
+    <input type="radio" name="Frenos" value="No Cumple" />
+    <label>No Cumple</label>
+</div>
+
+<div class="mb-3">
+    <label><strong>Fluidos</strong></label><br />
+
+    <input type="radio" name="Fluidos" value="Cumple" required />
+    <label>Cumple</label>
+
+    <input type="radio" name="Fluidos" value="No Cumple" />
+    <label>No Cumple</label>
+</div>
+
+    <button type="submit"
+            class="btn btn-success">
+        Registrar Inspección
+    </button>
+
+</form>

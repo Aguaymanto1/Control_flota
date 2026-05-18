@@ -1,0 +1,205 @@
+@model IEnumerable<Control_flota.Models.Operaciones.SolicitudServicio>
+
+@{
+    ViewData["Title"] = "Solicitudes de Servicio";
+}
+
+<h1>Solicitudes de Servicio</h1>
+
+<p>
+    <form method="get" asp-action="Index">
+        <input type="text" name="cliente" placeholder="Buscar cliente..." />
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+</p>
+<p>
+<a href="@Url.Action("RegistrarCliente", "Clientes")" class="btn btn-success">Registrar Nuevo Cliente</a>
+</p>
+<p>
+    <button type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#nuevaSolicitudModal">
+
+        Registrar Nueva Solicitud
+    </button>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Cliente</th>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Conductor</th>
+            <th>Placa</th>
+            <th>Orden Generada</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var solicitud in Model)
+        {
+            <tr>
+                <td>@solicitud.Codigo</td>
+                <td>@(solicitud.Cliente?.Nombre ?? "-")</td>
+                <td>@solicitud.Origen</td>
+                <td>@solicitud.Destino</td>
+                <td>@(solicitud.Conductor != null ? (solicitud.Conductor.Nombres + " " + solicitud.Conductor.Apellidos) : "-")</td>
+                <td>@(solicitud.Unidad != null ? solicitud.Unidad.Placa : "-")</td>
+                <td>
+                    @{
+                        var ids = ViewBag.OrdenesEmitidasIds as HashSet<int>;
+                        bool tiene = ids != null && ids.Contains(solicitud.Id);
+                    }
+                    @if(tiene)
+                    {
+                        <span class="badge bg-success">Emitida</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No emitida</span>
+                    }
+                </td>
+                <td>@solicitud.EstadoSolicitud</td>
+                <td>
+                    <a asp-action="AsignarFlota"
+                        asp-route-id="@solicitud.Id"
+                            class="btn btn-primary btn-sm">Asignar Flota</a>
+                    <a href="@Url.Action("Details", new { id = solicitud.Id })" class="btn btn-info">Ver Detalles</a>
+
+                    <form method="post" asp-action="Eliminar" asp-route-id="@solicitud.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta solicitud?')">Eliminar</button>
+                    </form>
+
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- MODAL NUEVA SOLICITUD -->
+<div class="modal fade"
+     id="nuevaSolicitudModal"
+     tabindex="-1"
+     aria-labelledby="nuevaSolicitudModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="nuevaSolicitudModalLabel">
+                    Registrar Nueva Solicitud
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <form method="post"
+                  asp-controller="Solicitudes"
+                  asp-action="RegistrarServicio">
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+
+                        <select name="ClienteId" class="form-control" required>
+
+                            <option value="">
+                                Seleccione un cliente
+                            </option>
+
+                            @foreach (var cliente in ViewBag.Clientes)
+                            {
+                                <option value="@cliente.Id">
+                                    @cliente.Nombre
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Origen</label>
+
+                        <input type="text"
+                               name="Origen"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Destino</label>
+
+                        <input type="text"
+                               name="Destino"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Peso (Kg)</label>
+
+                        <input type="number"
+                               step="0.01"
+                               name="PesoKg"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Carga</label>
+
+                        <select name="TipoCarga"
+                                class="form-control"
+                                required>
+
+                            <option value="">
+                                Seleccione el tipo de carga
+                            </option>
+
+                            @foreach (var tipo in ViewBag.TipoCargaOptions)
+                            {
+                                <option value="@tipo">
+                                    @tipo
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        Guardar Solicitud
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

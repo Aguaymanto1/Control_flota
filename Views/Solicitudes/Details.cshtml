@@ -1,0 +1,57 @@
+@model Control_flota.Models.Operaciones.SolicitudServicio
+
+@{
+    ViewData["Title"] = "Detalles de Solicitud";
+}
+
+<h1>Detalles de Solicitud</h1>
+
+<div>
+    <strong>Código:</strong> @Model.Codigo
+</div>
+<div>
+    <strong>Cliente:</strong> @(Model.Cliente?.Nombre ?? "-")
+</div>
+<div>
+    <strong>Origen:</strong> @Model.Origen
+</div>
+<div>
+    <strong>Destino:</strong> @Model.Destino
+</div>
+<div>
+    <strong>Tipo de Carga:</strong> @Model.TipoCarga
+</div>
+<div>
+    <strong>Peso (kg):</strong> @Model.PesoKg
+</div>
+<div>
+    <strong>Estado:</strong> @Model.EstadoSolicitud
+</div>
+
+@if(TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@{
+    var ordenId = ViewBag.OrdenId as int?;
+}
+
+@if(ordenId != null)
+{
+    <a class="btn btn-success" href="@Url.Action("Details", "Ordenes", new { id = ordenId })">Ver detalle de la Orden</a>
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Volver</a>
+}
+else if(Model.EstadoSolicitud == "Asignado")
+{
+    <form asp-action="GenerarOrden" method="post" onsubmit="return confirm('¿Generar orden a partir de esta solicitud?');">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-primary">Generar Orden</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary">Volver</a>
+    </form>
+}
+else
+{
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Volver</a>
+}

@@ -1,0 +1,133 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Control_flota.Models.Login;
+
+@inject SignInManager<Usuario> SignInManager
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FleetOps Pro</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="layout-wrapper">
+
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <aside class="sidebar">
+                <div class="sidebar-top">
+                    <div class="logo">
+                        <i class="fa-solid fa-truck"></i>
+                        <span>FleetOps Pro</span>
+                    </div>
+
+                    <div class="sidebar-menu">
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")" 
+                           asp-area="" asp-controller="Admin" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-solid fa-table-cells-large"></i>
+                                <span>Panel</span>
+                            </div>
+                        </a>
+
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Unidades" ? "active" : "")" 
+                           asp-area="" asp-controller="Unidades" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-solid fa-truck"></i>
+                                <span>Flota</span>
+                            </div>
+                            <div class="badge-menu">3</div>
+                        </a>
+
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Conductores" ? "active" : "")" 
+                           asp-area="" asp-controller="Conductores" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-regular fa-user"></i>
+                                <span>Conductores</span>
+                            </div>
+                        </a>
+
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Ordenes" ? "active" : "")" 
+                           asp-area="" asp-controller="Ordenes" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-regular fa-paper-plane"></i>
+                                <span>Despacho</span>
+                            </div>
+                            <div class="badge-menu">5</div>
+                        </a>
+
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Rastreo" ? "active" : "")" 
+                           asp-area="" asp-controller="Rastreo" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span>Rastreo</span>
+                            </div>
+                        </a>
+
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Finanzas" ? "active" : "")" 
+                           asp-area="" asp-controller="Finanzas" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-solid fa-filter"></i>
+                                <span>Finanzas</span>
+                            </div>
+                            <div class="badge-menu">2</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sidebar-bottom">
+                    <div class="menu-item" style="cursor: pointer;">
+                        <div class="menu-left">
+                            <i class="fa-regular fa-bell"></i>
+                            <span>Notificaciones</span>
+                        </div>
+                    </div>
+                    <div class="menu-item" style="cursor: pointer;">
+                        <div class="menu-left">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Configuración</span>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+        }
+
+        <div class="main-content">
+            
+            <header class="navbar-custom">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div>
+                        <h5 class="m-0 fw-bold text-dark">@ViewData["Title"]</h5> 
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <partial name="_LoginPartial" />
+                    </div>
+                </div>
+            </header>
+
+            <div class="workspace-container">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <footer class="py-3 text-center text-muted bg-white border-top mt-auto">
+                <small>&copy; 2026 - FleetOps Pro - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none">Privacidad</a></small>
+            </footer>
+
+        </div>
+    </div>
+</body>
+</html>

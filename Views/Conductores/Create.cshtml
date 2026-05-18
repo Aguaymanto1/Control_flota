@@ -1,0 +1,106 @@
+@model Control_flota.Models.Operaciones.Conductor
+
+@{
+    ViewData["Title"] = "Registrar Conductor";
+}
+
+<h1>Registrar Conductor</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label for="Dni">DNI</label>
+        <input type="text" asp-for="Dni" class="form-control" />
+        <span asp-validation-for="Dni" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Nombres">Nombres</label>
+        <input type="text" asp-for="Nombres" class="form-control" />
+        <span asp-validation-for="Nombres" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Apellidos">Apellidos</label>
+        <input type="text" asp-for="Apellidos" class="form-control" />
+        <span asp-validation-for="Apellidos" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Celular">Celular</label>
+        <input type="text" asp-for="Celular" class="form-control" />
+        <span asp-validation-for="Celular" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="NumeroLicencia">Número de Licencia</label>
+        <input type="text" asp-for="NumeroLicencia" class="form-control" />
+        <span asp-validation-for="NumeroLicencia" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="CategoriaLicencia">Categoría de Licencia</label>
+        <select asp-for="CategoriaLicencia" class="form-control">
+            <option value="A-IIb">A-IIb</option>
+            <option value="A-IIIb">A-IIIb</option>
+            <option value="A-IIIc">A-IIIc</option>
+        </select>
+        <span asp-validation-for="CategoriaLicencia" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="VencimientoLicencia">Vencimiento Licencia</label>
+        <input type="date" asp-for="VencimientoLicencia" class="form-control" />
+        <span asp-validation-for="VencimientoLicencia" class="text-danger"></span>
+    </div>
+
+    <!-- 🔴 NUEVOS CAMPOS PARA LOGIN -->
+    <hr />
+    <h4>Datos de Acceso al Sistema</h4>
+
+    <div class="form-group">
+        <label for="email">Correo Electrónico (Usuario)</label>
+        <input type="email" name="email" id="email" class="form-control" required />
+        <small class="form-text text-muted">Este será su usuario para iniciar sesión</small>
+        <span class="text-danger" id="email-error"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" name="password" id="password" class="form-control" required />
+        <small class="form-text text-muted">Mínimo 6 caracteres</small>
+    </div>
+
+    <div class="form-group">
+        <label for="confirmPassword">Confirmar Contraseña</label>
+        <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-success">Registrar Conductor</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Validación simple de contraseñas en el cliente
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 6 caracteres');
+                return false;
+            }
+        });
+    </script>
+}
