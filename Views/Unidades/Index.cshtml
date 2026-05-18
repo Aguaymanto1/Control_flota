@@ -42,13 +42,6 @@
                         @Html.AntiForgeryToken() <!-- Agregar el token de validación CSRF -->
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta unidad?');">Eliminar</button>
                     </form>
-
-<a asp-controller="Inspecciones"
-   asp-action="Create"
-   asp-route-placa="@unidad.Placa"
-   class="btn btn-info text-white">
-    Inspección
-</a>
                 </td>
             </tr>
         }

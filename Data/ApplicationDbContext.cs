@@ -17,8 +17,6 @@ public class ApplicationDbContext : IdentityDbContext<Usuario>
     public DbSet<SolicitudServicio> SolicitudesServicio => Set<SolicitudServicio>();
     public DbSet<Orden> Ordenes => Set<Orden>();
 
-    public DbSet<Inspeccion> Inspecciones { get; set; }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

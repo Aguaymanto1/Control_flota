@@ -176,44 +176,6 @@ namespace Control_flota.Migrations
                     b.ToTable("Conductores");
                 });
 
-            modelBuilder.Entity("Control_flota.Models.Operaciones.Inspeccion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EstadoVehiculo")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("FechaInspeccion")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Fluidos")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Frenos")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Llantas")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Luces")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Placa")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Inspecciones");
-                });
-
             modelBuilder.Entity("Control_flota.Models.Operaciones.Orden", b =>
                 {
                     b.Property<int>("Id")
@@ -452,9 +414,11 @@ namespace Control_flota.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderKey")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderDisplayName")
@@ -492,9 +456,11 @@ namespace Control_flota.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
