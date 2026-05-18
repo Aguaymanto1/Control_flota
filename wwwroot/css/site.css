@@ -1,31 +1,71 @@
-/* ===== TIPOGRAFIA GENERAL ===== */
-
+/* ==========================================================================
+   1. TIPOGRAFÍA Y BASES GENERALES
+   ========================================================================== */
 body {
     font-family: "Inter", sans-serif;
-    background: #f5f7fb;
+    background-color: #f8f9fa; /* Fondo gris claro limpio para el área de trabajo */
     color: #1f2937;
+    margin: 0;
+    padding: 0;
 }
-/* ===== LAYOUT ===== */
 
+/* Títulos Globales */
+h1 { font-size: 48px; font-weight: 800; color: #1f2937; letter-spacing: -1px; margin-bottom: 10px; }
+h2 { font-size: 34px; font-weight: 700; color: #1f2937; letter-spacing: -0.5px; margin-bottom: 10px; }
+h3 { font-size: 28px; font-weight: 700; color: #1f2937; }
+h4, h5, h6 { font-weight: 600; color: #374151; }
+
+/* ==========================================================================
+   2. LAYOUT ESTRUCTURAL (El acuerdo de convivencia)
+   ========================================================================== */
 .layout-wrapper {
     display: flex;
+    width: 100%;
     min-height: 100vh;
 }
 
-/* ===== SIDEBAR ===== */
+/* CONTENIDO PRINCIPAL (Desplazado al costado de forma predeterminada) */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    margin-left: 260px; /* Deja espacio exacto para el sidebar fijo */
+    width: calc(100% - 260px);
+    box-sizing: border-box;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
 
+/* CUANDO NO HAY SIDEBAR (Usuarios no autenticados o Landing Page) */
+.layout-wrapper:not(:has(.sidebar)) .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+.workspace-container {
+    padding: 30px;
+    flex-grow: 1;
+}
+
+/* ==========================================================================
+   3. SIDEBAR (BARRA LATERAL)
+   ========================================================================== */
 .sidebar {
     width: 260px;
-    background: #f4eef1;
-    padding: 20px 16px;
+    height: 100vh;
+    background-color: #f3f2f5; /* Color gris suave de tu foto */
+    position: fixed;
+    top: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-right: 1px solid #ddd;
-    position: fixed;
-    height: 100vh;
-    left: 0;
-    top: 0;
+    padding: 24px 16px;
+    border-right: 1px solid #e5e7eb;
+    z-index: 1000;
+    box-sizing: border-box;
+    transition: width 0.3s ease, padding 0.3s ease;
 }
 
 .sidebar-top {
@@ -38,95 +78,120 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 22px;
-    font-weight: bold;
-    color: #111;
-}
-
-.logo i {
-    background: #0d8bff;
-    color: white;
-    padding: 12px;
-    border-radius: 12px;
     font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding-left: 8px;
+}
+.logo i {
+    color: #0d8bff; /* Icono Azul */
 }
 
 .sidebar-menu {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
+/* Elementos del menú */
 .menu-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    border-radius: 12px;
-    color: #555;
+    padding: 12px 15px;
+    color: #4a5568;
     text-decoration: none;
-    transition: 0.3s;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
 }
 
 .menu-item:hover {
-    background: #e5e5e5;
-    color: #111;
+    background-color: #eaebef;
+    color: #1a1a1a;
 }
 
 .menu-item.active {
-    background: #0d8bff;
-    color: white;
+    background-color: #0d8bff; /* Azul FleetOps para la opción activa */
+    color: #ffffff;
 }
 
 .menu-left {
     display: flex;
     align-items: center;
-    gap: 14px;
-    font-size: 16px;
+    gap: 12px;
+    font-size: 15px;
+}
+.menu-left i {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
 }
 
+/* Notificaciones internas del menú (Badges) */
 .badge-menu {
-    background: #e5dde1;
-    color: #666;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-color: #e2e8f0;
+    color: #4a5568;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+.menu-item.active .badge-menu {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
 }
 
 .sidebar-bottom {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
-/* ===== MAIN CONTENT ===== */
-
-.main-content {
-    margin-left: 260px;
-    width: calc(100% - 260px);
+/* Ocultación suave de textos para la animación de contraer */
+.menu-item span,
+.logo span {
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
-/* ===== FOOTER ===== */
-
-.footer {
-    position: relative;
-    bottom: 0;
-    width: 100%;
-    white-space: nowrap;
-    line-height: 60px;
+/* ==========================================================================
+   4. NAVBAR SUPERIOR & BOTÓN LOGOUT MINIMALISTA
+   ========================================================================== */
+.navbar-custom {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 15px 30px;
 }
 
-/* ===== DESPACHO ===== */
-
-.dispatch-container {
-    padding: 20px;
+/* Acuerdo: Transforma de forma automática tu botón rojo de cerrar sesión en minimalista */
+.navbar-custom form button,
+.navbar-custom .btn-danger,
+.btn-minimalist-logout {
+    background: transparent !important;
+    border: none !important;
+    color: #4a5568 !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
 }
 
-/* HEADER */
+.navbar-custom form button:hover,
+.navbar-custom .btn-danger:hover,
+.btn-minimalist-logout:hover {
+    background-color: #eaebef !important;
+    color: #1a1a1a !important;
+}
+
+/* ==========================================================================
+   5. COMPONENTES DE VISTAS (Despacho, Filtros, Tablas)
+   ========================================================================== */
+.dispatch-container { padding: 20px; }
 
 .dispatch-header {
     display: flex;
@@ -137,238 +202,61 @@ body {
     gap: 15px;
 }
 
-.dispatch-title {
-    font-size: 48px;
-    font-weight: 800;
-    color: #1f2937;
-    margin-bottom: 5px;
-}
+.dispatch-title { font-size: 48px; font-weight: 800; color: #1f2937; margin-bottom: 5px; }
+.dispatch-subtitle { color: #6b7280; font-size: 16px; }
 
-.dispatch-subtitle {
-    color: #6b7280;
-    font-size: 16px;
-}
-
-/* BOTON NUEVA SOLICITUD */
-
+/* Botón de éxito moderno */
 .btn-success.btn-lg {
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 12px 22px;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/* TARJETA FILTRO */
-
-.filter-card {
+/* Tarjetas contenedoras de filtros y tablas */
+.filter-card, .table-card {
     background: white;
-    border-radius: 22px;
+    border-radius: 16px;
     padding: 22px;
     margin-bottom: 25px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    border: 1px solid #eee;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    border: 1px solid #e5e7eb;
 }
+.table-card { padding: 0; overflow: hidden; }
 
-/* BUSCADOR */
-
-.search-box {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.search-box i {
-    position: absolute;
-    top: 17px;
-    left: 16px;
-    color: #9ca3af;
-    font-size: 15px;
-}
-
+/* Buscador */
+.search-box { position: relative; margin-bottom: 20px; }
+.search-box i { position: absolute; top: 17px; left: 16px; color: #9ca3af; font-size: 15px; }
 .search-box input {
-    height: 55px;
-    border-radius: 14px;
+    height: 50px;
+    border-radius: 10px;
     border: 1px solid #ddd;
     padding-left: 45px;
     font-size: 15px;
     transition: 0.3s;
 }
-
 .search-box input:focus {
     border-color: #0d8bff;
     box-shadow: 0 0 0 0.2rem rgba(13,139,255,0.15);
 }
 
-/* BOTONES FILTRO */
+/* Tablas */
+.table th { border-bottom: 1px solid #e5e7eb; padding: 16px; font-size: 14px; color: #374151; font-weight: 700; background: #f9fafb; }
+.table td { padding: 16px; vertical-align: middle; border-color: #f1f1f1; }
+.table tbody tr:hover { background: #f9fbff; }
 
-.weight-filters {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
+/* Modales */
+.modal-content { border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.modal-header, .modal-footer { border-color: #f1f1f1; padding: 18px 25px; }
+.modal .form-control { border-radius: 10px; height: 45px; }
 
-.weight-btn {
-    border: none;
-    background: #f3f4f6;
-    color: #374151;
-    padding: 10px 18px;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.25s ease;
-}
 
-.weight-btn:hover {
-    background: #0d8bff;
-    color: white;
-    transform: translateY(-2px);
-}
-
-/* TABLA */
-
-.table-card {
-    background: white;
-    border-radius: 22px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    border: 1px solid #eee;
-}
-
-.table {
-    margin-bottom: 0;
-}
-
-.table thead {
-    background: #f9fafb;
-}
-
-.table thead th {
-    border-bottom: 1px solid #e5e7eb;
-    padding: 18px;
-    font-size: 14px;
-    color: #374151;
-    font-weight: 700;
-}
-
-.table tbody td {
-    padding: 18px;
-    vertical-align: middle;
-    border-color: #f1f1f1;
-}
-
-.table tbody tr {
-    transition: 0.2s;
-}
-
-.table tbody tr:hover {
-    background: #f9fbff;
-}
-
-/* BADGES */
-
-.badge {
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-/* BOTONES ACCIONES */
-
-.btn-info.btn-sm,
-.btn-danger.btn-sm {
-    border-radius: 10px;
-    padding: 6px 12px;
-    font-weight: 600;
-}
-
-.btn-info.btn-sm {
-    margin-right: 5px;
-}
-
-/* MODAL */
-
-.modal-content {
-    border-radius: 22px;
-    border: none;
-    overflow: hidden;
-}
-
-.modal-header {
-    border-bottom: 1px solid #eee;
-    padding: 20px 25px;
-}
-
-.modal-title {
-    font-weight: 700;
-}
-
-.modal-body {
-    padding: 25px;
-}
-
-.modal-footer {
-    border-top: 1px solid #eee;
-    padding: 20px 25px;
-}
-
-/* INPUTS MODAL */
-
-.modal .form-control {
-    border-radius: 12px;
-    height: 48px;
-}
-
-.modal select.form-control {
-    height: 48px;
-}
-
-/* RESPONSIVE */
-
+/* ==========================================================================
+   7. RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
 @media (max-width: 768px) {
-
-    .dispatch-title {
-        font-size: 36px;
-    }
-
-    .dispatch-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .weight-filters {
-        width: 100%;
-    }
-
-    .weight-btn {
-        flex: 1;
-        text-align: center;
-    }
-}
-
-/* ===== TITULOS GENERALES ===== */
-
-h1 {
-    font-size: 48px;
-    font-weight: 800;
-    color: #1f2937;
-    letter-spacing: -1px;
-    margin-bottom: 10px;
-}
-
-h2 {
-    font-size: 34px;
-    font-weight: 700;
-    color: #1f2937;
-    letter-spacing: -0.5px;
-    margin-bottom: 10px;
-}
-
-h3 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1f2937;
-}
-
-h4, h5, h6 {
-    font-weight: 600;
-    color: #374151;
+    .main-content { margin-left: 0 !important; width: 100% !important; }
+    .sidebar { display: none; }
+    .dispatch-title { font-size: 32px; }
+    .dispatch-header { flex-direction: column; align-items: flex-start; }
 }

@@ -119,7 +119,7 @@ namespace Control_flota.Areas.Identity.Pages.Account
                             }
                             else if (primerRol == "Conductor")
                             {
-                                return LocalRedirect("/Conductor/Index");
+                                return LocalRedirect("/conductor/index");
                             }
                         }
                     }
