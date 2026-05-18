@@ -1,9 +1,11 @@
+@using Microsoft.AspNetCore.Identity
+@using Control_flota.Models.Login;
+
+@inject SignInManager<Usuario> SignInManager
+
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Panel de Administrador";
+    // Esto ya se encarga de traer automáticamente el menú y la barra lateral:
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
 }
 
-<div class="container">
-    <h2>Panel de Administrador</h2>
-    <p>Bienvenido, @User.Identity?.Name</p>
-
-</div>

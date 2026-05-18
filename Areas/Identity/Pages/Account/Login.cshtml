@@ -1,5 +1,6 @@
 ﻿@page 
-@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.LoginModel
+@using Control_flota.Areas.Identity.Pages.Account
+@model LoginModel
 @{
     ViewData["Title"] = "Log in";
 }
@@ -25,38 +26,40 @@
                     Ingresa tus datos para continuar
                 </p>
 
-                <form id="account" method="post">
+                <form id="account" method="post" asp-route-returnUrl="@Model.ReturnUrl">
 
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
                     <!-- CORREO -->
                     <div class="input-group-custom">
-                        <label>Correo electrónico</label>
-                        <input name="Input.Email"
+                        <label asp-for="Input.Email">Correo electrónico</label>
+                        <input asp-for="Input.Email"
                                type="email"
                                class="custom-input"
                                placeholder="correo@ejemplo.com"
                                required />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
 
                     <!-- CONTRASEÑA -->
                     <div class="input-group-custom">
-                        <label>Contraseña</label>
-                        <input name="Input.Password"
+                        <label asp-for="Input.Password">Contraseña</label>
+                        <input asp-for="Input.Password"
                                type="password"
                                class="custom-input"
                                placeholder="********"
                                required />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
 
                     <button type="submit" class="btn-login">
                         Ingresar
                     </button>
 
-                    @if (!ViewData.ModelState.IsValid)
+                    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Count > 0)
                     {
                         <div class="error-msg">
-                            Credenciales incorrectas
+                            <i class="fa-solid fa-exclamation-circle"></i> Credenciales incorrectas o datos inválidos
                         </div>
                     }
 
@@ -227,8 +230,29 @@
 
     .error-msg {
         margin-top: 20px;
+        padding: 12px 16px;
         color: #ff8a8a;
         font-size: 0.9rem;
+        background: rgba(255, 138, 138, 0.1);
+        border: 1px solid rgba(255, 138, 138, 0.3);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .text-danger {
+        color: #ff8a8a !important;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
+    }
+    
+    .input-group-custom span[class*="text-danger"] {
+        display: block;
+        margin-top: 5px;
+        color: #ff8a8a;
+        font-size: 0.8rem;
     }
 
     /* DERECHA */
@@ -258,13 +282,14 @@
     }
 
         .right-content h2 {
+            color: #ffffff;
             font-size: 2.3rem;
             margin-bottom: 15px;
             font-weight: 700;
         }
 
         .right-content p {
-            color: #d3dbeb;
+            color: #ffffff;
             line-height: 1.6;
             max-width: 420px;
         }
@@ -289,4 +314,8 @@
             font-size: 2.2rem;
         }
     }
+    footer {
+        display: none !important;
+    }
+
 </style>

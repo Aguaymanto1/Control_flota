@@ -7421,11 +7421,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Fiorella\\Desktop\\sof 2 ordenar\\Control_flota\\Control_flota.csproj",
+      "projectUniqueName": "C:\\Users\\Fiorella\\Desktop\\soff\\Control_flota\\Control_flota.csproj",
       "projectName": "Control_flota",
-      "projectPath": "C:\\Users\\Fiorella\\Desktop\\sof 2 ordenar\\Control_flota\\Control_flota.csproj",
+      "projectPath": "C:\\Users\\Fiorella\\Desktop\\soff\\Control_flota\\Control_flota.csproj",
       "packagesPath": "C:\\Users\\Fiorella\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Fiorella\\Desktop\\sof 2 ordenar\\Control_flota\\obj\\",
+      "outputPath": "C:\\Users\\Fiorella\\Desktop\\soff\\Control_flota\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Fiorella\\AppData\\Roaming\\NuGet\\NuGet.Config"
