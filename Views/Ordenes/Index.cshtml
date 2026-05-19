@@ -1,4 +1,4 @@
-@model IEnumerable<Control_flota.Models.Operaciones.Orden>
+@model Control_flota.Models.Operaciones.DespachoViewModel
 
 @{
     ViewData["Title"] = "Despacho";
@@ -89,7 +89,113 @@
 
     </div>
 
-    <!-- TABLA -->
+    <!-- SOLICITUDES PENDIENTES -->
+    <div class="table-card mb-4">
+        <h2>Solicitudes pendientes de asignación</h2>
+
+        @if (!Model.SolicitudesPendientes.Any())
+        {
+            <div class="alert alert-info">
+                No hay solicitudes pendientes de asignar en este momento.
+            </div>
+        }
+        else
+        {
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Cliente</th>
+                        <th>Origen</th>
+                        <th>Destino</th>
+                        <th>Peso</th>
+                        <th>Tipo de carga</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var solicitud in Model.SolicitudesPendientes)
+                    {
+                        <tr>
+                            <td><strong>@solicitud.Codigo</strong></td>
+                            <td>@solicitud.Cliente?.Nombre</td>
+                            <td>@solicitud.Origen</td>
+                            <td>@solicitud.Destino</td>
+                            <td>@solicitud.PesoKg</td>
+                            <td>@solicitud.TipoCarga</td>
+                            <td>@solicitud.EstadoSolicitud</td>
+                            <td>
+                                <a class="btn btn-primary btn-sm"
+                                   href="@Url.Action("AsignarFlota", "Solicitudes", new { id = solicitud.Id })">
+                                    Asignar Flota
+                                </a>
+                                <a class="btn btn-info btn-sm"
+                                   href="@Url.Action("Details", "Solicitudes", new { id = solicitud.Id })">
+                                    Ver
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- SOLICITUDES ASIGNADAS -->
+    <div class="table-card mb-4">
+        <h2>Solicitudes asignadas</h2>
+
+        @if (!Model.SolicitudesAsignadas.Any())
+        {
+            <div class="alert alert-info">
+                No hay solicitudes asignadas en este momento.
+            </div>
+        }
+        else
+        {
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Cliente</th>
+                        <th>Origen</th>
+                        <th>Destino</th>
+                        <th>Peso</th>
+                        <th>Tipo de carga</th>
+                        <th>Conductor</th>
+                        <th>Unidad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var solicitud in Model.SolicitudesAsignadas)
+                    {
+                        <tr>
+                            <td><strong>@solicitud.Codigo</strong></td>
+                            <td>@solicitud.Cliente?.Nombre</td>
+                            <td>@solicitud.Origen</td>
+                            <td>@solicitud.Destino</td>
+                            <td>@solicitud.PesoKg</td>
+                            <td>@solicitud.TipoCarga</td>
+                            <td>@(solicitud.Conductor != null ? solicitud.Conductor.Nombres + " " + solicitud.Conductor.Apellidos : "Sin conductor")</td>
+                            <td>@(solicitud.Unidad?.Placa ?? "Sin unidad")</td>
+                            <td>@solicitud.EstadoSolicitud</td>
+                            <td>
+                                <a class="btn btn-info btn-sm"
+                                   href="@Url.Action("Details", "Solicitudes", new { id = solicitud.Id })">
+                                    Ver
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- TABLA DE ÓRDENES -->
     <div class="table-card">
 
         <table class="table align-middle">
@@ -108,7 +214,7 @@
 
             <tbody>
 
-                @foreach (var orden in Model)
+                @foreach (var orden in Model.Ordenes)
                 {
                     <tr>
 

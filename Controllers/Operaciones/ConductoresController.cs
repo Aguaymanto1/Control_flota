@@ -61,13 +61,38 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(usuario, "Conductor");
+                    var roleResult = await _userManager.AddToRoleAsync(usuario, "Conductor");
+                    if (!roleResult.Succeeded)
+                    {
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(conductor);
+                    }
+
                     conductor.IsDeleted = false;
                     _context.Add(conductor);
-                    await _context.SaveChangesAsync();
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        ModelState.AddModelError(string.Empty, "No se pudo guardar el conductor: " + ex.Message);
+                        return View(conductor);
+                    }
 
                     usuario.ConductorId = conductor.Id;
-                    await _userManager.UpdateAsync(usuario);
+                    var updateUserResult = await _userManager.UpdateAsync(usuario);
+                    if (!updateUserResult.Succeeded)
+                    {
+                        foreach (var error in updateUserResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(conductor);
+                    }
 
                     conductor.UserId = usuario.Id;
                     _context.Update(conductor);

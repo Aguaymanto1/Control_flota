@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Control_flota.Data;
 using Control_flota.Models.Operaciones;
@@ -8,9 +10,12 @@ public class SolicitudesController : Controller
 {
     private readonly ApplicationDbContext _context;
 
-    public SolicitudesController(ApplicationDbContext context)
+    private readonly UserManager<Control_flota.Models.Login.Usuario> _userManager;
+
+    public SolicitudesController(ApplicationDbContext context, UserManager<Control_flota.Models.Login.Usuario> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
 
@@ -103,6 +108,13 @@ public async Task<IActionResult> Index()
     // CLIENTES PARA EL MODAL
     ViewBag.Clientes = _context.Clientes.ToList();
 
+    // Si el usuario es conductor, exponer su ConductorId para la vista
+    if (User.Identity?.IsAuthenticated ?? false && User.IsInRole("Conductor"))
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+        ViewBag.CurrentConductorId = usuario?.ConductorId;
+    }
+
     // TIPOS DE CARGA PARA EL MODAL
     ViewBag.TipoCargaOptions = new List<string>
     {
@@ -183,18 +195,25 @@ public async Task<IActionResult> Index()
         var correlativo = count + 1;
         var codigo = $"ORD-{year:0000}-{month:00}-{correlativo:0000}";
 
-        var orden = new Orden
-        {
-            Codigo = codigo,
-            FechaEmision = now,
-            Estado = "Emitida",
-            ClienteId = solicitud.ClienteId,
-            Origen = solicitud.Origen,
-            Destino = solicitud.Destino,
-            NombreConductor = nombreConductor,
-            PlacaCamion = placaCamion,
-            SolicitudServicioId = solicitud.Id
-        };
+    var orden = new Orden
+    {
+        Codigo = codigo,
+        FechaEmision = now,
+        Estado = "Emitida",
+
+        ClienteId = solicitud.ClienteId,
+
+        Origen = solicitud.Origen,
+        Destino = solicitud.Destino,
+
+        NombreConductor = nombreConductor,
+
+        ConductorId = solicitud.ConductorId,
+
+        PlacaCamion = placaCamion,
+
+        SolicitudServicioId = solicitud.Id
+    };
 
         _context.Ordenes.Add(orden);
         await _context.SaveChangesAsync();
@@ -285,5 +304,43 @@ public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId
     _context.SaveChanges();
 
     return RedirectToAction("Index");
+}
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+[Authorize(Roles = "Conductor")]
+public async Task<IActionResult> IniciarRuta(int id)
+{
+    var usuario = await _userManager.GetUserAsync(User);
+    if (usuario == null || usuario.ConductorId == null) return Forbid();
+
+    var solicitud = await _context.SolicitudesServicio.FindAsync(id);
+    if (solicitud == null) return NotFound();
+    if (solicitud.ConductorId != usuario.ConductorId) return Forbid();
+
+    solicitud.EstadoSolicitud = "En Transito";
+    solicitud.FechaDespacho = DateTime.Now;
+    await _context.SaveChangesAsync();
+
+    return RedirectToAction(nameof(Index));
+}
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+[Authorize(Roles = "Conductor")]
+public async Task<IActionResult> FinalizarRuta(int id)
+{
+    var usuario = await _userManager.GetUserAsync(User);
+    if (usuario == null || usuario.ConductorId == null) return Forbid();
+
+    var solicitud = await _context.SolicitudesServicio.FindAsync(id);
+    if (solicitud == null) return NotFound();
+    if (solicitud.ConductorId != usuario.ConductorId) return Forbid();
+
+    solicitud.EstadoSolicitud = "Completado";
+    solicitud.FechaDespacho = DateTime.Now;
+    await _context.SaveChangesAsync();
+
+    return RedirectToAction(nameof(Index));
 }
 }

@@ -66,6 +66,25 @@ namespace Control_flota.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Inspecciones",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Placa = table.Column<string>(type: "TEXT", nullable: false),
+                    Luces = table.Column<string>(type: "TEXT", nullable: false),
+                    Llantas = table.Column<string>(type: "TEXT", nullable: false),
+                    Frenos = table.Column<string>(type: "TEXT", nullable: false),
+                    Fluidos = table.Column<string>(type: "TEXT", nullable: false),
+                    EstadoVehiculo = table.Column<string>(type: "TEXT", nullable: false),
+                    FechaInspeccion = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Inspecciones", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Unidades",
                 columns: table => new
                 {
@@ -112,33 +131,6 @@ namespace Control_flota.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Ordenes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Codigo = table.Column<string>(type: "TEXT", nullable: false),
-                    FechaEmision = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Estado = table.Column<string>(type: "TEXT", nullable: false),
-                    ClienteId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Origen = table.Column<string>(type: "TEXT", nullable: false),
-                    Destino = table.Column<string>(type: "TEXT", nullable: false),
-                    NombreConductor = table.Column<string>(type: "TEXT", nullable: false),
-                    PlacaCamion = table.Column<string>(type: "TEXT", nullable: false),
-                    SolicitudServicioId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ordenes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Ordenes_Clientes_ClienteId",
-                        column: x => x.ClienteId,
-                        principalTable: "Clientes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -169,6 +161,41 @@ namespace Control_flota.Migrations
                         principalTable: "Conductores",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ordenes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Codigo = table.Column<string>(type: "TEXT", nullable: false),
+                    FechaEmision = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Estado = table.Column<string>(type: "TEXT", nullable: false),
+                    ClienteId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Origen = table.Column<string>(type: "TEXT", nullable: false),
+                    Destino = table.Column<string>(type: "TEXT", nullable: false),
+                    NombreConductor = table.Column<string>(type: "TEXT", nullable: false),
+                    ConductorId = table.Column<int>(type: "INTEGER", nullable: true),
+                    PlacaCamion = table.Column<string>(type: "TEXT", nullable: false),
+                    SolicitudServicioId = table.Column<int>(type: "INTEGER", nullable: false),
+                    FechaInicio = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    FechaFin = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ordenes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Ordenes_Clientes_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "Clientes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Ordenes_Conductores_ConductorId",
+                        column: x => x.ConductorId,
+                        principalTable: "Conductores",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -234,8 +261,8 @@ namespace Control_flota.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
+                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
                     UserId = table.Column<string>(type: "TEXT", nullable: false)
                 },
@@ -279,8 +306,8 @@ namespace Control_flota.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
                     Value = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -362,6 +389,11 @@ namespace Control_flota.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Ordenes_ConductorId",
+                table: "Ordenes",
+                column: "ConductorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SolicitudesServicio_ClienteId",
                 table: "SolicitudesServicio",
                 column: "ClienteId");
@@ -407,6 +439,9 @@ namespace Control_flota.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Inspecciones");
 
             migrationBuilder.DropTable(
                 name: "Ordenes");

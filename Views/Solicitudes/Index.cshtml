@@ -65,14 +65,44 @@
                 </td>
                 <td>@solicitud.EstadoSolicitud</td>
                 <td>
-                    <a asp-action="AsignarFlota"
-                        asp-route-id="@solicitud.Id"
-                            class="btn btn-primary btn-sm">Asignar Flota</a>
-                    <a href="@Url.Action("Details", new { id = solicitud.Id })" class="btn btn-info">Ver Detalles</a>
+                    @{ var currentConductorId = ViewBag.CurrentConductorId as int?; }
 
-                    <form method="post" asp-action="Eliminar" asp-route-id="@solicitud.Id" style="display:inline;">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta solicitud?')">Eliminar</button>
-                    </form>
+                    @if (User.IsInRole("Conductor") && currentConductorId.HasValue && solicitud.ConductorId == currentConductorId.Value)
+                    {
+                        // Conductor view: show actions depending on estado
+                        <a href="@Url.Action("Details", new { id = solicitud.Id })" class="btn btn-info">Ver Detalles</a>
+
+                        @if (solicitud.EstadoSolicitud != null && solicitud.EstadoSolicitud.Contains("Asignado"))
+                        {
+                            <form method="post" asp-action="IniciarRuta" asp-route-id="@solicitud.Id" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success btn-sm">Iniciar Ruta</button>
+                            </form>
+                        }
+                        else if (solicitud.EstadoSolicitud != null && solicitud.EstadoSolicitud.Contains("En Transito"))
+                        {
+                            <form method="post" asp-action="FinalizarRuta" asp-route-id="@solicitud.Id" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-warning btn-sm">Finalizar Ruta</button>
+                            </form>
+                        }
+                    }
+                    else
+                    {
+                        // Admin/other view: keep previous actions
+                        if (solicitud.EstadoSolicitud != null && solicitud.EstadoSolicitud.Contains("Pendiente"))
+                        {
+                            <a asp-action="AsignarFlota"
+                               asp-route-id="@solicitud.Id"
+                               class="btn btn-primary btn-sm">Asignar Flota</a>
+                        }
+
+                        <a href="@Url.Action("Details", new { id = solicitud.Id })" class="btn btn-info">Ver Detalles</a>
+
+                        <form method="post" asp-action="Eliminar" asp-route-id="@solicitud.Id" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta solicitud?')">Eliminar</button>
+                        </form>
+                    }
 
                 </td>
                 

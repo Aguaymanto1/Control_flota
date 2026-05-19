@@ -838,7 +838,6 @@ C:\Users\Fiorella\Desktop\sof 2 ordenar\Control_flota\obj\Debug\net9.0\ref\Contr
 C:\Users\Fiorella\Desktop\sof 2 ordenar\Control_flota\obj\Debug\net9.0\compressed\iskepqrddr-hfdpwl35om.gz
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\appsettings.json
-C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\app.db
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.staticwebassets.runtime.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.staticwebassets.endpoints.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.exe
@@ -1255,3 +1254,4 @@ C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\refint\Control_flo
 C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.pdb
 C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.genruntimeconfig.cache
 C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\ref\Control_flota.dll
+C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\app.db

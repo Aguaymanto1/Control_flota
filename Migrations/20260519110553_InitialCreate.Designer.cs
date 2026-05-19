@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Control_flota.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260518020246_AddInspecciones")]
-    partial class AddInspecciones
+    [Migration("20260519110553_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -230,6 +230,9 @@ namespace Control_flota.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ConductorId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Destino")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -239,6 +242,12 @@ namespace Control_flota.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FechaFin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FechaInicio")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NombreConductor")
@@ -262,6 +271,8 @@ namespace Control_flota.Migrations
 
                     b.HasIndex("Codigo")
                         .IsUnique();
+
+                    b.HasIndex("ConductorId");
 
                     b.ToTable("Ordenes");
                 });
@@ -526,7 +537,13 @@ namespace Control_flota.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Control_flota.Models.Operaciones.Conductor", "Conductor")
+                        .WithMany()
+                        .HasForeignKey("ConductorId");
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("Conductor");
                 });
 
             modelBuilder.Entity("Control_flota.Models.Operaciones.SolicitudServicio", b =>

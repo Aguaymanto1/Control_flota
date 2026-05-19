@@ -12,7 +12,7 @@ public class OrdenesController : Controller
         _context = context;
     }
 
-    // Lista general de órdenes
+    // Lista general de órdenes y solicitudes pendientes en despacho
     public async Task<IActionResult> Index()
     {
 
@@ -30,7 +30,30 @@ public class OrdenesController : Controller
             .OrderByDescending(o => o.FechaEmision)
             .ToListAsync();
 
-        return View(ordenes);
+        var solicitudesPendientes = await _context.SolicitudesServicio
+            .Include(s => s.Cliente)
+            .Include(s => s.Conductor)
+            .Include(s => s.Unidad)
+            .Where(s => s.EstadoSolicitud.Contains("Pendiente"))
+            .OrderByDescending(s => s.FechaDespacho)
+            .ToListAsync();
+
+        var solicitudesAsignadas = await _context.SolicitudesServicio
+            .Include(s => s.Cliente)
+            .Include(s => s.Conductor)
+            .Include(s => s.Unidad)
+            .Where(s => s.EstadoSolicitud == "Asignado")
+            .OrderByDescending(s => s.FechaDespacho)
+            .ToListAsync();
+
+        var model = new DespachoViewModel
+        {
+            Ordenes = ordenes,
+            SolicitudesPendientes = solicitudesPendientes,
+            SolicitudesAsignadas = solicitudesAsignadas
+        };
+
+        return View(model);
     }
 
     // Detalle de orden

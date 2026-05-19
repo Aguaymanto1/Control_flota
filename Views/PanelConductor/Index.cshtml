@@ -1,0 +1,47 @@
+@using Control_flota.Models.Operaciones
+@model List<Orden>
+
+<h2>Mis Viajes</h2>
+
+@foreach(var orden in Model)
+{
+    <div class="card p-4 mb-4 shadow">
+
+        <h4>Orden: @orden.Codigo</h4>
+
+        <p><strong>Cliente:</strong> @orden.Cliente?.Nombre</p>
+
+        <p><strong>Destino:</strong> @orden.Destino</p>
+
+        <p>
+            <strong>Estado:</strong>
+
+            <span class="badge bg-primary">
+                @orden.Estado
+            </span>
+        </p>
+
+        @if(orden.Estado == "Pendiente")
+        {
+            <form asp-action="IniciarRuta" method="post">
+                <input type="hidden" name="id" value="@orden.Id" />
+
+                <button class="btn btn-success btn-lg w-100">
+                    Iniciar Ruta
+                </button>
+            </form>
+        }
+
+        @if(orden.Estado == "En Transito")
+        {
+            <form asp-action="FinalizarRuta" method="post">
+                <input type="hidden" name="id" value="@orden.Id" />
+
+                <button class="btn btn-danger btn-lg w-100">
+                    Finalizar Ruta
+                </button>
+            </form>
+        }
+
+    </div>
+}

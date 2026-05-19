@@ -176,6 +176,44 @@ namespace Control_flota.Migrations
                     b.ToTable("Conductores");
                 });
 
+            modelBuilder.Entity("Control_flota.Models.Operaciones.Inspeccion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EstadoVehiculo")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaInspeccion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Fluidos")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Frenos")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Llantas")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Luces")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Placa")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inspecciones");
+                });
+
             modelBuilder.Entity("Control_flota.Models.Operaciones.Orden", b =>
                 {
                     b.Property<int>("Id")
@@ -189,6 +227,9 @@ namespace Control_flota.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ConductorId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Destino")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -198,6 +239,12 @@ namespace Control_flota.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FechaFin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FechaInicio")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NombreConductor")
@@ -221,6 +268,8 @@ namespace Control_flota.Migrations
 
                     b.HasIndex("Codigo")
                         .IsUnique();
+
+                    b.HasIndex("ConductorId");
 
                     b.ToTable("Ordenes");
                 });
@@ -414,11 +463,9 @@ namespace Control_flota.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderDisplayName")
@@ -456,11 +503,9 @@ namespace Control_flota.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
@@ -489,7 +534,13 @@ namespace Control_flota.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Control_flota.Models.Operaciones.Conductor", "Conductor")
+                        .WithMany()
+                        .HasForeignKey("ConductorId");
+
                     b.Navigation("Cliente");
+
+                    b.Navigation("Conductor");
                 });
 
             modelBuilder.Entity("Control_flota.Models.Operaciones.SolicitudServicio", b =>
