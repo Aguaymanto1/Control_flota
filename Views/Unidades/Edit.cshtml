@@ -6,7 +6,10 @@
 
 <h1>Editar Unidad</h1>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <input asp-for="Id" type="hidden" />
     <div class="form-group">
         <label for="Placa">Placa</label>
         <input type="text" asp-for="Placa" class="form-control" />
@@ -23,6 +26,18 @@
         <label for="Marca">Marca</label>
         <input type="text" asp-for="Marca" class="form-control" />
         <span asp-validation-for="Marca" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Modelo">Modelo</label>
+        <input type="text" asp-for="Modelo" class="form-control" />
+        <span asp-validation-for="Modelo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Anio">Año</label>
+        <input type="number" asp-for="Anio" class="form-control" min="1990" max="2100" />
+        <span asp-validation-for="Anio" class="text-danger"></span>
     </div>
 
     <div class="form-group">

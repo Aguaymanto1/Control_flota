@@ -836,11 +836,22 @@ C:\Users\Fiorella\Desktop\sof 2 ordenar\Control_flota\obj\Debug\net9.0\Control_f
 C:\Users\Fiorella\Desktop\sof 2 ordenar\Control_flota\obj\Debug\net9.0\Control_flota.genruntimeconfig.cache
 C:\Users\Fiorella\Desktop\sof 2 ordenar\Control_flota\obj\Debug\net9.0\ref\Control_flota.dll
 C:\Users\Fiorella\Desktop\sof 2 ordenar\Control_flota\obj\Debug\net9.0\compressed\iskepqrddr-hfdpwl35om.gz
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.csproj.AssemblyReference.cache
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.AssemblyInfoInputs.cache
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.AssemblyInfo.cs
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.csproj.CoreCompileInputs.cache
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.RazorAssemblyInfo.cache
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.RazorAssemblyInfo.cs
+C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.sourcelink.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\appsettings.json
-C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\app.db
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.staticwebassets.runtime.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.staticwebassets.endpoints.json
+C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\app.db
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.exe
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.deps.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\Control_flota.runtimeconfig.json
@@ -1102,17 +1113,6 @@ C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\runtimes\win-arm64
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\runtimes\win-x86\native\e_sqlite3.dll
 C:\Users\Fiorella\Desktop\soff\Control_flota\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.csproj.AssemblyReference.cache
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\rpswa.dswa.cache.json
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.AssemblyInfoInputs.cache
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.AssemblyInfo.cs
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.csproj.CoreCompileInputs.cache
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.RazorAssemblyInfo.cache
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.RazorAssemblyInfo.cs
-C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\Control_flota.sourcelink.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\Users\Fiorella\Desktop\soff\Control_flota\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json

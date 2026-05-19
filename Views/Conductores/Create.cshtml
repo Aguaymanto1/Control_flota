@@ -55,7 +55,6 @@
         <span asp-validation-for="VencimientoLicencia" class="text-danger"></span>
     </div>
 
-    <!-- 🔴 NUEVOS CAMPOS PARA LOGIN -->
     <hr />
     <h4>Datos de Acceso al Sistema</h4>
 
@@ -82,25 +81,22 @@
 </form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
-    <script>
-        // Validación simple de contraseñas en el cliente
-        document.querySelector('form').addEventListener('submit', function(e) {
-            var password = document.getElementById('password').value;
-            var confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('Las contraseñas no coinciden');
-                return false;
-            }
-            
-            if (password.length < 6) {
-                e.preventDefault();
-                alert('La contraseña debe tener al menos 6 caracteres');
-                return false;
-            }
-        });
-    </script>
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Las contraseñas no coinciden');
+            return false;
+        }
+
+        if (password.length < 6) {
+            e.preventDefault();
+            alert('La contraseña debe tener al menos 6 caracteres');
+            return false;
+        }
+    });
+</script>
 }
