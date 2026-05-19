@@ -51,9 +51,17 @@ public class UnidadesController : Controller
 
         if (ModelState.IsValid)
         {
-            _context.Update(unidad);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _context.Update(unidad);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar la unidad: {ex.Message}");
+                return View("Error");
+            }
         }
         return View(unidad);
     }

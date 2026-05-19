@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Identity;
 using Control_flota.Data;
 using Control_flota.Models.Operaciones;
 using Control_flota.Models.Login;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Control_flota.Controllers  // ← Agrega el namespace
 {
+    [Authorize(Roles = "Administrador")]
     public class ConductoresController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -39,6 +41,12 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
                 return View(conductor);
             }
 
+            // 🔴 SOLUCIÓN: Dile a ASP.NET que no valide el UserId porque lo crearemos después
+            ModelState.Remove("UserId");
+            
+            // Si tienes alguna propiedad de navegación hacia el Usuario en tu modelo Conductor (ej. public Usuario Usuario {get;set;}), 
+            // también debes ignorarla así: ModelState.Remove("Usuario");
+
             if (ModelState.IsValid)
             {
                 var existingUser = await _userManager.FindByEmailAsync(email);
@@ -63,15 +71,16 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
                 {
                     await _userManager.AddToRoleAsync(usuario, "Conductor");
                     conductor.IsDeleted = false;
+                    
                     _context.Add(conductor);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(); // Se crea el conductor y se le asigna un Id
 
                     usuario.ConductorId = conductor.Id;
-                    await _userManager.UpdateAsync(usuario);
+                    await _userManager.UpdateAsync(usuario); // Actualizamos el usuario con el Id del conductor
 
                     conductor.UserId = usuario.Id;
                     _context.Update(conductor);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(); // Actualizamos el conductor con el Id del usuario
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -81,6 +90,7 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
+            
             return View(conductor);
         }
 

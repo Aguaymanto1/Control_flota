@@ -32,7 +32,8 @@ public class SolicitudesController : Controller
 
     // Método para registrar un nuevo servicio (POST)
     [HttpPost]
-    public async Task<IActionResult> RegistrarServicio(SolicitudServicio solicitud)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegistrarServicio(SolicitudServicio solicitud, string? returnUrl)
     {
         if (ModelState.IsValid)
         {
@@ -72,7 +73,12 @@ public class SolicitudesController : Controller
             _context.Add(solicitud);
             await _context.SaveChangesAsync();
 
-            // Redirigir a la lista de solicitudes
+            // Redirigir a la lista de solicitudes o al origen si viene de Despacho
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
             return RedirectToAction("Index");
         }
 
@@ -237,14 +243,23 @@ public IActionResult AsignarFlota(int id)
         .Where(c => c.Actividad == "Libre")
         .ToList();
 
-    // UNIDADES DISPONIBLES
+    // UNIDADES DISPONIBLES (preferimos libres y activas)
     var unidades = _context.Unidades
         .Where(u =>
-            u.Actividad == "Libre"      // Solo libres
-            && u.EstadoOperativo == "Activo"    // No mantenimiento
-            && u.CapacidadKg >= (decimal)solicitud.PesoKg// Soporta peso
+            u.Actividad == "Libre"
+            && u.EstadoOperativo == "Activo"
         )
+        .OrderBy(u => u.Placa)
         .ToList();
+
+    if (!unidades.Any())
+    {
+        unidades = _context.Unidades
+            .OrderBy(u => u.Placa)
+            .ToList();
+
+        ViewBag.UnidadesMensaje = "No hay unidades libres y activas disponibles; se muestran todas las unidades.";
+    }
 
     ViewBag.Conductores = conductores;
     ViewBag.Unidades = unidades;
@@ -253,10 +268,10 @@ public IActionResult AsignarFlota(int id)
     return View();
 }
 [HttpPost]
-public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId)
-{
-    var solicitud = _context.SolicitudesServicio.Find(SolicitudId);
-
+    [ValidateAntiForgeryToken]
+    public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId)
+    {
+        var solicitud = _context.SolicitudesServicio.Find(SolicitudId);
     var conductor = _context.Conductores.Find(ConductorId);
 
     var unidad = _context.Unidades.Find(UnidadId);

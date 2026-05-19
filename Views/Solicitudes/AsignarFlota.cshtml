@@ -1,12 +1,20 @@
 @{
     var conductores = ViewBag.Conductores;
     var unidades = ViewBag.Unidades;
+    var unidadesMensaje = ViewBag.UnidadesMensaje as string;
 }
 
 <h2>Asignar Flota</h2>
 
-<form method="post">
+@if (!string.IsNullOrEmpty(unidadesMensaje))
+{
+    <div class="alert alert-warning">
+        @unidadesMensaje
+    </div>
+}
 
+<form method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" name="SolicitudId" value="@ViewBag.SolicitudId" />
 
     <div class="mb-3">
