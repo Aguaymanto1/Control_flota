@@ -64,6 +64,13 @@
                                 <span>Clientes</span>
                             </div>
                         </a>
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Solicitudes" ? "active" : "")" 
+                            asp-area="" asp-controller="Solicitudes" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-solid fa-file-lines"></i>
+                                <span>Solicitudes</span>
+                            </div>
+                        </a>
                         <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Ordenes" ? "active" : "")" 
                            asp-area="" asp-controller="Ordenes" asp-action="Index">
                             <div class="menu-left">
@@ -94,6 +101,7 @@
                 </div>
 
                 <div class="sidebar-bottom">
+                    
                     <div class="menu-item" style="cursor: pointer;">
                         <div class="menu-left">
                             <i class="fa-regular fa-bell"></i>
@@ -106,22 +114,30 @@
                             <span>Configuración</span>
                         </div>
                     </div>
-                    </div>
+                    <!-- Usuario y logout -->
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <div style="padding: 10px 16px; border-top: 1px solid #e2e8f0; margin-bottom: 4px;">
+                            <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:2px;">Sesión activa</div>
+                            <div style="font-size:0.82rem; font-weight:600; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                @User.Identity.Name
+                            </div>
+                        </div>
+                        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" method="post" style="margin:0;">
+                            <button type="submit" class="menu-item" style="width:100%; background:none; border:none; text-align:left; cursor:pointer; color:#dc2626;">
+                                <div class="menu-left">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                    <span>Cerrar sesión</span>
+                                </div>
+                            </button>
+                        </form>
+                    }
+                </div>
+
             </aside>
         }
 
         <div class="main-content">
-            
-            <header class="navbar-custom">
-                <div class="d-flex justify-content-between align-items-center w-100">
-                    <div>
-                        <h5 class="m-0 fw-bold text-dark">@ViewData["Title"]</h5> 
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <partial name="_LoginPartial" />
-                    </div>
-                </div>
-            </header>
 
             <div class="workspace-container">
                 <main role="main" class="pb-3">

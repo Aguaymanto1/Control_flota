@@ -155,40 +155,6 @@ h4, h5, h6 { font-weight: 600; color: #374151; }
 }
 
 /* ==========================================================================
-   4. NAVBAR SUPERIOR & BOTÓN LOGOUT MINIMALISTA
-   ========================================================================== */
-.navbar-custom {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 15px 30px;
-}
-
-/* Acuerdo: Transforma de forma automática tu botón rojo de cerrar sesión en minimalista */
-.navbar-custom form button,
-.navbar-custom .btn-danger,
-.btn-minimalist-logout {
-    background: transparent !important;
-    border: none !important;
-    color: #4a5568 !important;
-    padding: 8px 16px !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    border-radius: 8px !important;
-    box-shadow: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    transition: all 0.2s ease !important;
-}
-
-.navbar-custom form button:hover,
-.navbar-custom .btn-danger:hover,
-.btn-minimalist-logout:hover {
-    background-color: #eaebef !important;
-    color: #1a1a1a !important;
-}
-
-/* ==========================================================================
    5. COMPONENTES DE VISTAS (Despacho, Filtros, Tablas)
    ========================================================================== */
 .dispatch-container { padding: 20px; }

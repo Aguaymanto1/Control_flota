@@ -1,46 +1,337 @@
 @model IEnumerable<Control_flota.Models.Operaciones.Conductor>
-
 @{
     ViewData["Title"] = "Conductores";
 }
 
-<h1>Conductores</h1>
+<style>
+    .conductores-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+    }
 
-<p>
-    <a href="@Url.Action("Create")" class="btn btn-primary">Registrar Nuevo Conductor</a>
-</p>
-<a href="@Url.Action("AlertasLicencias")" class="btn btn-warning">
-    ⚠️ Alertas de Licencias
-</a>
+    .conductores-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>DNI</th>
-            <th>Nombre</th>
-            <th>Licencia</th>
-            <th>Estado</th>
-            <th>Actividad</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var conductor in Model)
-        {
-            <tr>
-                <td>@conductor.Dni</td>
-                <td>@conductor.Nombres @conductor.Apellidos</td>
-                <td>@conductor.NumeroLicencia</td>
-                <td>@conductor.EstadoOperativo</td>
-                <td>@conductor.Actividad</td>
-                <td>
-                    <a href="@Url.Action("Edit", new { id = conductor.Id })" class="btn btn-warning">Editar</a>
-                    <form method="post" action="@Url.Action("Delete", new { id = conductor.Id })" style="display:inline;">
-                        @Html.AntiForgeryToken()  <!-- Protección contra CSRF -->
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar este conductor?');">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    .conductores-header p {
+        color: #64748b;
+        margin: 4px 0 0;
+        font-size: 0.9rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-primary-custom {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #1d4ed8;
+        color: white;
+    }
+
+    .btn-warning-custom {
+        background-color: #f59e0b;
+        color: white;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+    }
+
+    .btn-warning-custom:hover {
+        background-color: #d97706;
+        color: white;
+    }
+
+    .stats-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 24px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .stat-icon.blue { background: #eff6ff; color: #2563eb; }
+    .stat-icon.green { background: #f0fdf4; color: #16a34a; }
+    .stat-icon.orange { background: #fff7ed; color: #ea580c; }
+
+    .stat-info .number {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1;
+    }
+
+    .stat-info .label {
+        font-size: 0.78rem;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    .table-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-card table {
+        margin: 0;
+    }
+
+    .table-card thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 13px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        border-top: none;
+    }
+
+    .table-card tbody td {
+        padding: 14px 20px;
+        color: #1e293b;
+        font-size: 0.875rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table-card tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-card tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .conductor-name {
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .conductor-dni {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-activo { background: #f0fdf4; color: #16a34a; }
+    .badge-inactivo { background: #fef2f2; color: #dc2626; }
+    .badge-libre { background: #eff6ff; color: #2563eb; }
+    .badge-ocupado { background: #fff7ed; color: #ea580c; }
+
+    .action-btn {
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s;
+    }
+
+    .action-btn.edit {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .action-btn.edit:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .action-btn.delete {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .action-btn.delete:hover {
+        background: #fee2e2;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+        display: block;
+    }
+</style>
+
+@{
+    var total = Model.Count();
+    var activos = Model.Count(c => c.EstadoOperativo == "Activo");
+    var ocupados = Model.Count(c => c.Actividad == "Ocupado");
+}
+
+<div class="conductores-header">
+    <div>
+        <h1>Conductores</h1>
+        <p>Gestión del personal de conducción</p>
+    </div>
+    <div class="header-actions">
+        <a href="@Url.Action("AlertasLicencias")" class="btn-warning-custom">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Alertas de Licencias
+        </a>
+        <a href="@Url.Action("Create")" class="btn-primary-custom">
+            <i class="fa-solid fa-plus"></i>
+            Registrar Conductor
+        </a>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-regular fa-user"></i></div>
+        <div class="stat-info">
+            <div class="number">@total</div>
+            <div class="label">Total conductores</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+            <div class="number">@activos</div>
+            <div class="label">Activos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange"><i class="fa-solid fa-truck"></i></div>
+        <div class="stat-info">
+            <div class="number">@ocupados</div>
+            <div class="label">En servicio</div>
+        </div>
+    </div>
+</div>
+
+<div class="table-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fa-regular fa-user"></i>
+            <p>No hay conductores registrados aún.</p>
+            <a href="@Url.Action("Create")" class="btn-primary-custom">Registrar el primero</a>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Conductor</th>
+                    <th>Licencia</th>
+                    <th>Categoría</th>
+                    <th>Estado</th>
+                    <th>Actividad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var conductor in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="conductor-name">@conductor.Nombres @conductor.Apellidos</div>
+                            <div class="conductor-dni">DNI: @conductor.Dni</div>
+                        </td>
+                        <td>@conductor.NumeroLicencia</td>
+                        <td>@conductor.CategoriaLicencia</td>
+                        <td>
+                            <span class="badge-estado @(conductor.EstadoOperativo == "Activo" ? "badge-activo" : "badge-inactivo")">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                                @conductor.EstadoOperativo
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge-estado @(conductor.Actividad == "Libre" ? "badge-libre" : "badge-ocupado")">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                                @conductor.Actividad
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <a href="@Url.Action("Edit", new { id = conductor.Id })" class="action-btn edit">
+                                    <i class="fa-regular fa-pen-to-square"></i> Editar
+                                </a>
+                                <form method="post" action="@Url.Action("Delete", new { id = conductor.Id })" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="action-btn delete"
+                                            onclick="return confirm('¿Eliminar a @conductor.Nombres @conductor.Apellidos?');">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
