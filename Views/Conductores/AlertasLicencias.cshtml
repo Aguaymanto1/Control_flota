@@ -1,0 +1,57 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Conductor>
+@{ ViewData["Title"] = "Alertas de Licencias"; }
+
+<h2>⚠️ Licencias Próximas a Vencer (próximos 30 días)</h2>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success">@TempData["Exito"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay conductores con licencias por vencer en los próximos 30 días.</div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead class="table-warning">
+            <tr>
+                <th>Nombre del Conductor</th>
+                <th>Nro. de Licencia</th>
+                <th>Categoría</th>
+                <th>Fecha de Vencimiento Actual</th>
+                <th>Nueva Fecha de Vigencia</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Nombres @c.Apellidos</td>
+                <td>@c.NumeroLicencia</td>
+                <td>@c.CategoriaLicencia</td>
+                <td>@c.VencimientoLicencia.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <form method="post" asp-action="ActualizarVigencia">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@c.Id" />
+                        <input type="date"
+                               name="nuevaFecha"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               required
+                               class="form-control d-inline" style="width:180px;" />
+                        <button type="submit" class="btn btn-sm btn-primary ms-1">Guardar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<a href="@Url.Action("Index")" class="btn btn-secondary mt-2">Volver al listado</a>

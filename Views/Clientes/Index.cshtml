@@ -1,0 +1,74 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Cliente>
+@{ ViewData["Title"] = "Clientes"; }
+
+<h2>Clientes</h2>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success">@TempData["Exito"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="get" asp-action="Index" class="d-flex gap-2">
+        <input type="text" name="buscar" value="@ViewBag.Buscar"
+               placeholder="Buscar por Razón Social o RUC (mín. 3 caracteres)"
+               class="form-control" style="width:350px;" />
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
+        {
+            <a href="@Url.Action("Index")" class="btn btn-secondary">Limpiar</a>
+        }
+    </form>
+    <a href="@Url.Action("RegistrarCliente")" class="btn btn-success">+ Nuevo Cliente</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No se encontraron clientes.</div>
+}
+else
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Razón Social</th>
+                <th>RUC</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Persona de Contacto</th>
+                <th>Estado</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var c in Model)
+        {
+            <tr class="@(c.Estado == "Inactivo" ? "table-secondary text-muted" : "")">
+                <td>@c.Nombre</td>
+                <td>@c.Ruc</td>
+                <td>@c.Telefono</td>
+                <td>@c.Correo</td>
+                <td>@(string.IsNullOrEmpty(c.PersonaContacto) ? "-" : c.PersonaContacto)</td>
+                <td>
+                    <span class="badge @(c.Estado == "Activo" ? "bg-success" : "bg-secondary")">
+                        @c.Estado
+                    </span>
+                </td>
+                <td>@c.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = c.Id })" class="btn btn-warning btn-sm">Editar</a>
+                    @if (c.Estado == "Activo")
+                    {
+                        <form method="post" asp-action="Inactivar" asp-route-id="@c.Id" style="display:inline;"
+                              onsubmit="return confirm('¿Inactivar a @c.Nombre? Conservará su historial.');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Inactivar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

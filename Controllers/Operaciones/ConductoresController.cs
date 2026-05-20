@@ -148,5 +148,41 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
 
             return RedirectToAction(nameof(Index));
         }
+        // GET: Vista de alertas de licencias próximas a vencer
+        [HttpGet]
+        public IActionResult AlertasLicencias()
+        {
+            var hoy = DateTime.Today;
+            var limite = hoy.AddDays(30);
+
+            var conductores = _context.Conductores
+                .Where(c => !c.IsDeleted && c.VencimientoLicencia <= limite)
+                .OrderBy(c => c.VencimientoLicencia)
+                .ToList();
+
+            return View(conductores);
+        }
+
+        // POST: Actualizar fecha de vencimiento de licencia
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActualizarVigencia(int id, DateTime nuevaFecha)
+        {
+            if (nuevaFecha < DateTime.Today)
+            {
+                TempData["Error"] = "No se puede registrar una fecha pasada.";
+                return RedirectToAction(nameof(AlertasLicencias));
+            }
+
+            var conductor = await _context.Conductores.FindAsync(id);
+            if (conductor == null) return NotFound();
+
+            conductor.VencimientoLicencia = nuevaFecha;
+            _context.Update(conductor);
+            await _context.SaveChangesAsync();
+
+            TempData["Exito"] = $"Vigencia de {conductor.Nombres} {conductor.Apellidos} actualizada correctamente.";
+            return RedirectToAction(nameof(AlertasLicencias));
+        }
     }
 }

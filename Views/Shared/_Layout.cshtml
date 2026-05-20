@@ -57,7 +57,13 @@
                                 <span>Conductores</span>
                             </div>
                         </a>
-
+                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Clientes" ? "active" : "")" 
+                            asp-area="" asp-controller="Clientes" asp-action="Index">
+                            <div class="menu-left">
+                                <i class="fa-regular fa-building"></i>
+                                <span>Clientes</span>
+                            </div>
+                        </a>
                         <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Ordenes" ? "active" : "")" 
                            asp-area="" asp-controller="Ordenes" asp-action="Index">
                             <div class="menu-left">
@@ -74,6 +80,7 @@
                                 <span>Rastreo</span>
                             </div>
                         </a>
+                        
 
                         <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Finanzas" ? "active" : "")" 
                            asp-area="" asp-controller="Finanzas" asp-action="Index">

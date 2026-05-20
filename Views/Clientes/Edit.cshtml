@@ -1,0 +1,41 @@
+@model Control_flota.Models.Operaciones.Cliente
+@{ ViewData["Title"] = "Editar Cliente"; }
+
+<h2>Editar Cliente</h2>
+
+<form asp-action="Edit" method="post" style="max-width:500px;">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
+    <div class="mb-3">
+        <label class="form-label">RUC (no editable)</label>
+        <input type="text" value="@Model.Ruc" class="form-control" readonly />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label">Razón Social</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Direccion" class="form-label">Dirección</label>
+        <input asp-for="Direccion" class="form-control" />
+        <span asp-validation-for="Direccion" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Telefono" class="form-label">Teléfono</label>
+        <input asp-for="Telefono" class="form-control" />
+        <span asp-validation-for="Telefono" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Correo" class="form-label">Correo</label>
+        <input asp-for="Correo" type="email" class="form-control" />
+        <span asp-validation-for="Correo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="PersonaContacto" class="form-label">Persona de Contacto (opcional)</label>
+        <input asp-for="PersonaContacto" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
