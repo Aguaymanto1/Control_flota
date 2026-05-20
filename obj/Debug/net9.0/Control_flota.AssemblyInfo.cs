@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Control_flota")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d5408dd251a0ad712d98d4a4ca6f885369cc0ee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+33d1ebb8b793cf7a7001fb5d9dbaca24ca6e878f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Control_flota")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Control_flota")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

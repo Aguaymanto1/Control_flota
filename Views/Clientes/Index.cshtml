@@ -1,74 +1,317 @@
 @model IEnumerable<Control_flota.Models.Operaciones.Cliente>
-@{ ViewData["Title"] = "Clientes"; }
+@{
+    ViewData["Title"] = "Clientes";
+}
 
-<h2>Clientes</h2>
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .search-bar input {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 9px 14px;
+        font-size: 0.875rem;
+        width: 320px;
+        outline: none;
+        transition: border 0.2s;
+    }
+
+    .search-bar input:focus {
+        border-color: #2563eb;
+    }
+
+    .btn-primary-custom {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #1d4ed8;
+        color: white;
+    }
+
+    .stats-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 24px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .stat-icon.blue  { background: #eff6ff; color: #2563eb; }
+    .stat-icon.green { background: #f0fdf4; color: #16a34a; }
+    .stat-icon.gray  { background: #f1f5f9; color: #64748b; }
+
+    .stat-info .number {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1;
+    }
+
+    .stat-info .label {
+        font-size: 0.78rem;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    .table-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-card table { margin: 0; }
+
+    .table-card thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 13px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        border-top: none;
+    }
+
+    .table-card tbody td {
+        padding: 14px 20px;
+        color: #1e293b;
+        font-size: 0.875rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table-card tbody tr:last-child td { border-bottom: none; }
+    .table-card tbody tr:hover { background: #f8fafc; }
+
+    .client-name {
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .client-ruc {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-activo   { background: #f0fdf4; color: #16a34a; }
+    .badge-inactivo { background: #f1f5f9; color: #64748b; }
+
+    .action-btn {
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s;
+    }
+
+    .action-btn.edit   { background: #f1f5f9; color: #475569; }
+    .action-btn.edit:hover { background: #e2e8f0; color: #1e293b; }
+    .action-btn.inactivar { background: #fef2f2; color: #dc2626; }
+    .action-btn.inactivar:hover { background: #fee2e2; }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+        display: block;
+    }
+</style>
+
+@{
+    var total    = Model.Count();
+    var activos  = Model.Count(c => c.Estado == "Activo");
+    var inactivos = Model.Count(c => c.Estado == "Inactivo");
+}
 
 @if (TempData["Exito"] != null)
 {
-    <div class="alert alert-success">@TempData["Exito"]</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i>@TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <form method="get" asp-action="Index" class="d-flex gap-2">
-        <input type="text" name="buscar" value="@ViewBag.Buscar"
-               placeholder="Buscar por Razón Social o RUC (mín. 3 caracteres)"
-               class="form-control" style="width:350px;" />
-        <button type="submit" class="btn btn-primary">Buscar</button>
-        @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
-        {
-            <a href="@Url.Action("Index")" class="btn btn-secondary">Limpiar</a>
-        }
-    </form>
-    <a href="@Url.Action("RegistrarCliente")" class="btn btn-success">+ Nuevo Cliente</a>
+<!-- HEADER -->
+<div class="page-header">
+    <p class="page-subtitle">Gestión de clientes y empresas</p>
+    <a href="@Url.Action("RegistrarCliente")" class="btn-primary-custom">
+        <i class="fa-solid fa-plus"></i> Nuevo Cliente
+    </a>
 </div>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">No se encontraron clientes.</div>
-}
-else
-{
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Razón Social</th>
-                <th>RUC</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th>Persona de Contacto</th>
-                <th>Estado</th>
-                <th>Fecha Registro</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var c in Model)
-        {
-            <tr class="@(c.Estado == "Inactivo" ? "table-secondary text-muted" : "")">
-                <td>@c.Nombre</td>
-                <td>@c.Ruc</td>
-                <td>@c.Telefono</td>
-                <td>@c.Correo</td>
-                <td>@(string.IsNullOrEmpty(c.PersonaContacto) ? "-" : c.PersonaContacto)</td>
-                <td>
-                    <span class="badge @(c.Estado == "Activo" ? "bg-success" : "bg-secondary")">
-                        @c.Estado
-                    </span>
-                </td>
-                <td>@c.FechaRegistro.ToString("dd/MM/yyyy")</td>
-                <td>
-                    <a href="@Url.Action("Edit", new { id = c.Id })" class="btn btn-warning btn-sm">Editar</a>
-                    @if (c.Estado == "Activo")
-                    {
-                        <form method="post" asp-action="Inactivar" asp-route-id="@c.Id" style="display:inline;"
-                              onsubmit="return confirm('¿Inactivar a @c.Nombre? Conservará su historial.');">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger btn-sm">Inactivar</button>
-                        </form>
-                    }
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
+<!-- STATS -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-regular fa-building"></i></div>
+        <div class="stat-info">
+            <div class="number">@total</div>
+            <div class="label">Total clientes</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+            <div class="number">@activos</div>
+            <div class="label">Activos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon gray"><i class="fa-solid fa-ban"></i></div>
+        <div class="stat-info">
+            <div class="number">@inactivos</div>
+            <div class="label">Inactivos</div>
+        </div>
+    </div>
+</div>
+
+<!-- BUSCADOR -->
+<form method="get" asp-action="Index" class="search-bar">
+    <input type="text" name="buscar" value="@ViewBag.Buscar"
+           placeholder="Buscar por Razón Social o RUC (mín. 3 caracteres)" />
+    <button type="submit" class="btn-primary-custom">
+        <i class="fa-solid fa-magnifying-glass"></i> Buscar
+    </button>
+    @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
+    {
+        <a href="@Url.Action("Index")" class="action-btn edit">Limpiar</a>
+    }
+</form>
+
+<!-- TABLA -->
+<div class="table-card">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fa-regular fa-building"></i>
+            <p>No se encontraron clientes.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Persona de Contacto</th>
+                    <th>Estado</th>
+                    <th>Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr class="@(c.Estado == "Inactivo" ? "opacity-50" : "")">
+                        <td>
+                            <div class="client-name">@c.Nombre</div>
+                            <div class="client-ruc">RUC: @c.Ruc</div>
+                        </td>
+                        <td>@c.Telefono</td>
+                        <td>@c.Correo</td>
+                        <td>@(string.IsNullOrEmpty(c.PersonaContacto) ? "-" : c.PersonaContacto)</td>
+                        <td>
+                            <span class="badge-estado @(c.Estado == "Activo" ? "badge-activo" : "badge-inactivo")">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                                @c.Estado
+                            </span>
+                        </td>
+                        <td>@c.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <a href="@Url.Action("Edit", new { id = c.Id })" class="action-btn edit">
+                                    <i class="fa-regular fa-pen-to-square"></i> Editar
+                                </a>
+                                @if (c.Estado == "Activo")
+                                {
+                                    <form method="post" asp-action="Inactivar" asp-route-id="@c.Id" style="display:inline;"
+                                          onsubmit="return confirm('¿Inactivar a @c.Nombre?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="action-btn inactivar">
+                                            <i class="fa-solid fa-ban"></i> Inactivar
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
