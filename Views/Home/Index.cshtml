@@ -128,7 +128,9 @@
         font-weight: 700;
     }
 </style>
-
+@{
+    Layout = "_Layout";
+}
 @if (SignInManager.IsSignedIn(User))
 {
     <!-- Vista simplificada para usuario logueado -->
