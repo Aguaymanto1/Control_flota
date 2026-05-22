@@ -29,7 +29,7 @@ public class Conductor
 
     [Required(ErrorMessage = "La fecha de vencimiento de la licencia es obligatoria.")]
     [DataType(DataType.Date)]
-    public DateTime? VencimientoLicencia { get; set; }
+    public DateTime VencimientoLicencia { get; set; }
 
     public string EstadoOperativo { get; set; } = "Activo";
 
