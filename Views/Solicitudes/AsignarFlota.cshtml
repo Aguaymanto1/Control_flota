@@ -6,6 +6,20 @@
 
 <h2>Asignar Flota</h2>
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
 @if (!string.IsNullOrEmpty(unidadesMensaje))
 {
     <div class="alert alert-warning">
@@ -15,7 +29,10 @@
 
 <form method="post">
     @Html.AntiForgeryToken()
-    <input type="hidden" name="SolicitudId" value="@ViewBag.SolicitudId" />
+
+    <input type="hidden"
+           name="SolicitudId"
+           value="@ViewBag.SolicitudId" />
 
     <div class="mb-3">
         <label>Conductor</label>
@@ -50,6 +67,5 @@
     <button type="submit" class="btn btn-success">
         Asignar Flota
     </button>
-    
 
 </form>

@@ -230,7 +230,7 @@ public async Task<IActionResult> Eliminar(int id)
 [HttpGet]
 public IActionResult AsignarFlota(int id)
 {
-    // Obtener la solicitud actual
+    // OBTENER LA SOLICITUD
     var solicitud = _context.SolicitudesServicio.Find(id);
 
     if (solicitud == null)
@@ -243,22 +243,20 @@ public IActionResult AsignarFlota(int id)
         .Where(c => c.Actividad == "Libre")
         .ToList();
 
-    // UNIDADES DISPONIBLES (preferimos libres y activas)
+    // SOLO UNIDADES APTAS Y LIBRES
     var unidades = _context.Unidades
         .Where(u =>
             u.Actividad == "Libre"
-            && u.EstadoOperativo == "Activo"
+            && u.EstadoOperativo == "Inspeccionado - Apto"
         )
         .OrderBy(u => u.Placa)
         .ToList();
 
+    // SI NO HAY UNIDADES APTAS
     if (!unidades.Any())
     {
-        unidades = _context.Unidades
-            .OrderBy(u => u.Placa)
-            .ToList();
-
-        ViewBag.UnidadesMensaje = "No hay unidades libres y activas disponibles; se muestran todas las unidades.";
+        ViewBag.UnidadesMensaje =
+            "No hay unidades inspeccionadas y libres disponibles.";
     }
 
     ViewBag.Conductores = conductores;
@@ -268,15 +266,52 @@ public IActionResult AsignarFlota(int id)
     return View();
 }
 [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId)
+[ValidateAntiForgeryToken]
+public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId)
+{
+    // VALIDACIONES
+    if (ConductorId == 0 && UnidadId == 0)
     {
-        var solicitud = _context.SolicitudesServicio.Find(SolicitudId);
-    var conductor = _context.Conductores.Find(ConductorId);
+        TempData["Error"] =
+            "Seleccione conductor y unidad.";
 
-    var unidad = _context.Unidades.Find(UnidadId);
+        return RedirectToAction(
+            "AsignarFlota",
+            new { id = SolicitudId });
+    }
 
-    if (solicitud == null || conductor == null || unidad == null)
+    if (ConductorId == 0)
+    {
+        TempData["Error"] =
+            "Seleccione un conductor.";
+
+        return RedirectToAction(
+            "AsignarFlota",
+            new { id = SolicitudId });
+    }
+
+    if (UnidadId == 0)
+    {
+        TempData["Error"] =
+            "Seleccione una unidad.";
+
+        return RedirectToAction(
+            "AsignarFlota",
+            new { id = SolicitudId });
+    }
+
+    var solicitud =
+        _context.SolicitudesServicio.Find(SolicitudId);
+
+    var conductor =
+        _context.Conductores.Find(ConductorId);
+
+    var unidad =
+        _context.Unidades.Find(UnidadId);
+
+    if (solicitud == null ||
+        conductor == null ||
+        unidad == null)
     {
         return NotFound();
     }
@@ -284,7 +319,7 @@ public IActionResult AsignarFlota(int id)
     // CAMBIAR ESTADO DE LA SOLICITUD
     solicitud.EstadoSolicitud = "Asignado";
 
-    // Guardar relación con conductor y unidad
+    // GUARDAR RELACIÓN
     solicitud.ConductorId = ConductorId;
     solicitud.UnidadId = UnidadId;
 
@@ -298,6 +333,9 @@ public IActionResult AsignarFlota(int id)
     solicitud.FechaDespacho = DateTime.Now;
 
     _context.SaveChanges();
+
+    TempData["Success"] =
+        "Flota asignada correctamente.";
 
     return RedirectToAction("Index");
 }

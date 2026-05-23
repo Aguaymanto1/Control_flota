@@ -38,6 +38,10 @@
                 <td>@unidad.Actividad</td>
                 <td>
                     <a href="@Url.Action("Edit", new { id = unidad.Id })" class="btn btn-warning">Editar</a>
+                    <a href="@Url.Action("Create", "Inspecciones", new { placa = unidad.Placa })"
+       class="btn btn-info">
+        Inspección
+    </a>
                      <form method="post" action="@Url.Action("Delete", new { id = unidad.Id })" style="display:inline;">
                         @Html.AntiForgeryToken() <!-- Agregar el token de validación CSRF -->
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta unidad?');">Eliminar</button>
