@@ -49,7 +49,15 @@ public IActionResult Create(Inspeccion inspeccion)
     // ACTUALIZAR ESTADO DE LA UNIDAD
     if (unidad != null)
     {
-        unidad.EstadoOperativo = inspeccion.EstadoVehiculo;
+       unidad.EstadoOperativo = inspeccion.EstadoVehiculo;
+
+    // SI EL VEHÍCULO ES APTO
+    if (inspeccion.EstadoVehiculo == "Inspeccionado - Apto")
+    {
+        // VENCE EN 1 AÑO
+        unidad.VencimientoRevisionTecnica =
+            DateTime.Now.AddYears(1);
+    }
     }
 
     // GUARDAR CAMBIOS
