@@ -1,53 +1,317 @@
 @model IEnumerable<Control_flota.Models.Operaciones.Unidad>
-
 @{
-    ViewData["Title"] = "Unidades";
+    ViewData["Title"] = "Flota";
 }
 
-<h1>Unidades de Flota</h1>
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
 
-<p>
-    <a href="@Url.Action("Create")" class="btn btn-primary">Registrar Nueva Unidad</a>
-</p>
+    .page-subtitle {
+        color: #64748b;
+        margin: 0;
+        font-size: 0.9rem;
+    }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Placa</th>
-            <th>Tipo</th>
-            <th>Marca</th>
-            <th>Modelo</th>
-            <th>Año</th>
-            <th>Capacidad (kg)</th>
-            <th>Estado</th>
-            <th>Actividad</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var unidad in Model)
-        {
-            <tr>
-                <td>@unidad.Placa</td>
-                <td>@unidad.Tipo</td>
-                <td>@unidad.Marca</td>
-                <td>@unidad.Modelo</td>
-                <td>@unidad.Anio</td>
-                <td>@unidad.CapacidadKg</td>
-                <td>@unidad.EstadoOperativo</td>
-                <td>@unidad.Actividad</td>
-                <td>
-                    <a href="@Url.Action("Edit", new { id = unidad.Id })" class="btn btn-warning">Editar</a>
-                    <a href="@Url.Action("Create", "Inspecciones", new { placa = unidad.Placa })"
-       class="btn btn-info">
-        Inspección
+    .btn-primary-custom {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #1d4ed8;
+        color: white;
+    }
+
+    .stats-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 24px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .stat-icon.blue   { background: #eff6ff; color: #2563eb; }
+    .stat-icon.green  { background: #f0fdf4; color: #16a34a; }
+    .stat-icon.orange { background: #fff7ed; color: #ea580c; }
+    .stat-icon.red    { background: #fef2f2; color: #dc2626; }
+
+    .stat-info .number {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1;
+    }
+
+    .stat-info .label {
+        font-size: 0.78rem;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    .table-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-card table { margin: 0; }
+
+    .table-card thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 13px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        border-top: none;
+    }
+
+    .table-card tbody td {
+        padding: 14px 20px;
+        color: #1e293b;
+        font-size: 0.875rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table-card tbody tr:last-child td { border-bottom: none; }
+    .table-card tbody tr:hover { background: #f8fafc; }
+
+    .unit-placa {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 0.95rem;
+    }
+
+    .unit-sub {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-activo       { background: #f0fdf4; color: #16a34a; }
+    .badge-inactivo     { background: #fef2f2; color: #dc2626; }
+    .badge-apto         { background: #eff6ff; color: #2563eb; }
+    .badge-mantenimiento{ background: #fff7ed; color: #ea580c; }
+    .badge-libre        { background: #f0fdf4; color: #16a34a; }
+    .badge-ocupado      { background: #fff7ed; color: #ea580c; }
+
+    .action-btn {
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s;
+    }
+
+    .action-btn.edit        { background: #f1f5f9; color: #475569; }
+    .action-btn.edit:hover  { background: #e2e8f0; color: #1e293b; }
+    .action-btn.inspect     { background: #eff6ff; color: #2563eb; }
+    .action-btn.inspect:hover { background: #dbeafe; }
+    .action-btn.delete      { background: #fef2f2; color: #dc2626; }
+    .action-btn.delete:hover { background: #fee2e2; }
+
+    .capacity-bar-wrap {
+        background: #f1f5f9;
+        border-radius: 99px;
+        height: 6px;
+        width: 80px;
+        margin-top: 4px;
+    }
+
+    .capacity-bar {
+        height: 6px;
+        border-radius: 99px;
+        background: #2563eb;
+    }
+</style>
+
+@{
+    var total      = Model.Count();
+    var activos    = Model.Count(u => u.EstadoOperativo == "Activo" || u.EstadoOperativo == "Inspeccionado - Apto");
+    var libres     = Model.Count(u => u.Actividad == "Libre");
+    var ocupados   = Model.Count(u => u.Actividad == "Ocupado");
+}
+
+<!-- HEADER -->
+<div class="page-header">
+    <div>
+        <h2 style="font-size:1.75rem; font-weight:700; color:#0f172a; margin:0;">Unidades de Flota</h2>
+        <p class="page-subtitle">Gestión de unidades vehiculares</p>
+    </div>
+    <a href="@Url.Action("Create")" class="btn-primary-custom">
+        <i class="fa-solid fa-plus"></i> Registrar Unidad
     </a>
-                     <form method="post" action="@Url.Action("Delete", new { id = unidad.Id })" style="display:inline;">
-                        @Html.AntiForgeryToken() <!-- Agregar el token de validación CSRF -->
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta unidad?');">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-truck"></i></div>
+        <div class="stat-info">
+            <div class="number">@total</div>
+            <div class="label">Total unidades</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+            <div class="number">@activos</div>
+            <div class="label">Operativas</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-key"></i></div>
+        <div class="stat-info">
+            <div class="number">@libres</div>
+            <div class="label">Disponibles</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange"><i class="fa-solid fa-road"></i></div>
+        <div class="stat-info">
+            <div class="number">@ocupados</div>
+            <div class="label">En servicio</div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLA -->
+<div class="table-card">
+    @if (!Model.Any())
+    {
+        <div style="text-align:center; padding:60px 20px; color:#94a3b8;">
+            <i class="fa-solid fa-truck" style="font-size:2.5rem; display:block; margin-bottom:12px;"></i>
+            <p>No hay unidades registradas.</p>
+            <a href="@Url.Action("Create")" class="btn-primary-custom">Registrar la primera</a>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Unidad</th>
+                    <th>Tipo</th>
+                    <th>Capacidad</th>
+                    <th>Estado</th>
+                    <th>Actividad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    var maxCap = 100000.0;
+                    var pct = Math.Min(((double)(u.CapacidadKg ?? 0) / maxCap) * 100, 100);
+
+                    string estadoClass = u.EstadoOperativo switch {
+                        "Activo" => "badge-activo",
+                        "Inspeccionado - Apto" => "badge-apto",
+                        "Mantenimiento Preventivo" => "badge-mantenimiento",
+                        _ => "badge-inactivo"
+                    };
+
+                    string actividadClass = u.Actividad == "Libre" ? "badge-libre" : "badge-ocupado";
+
+                    <tr>
+                        <td>
+                            <div class="unit-placa">@u.Placa</div>
+                            <div class="unit-sub">@u.Marca @u.Modelo · @u.Anio</div>
+                        </td>
+                        <td>@u.Tipo</td>
+                        <td>
+                            <div style="font-size:0.85rem; font-weight:600;">@((u.CapacidadKg ?? 0).ToString("N0")) kg</div>
+                            <div class="capacity-bar-wrap">
+                                <div class="capacity-bar" style="width:@pct.ToString("0")%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-estado @estadoClass">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                                @u.EstadoOperativo
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge-estado @actividadClass">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                                @u.Actividad
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                <a href="@Url.Action("Edit", new { id = u.Id })" class="action-btn edit">
+                                    <i class="fa-regular fa-pen-to-square"></i> Editar
+                                </a>
+                                <a href="@Url.Action("Create", "Inspecciones", new { placa = u.Placa })" class="action-btn inspect">
+                                    <i class="fa-solid fa-clipboard-check"></i> Inspección
+                                </a>
+                                <form method="post" action="@Url.Action("Delete", new { id = u.Id })" style="display:inline;"
+                                      onsubmit="return confirm('¿Eliminar la unidad @u.Placa?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

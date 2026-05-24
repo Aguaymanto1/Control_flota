@@ -33,70 +33,52 @@
                     </div>
 
                     <div class="sidebar-menu">
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")" 
-                           asp-area="" asp-controller="Admin" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-solid fa-table-cells-large"></i>
-                                <span>Panel</span>
-                            </div>
-                        </a>
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Index">
+                                <div class="menu-left"><i class="fa-solid fa-table-cells-large"></i><span>Panel</span></div>
+                            </a>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Unidades" ? "active" : "")"
+                            asp-controller="Unidades" asp-action="Index">
+                                <div class="menu-left"><i class="fa-solid fa-truck"></i><span>Flota</span></div>
+                                <div class="badge-menu">3</div>
+                            </a>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Conductores" ? "active" : "")"
+                            asp-controller="Conductores" asp-action="Index">
+                                <div class="menu-left"><i class="fa-regular fa-user"></i><span>Conductores</span></div>
+                            </a>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Clientes" ? "active" : "")"
+                            asp-controller="Clientes" asp-action="Index">
+                                <div class="menu-left"><i class="fa-regular fa-building"></i><span>Clientes</span></div>
+                            </a>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Solicitudes" ? "active" : "")"
+                            asp-controller="Solicitudes" asp-action="Index">
+                                <div class="menu-left"><i class="fa-solid fa-file-lines"></i><span>Solicitudes</span></div>
+                            </a>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Ordenes" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
+                            asp-controller="Ordenes" asp-action="Index">
+                                <div class="menu-left"><i class="fa-regular fa-paper-plane"></i><span>Despacho</span></div>
+                                <div class="badge-menu">5</div>
+                            </a>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "EnDesarrollo" && ViewContext.RouteData.Values["action"]?.ToString() == "Rastreo" ? "active" : "")"
+                            asp-controller="EnDesarrollo" asp-action="Rastreo">
+                                <div class="menu-left"><i class="fa-solid fa-location-dot"></i><span>Rastreo</span></div>
+                            </a>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "EnDesarrollo" && ViewContext.RouteData.Values["action"]?.ToString() == "Finanzas" ? "active" : "")"
+                            asp-controller="EnDesarrollo" asp-action="Finanzas">
+                                <div class="menu-left"><i class="fa-solid fa-filter"></i><span>Finanzas</span></div>
+                                <div class="badge-menu">2</div>
+                            </a>
+                        }
 
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Unidades" ? "active" : "")" 
-                           asp-area="" asp-controller="Unidades" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-solid fa-truck"></i>
-                                <span>Flota</span>
-                            </div>
-                            <div class="badge-menu">3</div>
-                        </a>
-
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Conductores" ? "active" : "")" 
-                           asp-area="" asp-controller="Conductores" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-regular fa-user"></i>
-                                <span>Conductores</span>
-                            </div>
-                        </a>
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Clientes" ? "active" : "")" 
-                            asp-area="" asp-controller="Clientes" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-regular fa-building"></i>
-                                <span>Clientes</span>
-                            </div>
-                        </a>
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Solicitudes" ? "active" : "")" 
-                            asp-area="" asp-controller="Solicitudes" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-solid fa-file-lines"></i>
-                                <span>Solicitudes</span>
-                            </div>
-                        </a>
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Ordenes" ? "active" : "")" 
-                           asp-area="" asp-controller="Ordenes" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-regular fa-paper-plane"></i>
-                                <span>Despacho</span>
-                            </div>
-                            <div class="badge-menu">5</div>
-                        </a>
-
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Rastreo" ? "active" : "")" 
-                           asp-area="" asp-controller="Rastreo" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <span>Rastreo</span>
-                            </div>
-                        </a>
-                        
-
-                        <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Finanzas" ? "active" : "")" 
-                           asp-area="" asp-controller="Finanzas" asp-action="Index">
-                            <div class="menu-left">
-                                <i class="fa-solid fa-filter"></i>
-                                <span>Finanzas</span>
-                            </div>
-                            <div class="badge-menu">2</div>
-                        </a>
+                        @if (User.IsInRole("Conductor"))
+                        {
+                            <a class="menu-item @(ViewContext.RouteData.Values["action"]?.ToString() == "PanelConductor" ? "active" : "")"
+                            asp-controller="Ordenes" asp-action="PanelConductor">
+                                <div class="menu-left"><i class="fa-solid fa-road"></i><span>Mis Viajes</span></div>
+                            </a>
+                        }
                     </div>
                 </div>
 
@@ -138,17 +120,6 @@
         }
 
         <div class="main-content">
-
-            <header class="navbar-custom">
-                <div class="d-flex justify-content-between align-items-center w-100">
-                    <div>
-                        <h5 class="m-0 fw-bold text-dark">@ViewData["Title"]</h5> 
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <partial name="_LoginPartial" />
-                    </div>
-                </div>
-            </header>
             
             <div class="workspace-container">
                 <main role="main" class="pb-3">

@@ -199,7 +199,8 @@ public async Task<IActionResult> Index()
             Destino = solicitud.Destino,
             NombreConductor = nombreConductor,
             PlacaCamion = placaCamion,
-            SolicitudServicioId = solicitud.Id
+            SolicitudServicioId = solicitud.Id,
+            ConductorId = solicitud.ConductorId
         };
 
         _context.Ordenes.Add(orden);

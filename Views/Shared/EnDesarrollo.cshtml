@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "En desarrollo";
+    string modulo = ViewBag.Modulo ?? "Esta funcionalidad";
+}
+
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;
+            min-height:60vh; text-align:center; color:#64748b;">
+    <div style="width:80px; height:80px; background:#eff6ff; border-radius:20px;
+                display:flex; align-items:center; justify-content:center;
+                font-size:2rem; color:#2563eb; margin-bottom:24px;">
+        <i class="fa-solid fa-wrench"></i>
+    </div>
+    <h2 style="font-size:1.5rem; font-weight:700; color:#0f172a; margin-bottom:8px;">
+        @modulo en desarrollo
+    </h2>
+    <p style="max-width:360px; line-height:1.6;">
+        Esta sección está siendo desarrollada y estará disponible en un próximo sprint.
+    </p>
+    <span style="background:#eff6ff; color:#2563eb; padding:4px 14px;
+                 border-radius:20px; font-size:0.8rem; font-weight:600; margin-top:8px;">
+        🚧 Sprint en progreso
+    </span>
+</div>

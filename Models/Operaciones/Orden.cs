@@ -27,4 +27,8 @@ public class Orden
 
     // Relación con la solicitud de servicio original
     public int SolicitudServicioId { get; set; }
+
+    // Para filtrar órdenes del conductor logueado
+    public int? ConductorId { get; set; }
+    public virtual Conductor? Conductor { get; set; }
 }

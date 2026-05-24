@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Control_flota.Data;
 using Control_flota.Models.Login;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddIdentity<Usuario, IdentityRole>(options => options.SignIn.Re
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
+QuestPDF.Settings.License = LicenseType.Community;
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

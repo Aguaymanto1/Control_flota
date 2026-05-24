@@ -1,0 +1,208 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Orden>
+@{
+    ViewData["Title"] = "Mis Viajes";
+}
+
+<style>
+    .page-subtitle { color: #64748b; margin: 4px 0 0; font-size: 0.9rem; }
+
+    .stats-row { display: flex; gap: 16px; margin-bottom: 24px; }
+
+    .stat-card {
+        background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+        padding: 16px 24px; flex: 1; display: flex; align-items: center; gap: 14px;
+    }
+
+    .stat-icon {
+        width: 42px; height: 42px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .stat-icon.blue   { background: #eff6ff; color: #2563eb; }
+    .stat-icon.orange { background: #fff7ed; color: #ea580c; }
+    .stat-icon.green  { background: #f0fdf4; color: #16a34a; }
+
+    .stat-info .number { font-size: 1.4rem; font-weight: 700; color: #0f172a; line-height: 1; }
+    .stat-info .label  { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
+
+    .table-card {
+        background: white; border: 1px solid #e2e8f0;
+        border-radius: 12px; overflow: hidden;
+    }
+    .table-card table { margin: 0; }
+
+    .table-card thead th {
+        background: #f8fafc; color: #475569; font-size: 0.75rem;
+        font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+        padding: 13px 20px; border-bottom: 1px solid #e2e8f0; border-top: none;
+    }
+
+    .table-card tbody td {
+        padding: 14px 20px; color: #1e293b; font-size: 0.875rem;
+        vertical-align: middle; border-bottom: 1px solid #f1f5f9;
+    }
+    .table-card tbody tr:last-child td { border-bottom: none; }
+    .table-card tbody tr:hover { background: #f8fafc; }
+
+    .codigo { font-weight: 700; font-family: monospace; font-size: 0.85rem; }
+    .sub-text { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+
+    .badge-estado {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-emitida    { background: #eff6ff; color: #2563eb; }
+    .badge-transito   { background: #fff7ed; color: #ea580c; }
+    .badge-completado { background: #f0fdf4; color: #16a34a; }
+
+    .action-btn {
+        border: none; padding: 8px 18px; border-radius: 8px;
+        font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+    }
+    .btn-iniciar   { background: #2563eb; color: white; }
+    .btn-iniciar:hover { background: #1d4ed8; }
+    .btn-finalizar { background: #16a34a; color: white; }
+    .btn-finalizar:hover { background: #15803d; }
+    .btn-disabled  { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+</style>
+
+@{
+    var emitidas   = Model.Count(o => o.Estado == "Emitida");
+    var enTransito = Model.Count(o => o.Estado == "En Tránsito");
+    var completadas = Model.Count(o => o.Estado == "Completado");
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="fa-solid fa-circle-check me-2"></i>@TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- HEADER -->
+<div style="margin-bottom:24px;">
+    <h2 style="font-size:1.75rem; font-weight:700; color:#0f172a; margin:0;">Mis Viajes</h2>
+    <p class="page-subtitle">Panel del conductor — órdenes asignadas</p>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-regular fa-file-lines"></i></div>
+        <div class="stat-info">
+            <div class="number">@emitidas</div>
+            <div class="label">Pendientes de inicio</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange"><i class="fa-solid fa-road"></i></div>
+        <div class="stat-info">
+            <div class="number">@enTransito</div>
+            <div class="label">En tránsito</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+            <div class="number">@completadas</div>
+            <div class="label">Completados</div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLA -->
+<div class="table-card">
+    @if (!Model.Any())
+    {
+        <div style="text-align:center; padding:60px; color:#94a3b8;">
+            <i class="fa-solid fa-truck" style="font-size:2.5rem; display:block; margin-bottom:12px;"></i>
+            <p>No tienes órdenes asignadas aún.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Orden</th>
+                    <th>Cliente</th>
+                    <th>Ruta</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var orden in Model)
+            {
+                string badgeClass = orden.Estado switch {
+                    "Emitida"     => "badge-emitida",
+                    "En Tránsito" => "badge-transito",
+                    "Completado"  => "badge-completado",
+                    _ => "badge-emitida"
+                };
+
+                <tr>
+                    <td><span class="codigo">@orden.Codigo</span></td>
+                    <td>@orden.Cliente?.Nombre</td>
+                    <td>
+                        <div style="font-weight:500;">@orden.Origen</div>
+                        <div class="sub-text">
+                            <i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> @orden.Destino
+                        </div>
+                    </td>
+                    <td>@orden.FechaEmision.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <span class="badge-estado @badgeClass">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            @orden.Estado
+                        </span>
+                    </td>
+                    <td>
+                        @if (orden.Estado == "Emitida")
+                        {
+                            <form method="post" asp-action="IniciarRuta" asp-route-id="@orden.Id"
+                                  onsubmit="return confirm('¿Iniciar ruta para @orden.Codigo?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="action-btn btn-iniciar">
+                                    <i class="fa-solid fa-play"></i> Iniciar Ruta
+                                </button>
+                            </form>
+                        }
+                        else if (orden.Estado == "En Tránsito")
+                        {
+                            <form method="post" asp-action="FinalizarRuta" asp-route-id="@orden.Id"
+                                  onsubmit="return confirm('¿Confirmar llegada al destino?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="action-btn btn-finalizar">
+                                    <i class="fa-solid fa-flag-checkered"></i> Finalizar Ruta
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div style="display:flex; flex-direction:column; gap:6px;">
+                                <span class="action-btn btn-disabled">
+                                    <i class="fa-solid fa-check"></i> Completado
+                                </span>
+                                <a href="@Url.Action("DescargarConstancia", new { id = orden.Id })"
+                                class="action-btn" style="background:#f0fdf4; color:#16a34a; text-decoration:none;">
+                                    <i class="fa-solid fa-file-arrow-down"></i> Constancia PDF
+                                </a>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
