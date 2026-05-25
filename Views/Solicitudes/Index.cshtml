@@ -15,9 +15,7 @@
 
     .header-actions { display: flex; gap: 10px; }
 
-    .btn-primary-custom {
-        background-color: #2563eb;
-        color: white;
+    .btn-primary-custom, .btn-secondary-custom, .btn-success-custom {
         border: none;
         padding: 9px 18px;
         border-radius: 8px;
@@ -30,40 +28,14 @@
         cursor: pointer;
         transition: background 0.2s;
     }
+
+    .btn-primary-custom { background-color: #2563eb; color: white; }
     .btn-primary-custom:hover { background-color: #1d4ed8; color: white; }
 
-    .btn-secondary-custom {
-        background-color: #f1f5f9;
-        color: #475569;
-        border: none;
-        padding: 9px 18px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
+    .btn-secondary-custom { background-color: #f1f5f9; color: #475569; }
     .btn-secondary-custom:hover { background-color: #e2e8f0; color: #1e293b; }
 
-    .btn-success-custom {
-        background-color: #16a34a;
-        color: white;
-        border: none;
-        padding: 9px 18px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
+    .btn-success-custom { background-color: #16a34a; color: white; }
     .btn-success-custom:hover { background-color: #15803d; color: white; }
 
     .stats-row { display: flex; gap: 16px; margin-bottom: 24px; }
@@ -77,7 +49,10 @@
         display: flex;
         align-items: center;
         gap: 14px;
+        transition: all 0.2s ease;
     }
+    
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
 
     .stat-icon {
         width: 42px; height: 42px;
@@ -88,29 +63,9 @@
     .stat-icon.blue   { background: #eff6ff; color: #2563eb; }
     .stat-icon.orange { background: #fff7ed; color: #ea580c; }
     .stat-icon.green  { background: #f0fdf4; color: #16a34a; }
-    .stat-icon.gray   { background: #f1f5f9; color: #64748b; }
 
     .stat-info .number { font-size: 1.4rem; font-weight: 700; color: #0f172a; line-height: 1; }
-    .stat-info .label  { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
-
-    .toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        gap: 10px;
-    }
-
-    .search-bar { display: flex; gap: 8px; }
-    .search-bar input {
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 8px 14px;
-        font-size: 0.875rem;
-        width: 240px;
-        outline: none;
-    }
-    .search-bar input:focus { border-color: #2563eb; }
+    .stat-info .label  { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; font-weight: 600; }
 
     .table-card {
         background: white;
@@ -156,6 +111,7 @@
     .badge-noemitida   { background: #f1f5f9; color: #64748b; }
     .badge-asignado    { background: #eff6ff; color: #2563eb; }
     .badge-pendiente   { background: #fff7ed; color: #ea580c; }
+    .badge-completado  { background: #dcfce7; color: #15803d; }
 
     .action-btn {
         border: none; padding: 5px 12px; border-radius: 6px;
@@ -172,14 +128,13 @@
 </style>
 
 @{
-    var total     = Model.Count();
-    var pendientes = Model.Count(s => s.EstadoSolicitud == "Pendiente" || s.EstadoSolicitud == "Pendiente de Asignación");
-    var asignados  = Model.Count(s => s.EstadoSolicitud == "Asignado");
-    var ids        = ViewBag.OrdenesEmitidasIds as HashSet<int>;
-    var emitidas   = ids?.Count ?? 0;
+    var total       = Model.Count();
+    var pendientes  = Model.Count(s => s.EstadoSolicitud == "Pendiente" || s.EstadoSolicitud == "Pendiente de Asignación");
+    var asignados   = Model.Count(s => s.EstadoSolicitud == "Asignado");
+    var completadas = Model.Count(s => s.EstadoSolicitud == "Completado");
+    var ids         = ViewBag.OrdenesEmitidasIds as HashSet<int>;
 }
 
-<!-- HEADER -->
 <div class="page-header">
     <div>
         <h2 style="font-size:1.75rem; font-weight:700; color:#0f172a; margin:0;">Solicitudes de Servicio</h2>
@@ -192,46 +147,43 @@
         <a href="@Url.Action("RegistrarCliente", "Clientes")" class="btn-secondary-custom">
             <i class="fa-solid fa-building"></i> Nuevo Cliente
         </a>
-        <button type="button" class="btn-success-custom"
-                data-bs-toggle="modal" data-bs-target="#nuevaSolicitudModal">
+        <button type="button" class="btn-success-custom" data-bs-toggle="modal" data-bs-target="#nuevaSolicitudModal">
             <i class="fa-solid fa-plus"></i> Nueva Solicitud
         </button>
     </div>
 </div>
 
-<!-- STATS -->
 <div class="stats-row">
-    <div class="stat-card">
+    <div class="stat-card" id="filtro-TODOS" onclick="filtrarTabla('TODOS')" style="cursor:pointer; border-color:#2563eb; background-color:#f8fafc;">
         <div class="stat-icon blue"><i class="fa-regular fa-file-lines"></i></div>
         <div class="stat-info">
             <div class="number">@total</div>
-            <div class="label">Total solicitudes</div>
+            <div class="label">Todas</div>
         </div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" id="filtro-Pendiente" onclick="filtrarTabla('Pendiente')" style="cursor:pointer;">
         <div class="stat-icon orange"><i class="fa-solid fa-clock"></i></div>
         <div class="stat-info">
             <div class="number">@pendientes</div>
             <div class="label">Pendientes</div>
         </div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" id="filtro-Asignado" onclick="filtrarTabla('Asignado')" style="cursor:pointer;">
         <div class="stat-icon blue"><i class="fa-solid fa-truck"></i></div>
         <div class="stat-info">
             <div class="number">@asignados</div>
-            <div class="label">Asignados</div>
+            <div class="label">Asignadas</div>
         </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon green"><i class="fa-solid fa-file-circle-check"></i></div>
+    <div class="stat-card" id="filtro-Completado" onclick="filtrarTabla('Completado')" style="cursor:pointer;">
+        <div class="stat-icon green"><i class="fa-solid fa-check-double"></i></div>
         <div class="stat-info">
-            <div class="number">@emitidas</div>
-            <div class="label">Con orden emitida</div>
+            <div class="number">@completadas</div>
+            <div class="label">Completadas</div>
         </div>
     </div>
 </div>
 
-<!-- TABLA -->
 <div class="table-card">
     @if (!Model.Any())
     {
@@ -258,14 +210,19 @@
             @foreach (var solicitud in Model)
             {
                 bool tieneOrden = ids != null && ids.Contains(solicitud.Id);
+                
+                // Limpiamos el texto del estado para el script de filtrado
+                string estadoFiltro = solicitud.EstadoSolicitud.Contains("Pendiente") ? "Pendiente" : solicitud.EstadoSolicitud;
+                
                 string estadoClass = solicitud.EstadoSolicitud switch {
                     "Asignado" => "badge-asignado",
+                    "Completado" => "badge-completado",
                     "Pendiente" => "badge-pendiente",
                     "Pendiente de Asignación" => "badge-pendiente",
                     _ => "badge-pendiente"
                 };
 
-                <tr>
+                <tr class="fila-solicitud" data-estado="@estadoFiltro">
                     <td><span class="codigo">@solicitud.Codigo</span></td>
                     <td>@(solicitud.Cliente?.Nombre ?? "-")</td>
                     <td>
@@ -298,22 +255,32 @@
                     </td>
                     <td>
                         <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                            @if (solicitud.EstadoSolicitud != "Asignado")
-                            {
-                                <a asp-action="AsignarFlota" asp-route-id="@solicitud.Id" class="action-btn assign">
-                                    <i class="fa-solid fa-truck"></i> Asignar
-                                </a>
-                            }
                             <a href="@Url.Action("Details", new { id = solicitud.Id })" class="action-btn view">
                                 <i class="fa-regular fa-eye"></i> Ver
                             </a>
-                            <form method="post" asp-action="Eliminar" asp-route-id="@solicitud.Id" style="display:inline;"
-                                  onsubmit="return confirm('¿Eliminar esta solicitud?');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="action-btn delete">
-                                    <i class="fa-regular fa-trash-can"></i> Eliminar
-                                </button>
-                            </form>
+                            
+                            @if (solicitud.EstadoSolicitud != "Completado")
+                            {
+                                @if (solicitud.EstadoSolicitud != "Asignado")
+                                {
+                                    <a asp-action="AsignarFlota" asp-route-id="@solicitud.Id" class="action-btn assign">
+                                        <i class="fa-solid fa-truck"></i> Asignar
+                                    </a>
+                                }
+                                <form method="post" asp-action="Eliminar" asp-route-id="@solicitud.Id" style="display:inline;"
+                                      onsubmit="return confirm('¿Eliminar esta solicitud?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                            }
                         </div>
                     </td>
                 </tr>
@@ -323,7 +290,6 @@
     }
 </div>
 
-<!-- MODAL NUEVA SOLICITUD -->
 <div class="modal fade" id="nuevaSolicitudModal" tabindex="-1" aria-labelledby="nuevaSolicitudModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-radius:16px; border:none;">
@@ -382,3 +348,30 @@
         </div>
     </div>
 </div>
+
+<script>
+    function filtrarTabla(estado) {
+        // Resetear estilos de todos los bloques
+        document.querySelectorAll('.stat-card').forEach(c => {
+            c.style.borderColor = '#e2e8f0';
+            c.style.backgroundColor = 'white';
+        });
+        
+        // Resaltar el bloque activo
+        const cardSeleccionada = document.getElementById('filtro-' + estado);
+        if(cardSeleccionada) {
+            cardSeleccionada.style.borderColor = '#2563eb';
+            cardSeleccionada.style.backgroundColor = '#f8fafc';
+        }
+
+        // Mostrar/Ocultar filas
+        const filas = document.querySelectorAll('.fila-solicitud');
+        filas.forEach(fila => {
+            if (estado === 'TODOS' || fila.getAttribute('data-estado') === estado) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    }
+</script>

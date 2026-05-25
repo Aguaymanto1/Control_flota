@@ -1,36 +1,32 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Control_flota.Data;
 
 namespace Control_flota.Controllers
 {
-    [Route("[controller]/[action]")]
     [Authorize(Roles = "Administrador")]
-    
-    [Route("~/Admin")]
     public class AdminController : Controller
     {
-        private readonly ILogger<AdminController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public AdminController(ILogger<AdminController> logger)
+        public AdminController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        
+        public async Task<IActionResult> Index()
         {
+            ViewBag.TotalConductores = await _context.Conductores.CountAsync();
+            ViewBag.TotalUnidades = await _context.Unidades.CountAsync();
+            ViewBag.SolicitudesPendientes = await _context.SolicitudesServicio.CountAsync(s => s.EstadoSolicitud == "Pendiente de Asignación" || s.EstadoSolicitud == "Pendiente");
+            ViewBag.ViajesActivos = await _context.Ordenes.CountAsync(o => o.Estado == "En Tránsito");
+            
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View("Error!");
         }
     }
 }

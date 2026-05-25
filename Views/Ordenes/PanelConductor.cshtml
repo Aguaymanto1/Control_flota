@@ -167,38 +167,39 @@
                         </span>
                     </td>
                     <td>
-                        @if (orden.Estado == "Emitida")
-                        {
-                            <form method="post" asp-action="IniciarRuta" asp-route-id="@orden.Id"
-                                  onsubmit="return confirm('¿Iniciar ruta para @orden.Codigo?');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="action-btn btn-iniciar">
-                                    <i class="fa-solid fa-play"></i> Iniciar Ruta
-                                </button>
-                            </form>
-                        }
-                        else if (orden.Estado == "En Tránsito")
-                        {
-                            <form method="post" asp-action="FinalizarRuta" asp-route-id="@orden.Id"
-                                  onsubmit="return confirm('¿Confirmar llegada al destino?');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="action-btn btn-finalizar">
-                                    <i class="fa-solid fa-flag-checkered"></i> Finalizar Ruta
-                                </button>
-                            </form>
-                        }
-                        else
-                        {
-                            <div style="display:flex; flex-direction:column; gap:6px;">
-                                <span class="action-btn btn-disabled">
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            @if (orden.Estado == "Emitida")
+                            {
+                                <form method="post" asp-action="IniciarRuta" asp-route-id="@orden.Id"
+                                      onsubmit="return confirm('¿Iniciar ruta para @orden.Codigo?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="action-btn btn-iniciar" style="width:100%; justify-content:center;">
+                                        <i class="fa-solid fa-play"></i> Iniciar Ruta
+                                    </button>
+                                </form>
+                            }
+                            else if (orden.Estado == "En Tránsito")
+                            {
+                                <form method="post" asp-action="FinalizarRuta" asp-route-id="@orden.Id"
+                                      onsubmit="return confirm('¿Confirmar llegada al destino?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="action-btn btn-finalizar" style="width:100%; justify-content:center;">
+                                        <i class="fa-solid fa-flag-checkered"></i> Finalizar Ruta
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="action-btn btn-disabled" style="width:100%; justify-content:center;">
                                     <i class="fa-solid fa-check"></i> Completado
                                 </span>
-                                <a href="@Url.Action("DescargarConstancia", new { id = orden.Id })"
-                                class="action-btn" style="background:#f0fdf4; color:#16a34a; text-decoration:none;">
-                                    <i class="fa-solid fa-file-arrow-down"></i> Constancia PDF
-                                </a>
-                            </div>
-                        }
+                            }
+
+                            <a href="@Url.Action("DescargarConstancia", new { id = orden.Id })"
+                               class="action-btn" style="background:#f0fdf4; color:#16a34a; text-decoration:none; justify-content:center;">
+                                <i class="fa-solid fa-file-arrow-down"></i> Constancia PDF
+                            </a>
+                        </div>
                     </td>
                 </tr>
             }

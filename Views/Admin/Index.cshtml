@@ -1,11 +1,69 @@
-@using Microsoft.AspNetCore.Identity
-@using Control_flota.Models.Login;
-
-@inject SignInManager<Usuario> SignInManager
-
 @{
     ViewData["Title"] = "Panel de Administrador";
-    // Esto ya se encarga de traer automáticamente el menú y la barra lateral:
-    Layout = "~/Views/Shared/_Layout.cshtml"; 
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 style="font-weight:700; color:#0f172a; margin:0;">Panel de Control</h2>
+            <p style="color:#64748b; margin:4px 0 0;">Indicadores globales de operaciones logísticas</p>
+        </div>
+        <span class="badge bg-primary px-3 py-2" style="font-size:0.85rem; font-weight:600;">Modo Administrador</span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="background:white; border-radius:12px;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="background:#eff6ff; color:#2563eb; width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+                        <i class="fa-solid fa-clock-history"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size:1.5rem; font-weight:700; color:#0f172a; margin:0;">@ViewBag.SolicitudesPendientes</h3>
+                        <p style="color:#94a3b8; font-size:0.8rem; margin:0; font-weight:500;">Solicitudes Pendientes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="background:white; border-radius:12px;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="background:#fff7ed; color:#ea580c; width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size:1.5rem; font-weight:700; color:#0f172a; margin:0;">@ViewBag.ViajesActivos</h3>
+                        <p style="color:#94a3b8; font-size:0.8rem; margin:0; font-weight:500;">Unidades en Ruta</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="background:white; border-radius:12px;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="background:#f0fdf4; color:#16a34a; width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size:1.5rem; font-weight:700; color:#0f172a; margin:0;">@ViewBag.TotalConductores</h3>
+                        <p style="color:#94a3b8; font-size:0.8rem; margin:0; font-weight:500;">Conductores Totales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 border-0 shadow-sm" style="background:white; border-radius:12px;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="background:#f5f3ff; color:#7c3aed; width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+                        <i class="fa-solid fa-bus"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size:1.5rem; font-weight:700; color:#0f172a; margin:0;">@ViewBag.TotalUnidades</h3>
+                        <p style="color:#94a3b8; font-size:0.8rem; margin:0; font-weight:500;">Flota Registrada</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
