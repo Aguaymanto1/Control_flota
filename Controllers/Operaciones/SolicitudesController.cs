@@ -134,7 +134,7 @@ public async Task<IActionResult> Index()
 
         // Buscar si ya existe una orden vinculada a esta solicitud
         var orden = await _context.Ordenes
-            .FirstOrDefaultAsync(o => o.SolicitudServicioId == id && o.Estado == "Emitida");
+            .FirstOrDefaultAsync(o => o.SolicitudServicioId == id);
 
         ViewBag.OrdenId = orden?.Id;
 
@@ -153,6 +153,11 @@ public async Task<IActionResult> Index()
         if (solicitud == null)
             return NotFound();
 
+        if (solicitud.EstadoSolicitud == "Completado")
+        {
+            TempData["Error"] = "No puedes modificar una solicitud que ya ha sido completada de forma definitiva.";
+            return RedirectToAction(nameof(Index));
+        }
         // Solo permitir generación si la solicitud está asignada
         if (solicitud.EstadoSolicitud != "Asignado")
         {
@@ -315,6 +320,12 @@ public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId
         unidad == null)
     {
         return NotFound();
+    }
+
+    if (solicitud.EstadoSolicitud == "Completado")
+    {
+        TempData["Error"] = "No puedes modificar una solicitud que ya ha sido completada de forma definitiva.";
+        return RedirectToAction(nameof(Index));
     }
 
     // CAMBIAR ESTADO DE LA SOLICITUD

@@ -156,6 +156,9 @@ public class OrdenesController : Controller
 
         if (solicitud != null)
         {
+            // ESTA ES LA LÍNEA QUE FALTABA PARA CERRAR LA SOLICITUD
+            solicitud.EstadoSolicitud = "Completado";
+
             if (solicitud.Conductor != null)
             {
                 solicitud.Conductor.Actividad = "Libre";
