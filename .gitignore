@@ -35,6 +35,8 @@ build/
 out/
 release/
 debug/
+bin/
+obj/
 *.min.js
 *.min.css
 *.bundle.js
