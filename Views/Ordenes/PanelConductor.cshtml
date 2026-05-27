@@ -70,6 +70,7 @@
     var emitidas   = Model.Count(o => o.Estado == "Emitida");
     var enTransito = Model.Count(o => o.Estado == "En Tránsito");
     var completadas = Model.Count(o => o.Estado == "Completado");
+    var totalGastos = Model.Sum(o => o.Gastos?.Sum(g => g.Monto) ?? 0);
 }
 
 @if (TempData["Exito"] != null)
@@ -114,6 +115,15 @@
         <div class="stat-info">
             <div class="number">@completadas</div>
             <div class="label">Completados</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#f3e8ff; color:#9333ea;">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <div class="stat-info">
+            <div class="number">S/ @totalGastos.ToString("0.00")</div>
+            <div class="label">Total Gastos</div>
         </div>
     </div>
 </div>
@@ -180,6 +190,10 @@
                             }
                             else if (orden.Estado == "En Tránsito")
                             {
+                                <a href="@Url.Action("ReportarGasto", new { id = orden.Id })" class="action-btn" style="background:#f59e0b; color:white; justify-content:center; margin-bottom: 8px; text-decoration:none;">
+                                    <i class="fa-solid fa-receipt"></i> Adjuntar Gasto
+                                </a>
+
                                 <form method="post" asp-action="FinalizarRuta" asp-route-id="@orden.Id"
                                       onsubmit="return confirm('¿Confirmar llegada al destino?');">
                                     @Html.AntiForgeryToken()

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System.IO; // Necesario para guardar las imágenes de los gastos
 
 public class OrdenesController : Controller
 {
@@ -51,10 +52,12 @@ public class OrdenesController : Controller
     }
 
     // Detalle de orden
+// Detalle de orden (Vista del Administrador)
     public async Task<IActionResult> Details(int id)
     {
         var orden = await _context.Ordenes
             .Include(o => o.Cliente)
+            .Include(o => o.Gastos) // <-- AGREGA ESTA LÍNEA AQUÍ
             .FirstOrDefaultAsync(o => o.Id == id);
 
         if (orden == null)
@@ -86,6 +89,7 @@ public class OrdenesController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
     // Panel del conductor - solo sus órdenes
     [Authorize(Roles = "Conductor")]
     public async Task<IActionResult> PanelConductor()
@@ -99,6 +103,7 @@ public class OrdenesController : Controller
 
         var ordenes = await _context.Ordenes
             .Include(o => o.Cliente)
+            .Include(o => o.Gastos)
             .Where(o => o.ConductorId == user.Conductor.Id)
             .OrderByDescending(o => o.FechaEmision)
             .ToListAsync();
@@ -156,7 +161,6 @@ public class OrdenesController : Controller
 
         if (solicitud != null)
         {
-            // ESTA ES LA LÍNEA QUE FALTABA PARA CERRAR LA SOLICITUD
             solicitud.EstadoSolicitud = "Completado";
 
             if (solicitud.Conductor != null)
@@ -175,6 +179,98 @@ public class OrdenesController : Controller
         TempData["Exito"] = "Ruta finalizada. Conductor y unidad liberados.";
         return RedirectToAction(nameof(PanelConductor));
     }
+
+// --- NUEVAS ACCIONES DE GASTOS (HU-12) ---
+    [HttpGet]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> ReportarGasto(int id)
+    {
+        // Cambiamos el FindAsync por un Include para traer los gastos que ya existen
+        var orden = await _context.Ordenes
+            .Include(o => o.Gastos)
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (orden == null) return NotFound();
+        
+        return View(orden);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> ReportarGasto(int ordenId, decimal monto, string concepto, IFormFile comprobante)
+    {
+        if (monto <= 0)
+        {
+            TempData["Error"] = "El monto debe ser numérico y mayor a cero";
+            return RedirectToAction("ReportarGasto", new { id = ordenId });
+        }
+
+        string rutaImagen = null;
+
+        if (comprobante != null)
+        {
+            if (comprobante.Length > 5 * 1024 * 1024) 
+            {
+                TempData["Error"] = "La imagen supera el peso máximo de 5MB permitido";
+                return RedirectToAction("ReportarGasto", new { id = ordenId });
+            }
+
+            string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/gastos");
+            Directory.CreateDirectory(folder);
+            
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(comprobante.FileName);
+            string path = Path.Combine(folder, fileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await comprobante.CopyToAsync(stream);
+            }
+            rutaImagen = "/gastos/" + fileName;
+        }
+
+        var gasto = new GastoRuta
+        {
+            OrdenId = ordenId,
+            Monto = monto,
+            Concepto = concepto,
+            RutaComprobante = rutaImagen
+        };
+
+        _context.GastosRuta.Add(gasto);
+        await _context.SaveChangesAsync();
+
+        TempData["Exito"] = "Gasto registrado correctamente.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+    // NUEVO MÉTODO PARA ELIMINAR GASTOS
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> EliminarGasto(int id, int ordenId)
+    {
+        var gasto = await _context.GastosRuta.FindAsync(id);
+        if (gasto != null)
+        {
+            // Borrar el archivo físico para no saturar el servidor
+            if (!string.IsNullOrEmpty(gasto.RutaComprobante))
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", gasto.RutaComprobante.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            _context.GastosRuta.Remove(gasto);
+            await _context.SaveChangesAsync();
+            TempData["Exito"] = "Gasto eliminado correctamente.";
+        }
+
+        return RedirectToAction("ReportarGasto", new { id = ordenId });
+    }
+    // -----------------------------------------
     [Authorize(Roles = "Conductor")]
     public async Task<IActionResult> DescargarConstancia(int id)
     {

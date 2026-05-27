@@ -31,4 +31,5 @@ public class Orden
     // Para filtrar órdenes del conductor logueado
     public int? ConductorId { get; set; }
     public virtual Conductor? Conductor { get; set; }
+    public virtual ICollection<GastoRuta> Gastos { get; set; } = new List<GastoRuta>();
 }
