@@ -27,11 +27,23 @@
                 <input type="text" name="concepto" class="form-control" required />
             </div>
 
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="esCombustible" name="esCombustible" />
+                <label class="form-check-label" for="esCombustible">Este gasto es combustible</label>
+            </div>
+
+            <div id="combustibleFields" style="display:none;">
+                <div class="mb-3">
+                    <label class="form-label" style="font-weight: 500; color: #475569;">Galones</label>
+                    <input type="number" name="galones" id="galones" class="form-control" step="0.01" min="0" />
+                </div>
+            </div>
+
             <div class="mb-3">
                 <label class="form-label" style="font-weight: 500; color: #475569;">Monto</label>
                 <div class="input-group">
                     <span class="input-group-text">S/</span>
-                    <input type="number" name="monto" class="form-control" step="0.01" min="0.01" required />
+                    <input type="number" name="monto" id="monto" class="form-control" step="0.01" min="0.01" required />
                 </div>
             </div>
 
@@ -40,11 +52,47 @@
                 <input type="file" name="comprobante" class="form-control" accept="image/*" capture="environment" required />
             </div>
 
-            <button type="submit" class="btn btn-primary w-100" style="font-weight: 600; padding: 10px;">
+            <button type="submit" id="submitBtn" class="btn btn-primary w-100" style="font-weight: 600; padding: 10px;" disabled>
                 <i class="fa-solid fa-floppy-disk me-2"></i> Guardar Gasto
             </button>
         </form>
     </div>
+
+    <script>
+        (function(){
+            const esCombustible = document.getElementById('esCombustible');
+            const combustibleFields = document.getElementById('combustibleFields');
+            const galones = document.getElementById('galones');
+            const monto = document.getElementById('monto');
+            const comprobante = document.querySelector('input[name="comprobante"]');
+            const concepto = document.querySelector('input[name="concepto"]');
+            const submitBtn = document.getElementById('submitBtn');
+
+            function updateState(){
+                if(esCombustible.checked){
+                    combustibleFields.style.display = 'block';
+                    const g = parseFloat(galones.value || 0);
+                    const m = parseFloat(monto.value || 0);
+                    submitBtn.disabled = !(g > 0 && m > 0);
+                } else {
+                    combustibleFields.style.display = 'none';
+                    const hasConcepto = concepto.value.trim().length > 0;
+                    const m = parseFloat(monto.value || 0);
+                    const hasComprobante = comprobante.value !== '';
+                    submitBtn.disabled = !(hasConcepto && m > 0 && hasComprobante);
+                }
+            }
+
+            esCombustible.addEventListener('change', updateState);
+            galones && galones.addEventListener('input', updateState);
+            monto.addEventListener('input', updateState);
+            comprobante.addEventListener('change', updateState);
+            concepto.addEventListener('input', updateState);
+
+            // Inicializar
+            updateState();
+        })();
+    </script>
 
     @if (Model.Gastos != null && Model.Gastos.Any())
     {
