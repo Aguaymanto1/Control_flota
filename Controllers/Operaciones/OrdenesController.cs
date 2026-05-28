@@ -84,9 +84,37 @@ public class OrdenesController : Controller
         if (orden == null)
             return NotFound();
 
+        // 1. Rescatamos la solicitud original ANTES de borrar la orden
+        var solicitud = await _context.SolicitudesServicio
+            .Include(s => s.Conductor)
+            .Include(s => s.Unidad)
+            .FirstOrDefaultAsync(s => s.Id == orden.SolicitudServicioId);
+
+        if (solicitud != null)
+        {
+            // 2. Devolvemos la solicitud a estado pendiente para que puedas asignarle otra flota
+            solicitud.EstadoSolicitud = "Pendiente de Asignación";
+
+            // 3. Liberamos al conductor
+            if (solicitud.Conductor != null)
+            {
+                solicitud.Conductor.Actividad = "Libre";
+                _context.Update(solicitud.Conductor);
+            }
+
+            // 4. Liberamos a la unidad
+            if (solicitud.Unidad != null)
+            {
+                solicitud.Unidad.Actividad = "Libre";
+                _context.Update(solicitud.Unidad);
+            }
+        }
+
+        // 5. Ahora sí, borramos la orden
         _context.Ordenes.Remove(orden);
         await _context.SaveChangesAsync();
 
+        TempData["Exito"] = "Orden eliminada. El conductor y la unidad han sido liberados.";
         return RedirectToAction(nameof(Index));
     }
 
