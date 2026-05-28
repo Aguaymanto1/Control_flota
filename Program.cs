@@ -20,6 +20,16 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 QuestPDF.Settings.License = LicenseType.Community;
 var app = builder.Build();
+var cultureInfo = new System.Globalization.CultureInfo("es-PE");
+cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
+cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(cultureInfo),
+    SupportedCultures = new[] { cultureInfo },
+    SupportedUICultures = new[] { cultureInfo }
+});
 
 if (app.Environment.IsDevelopment())
 {

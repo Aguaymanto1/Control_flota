@@ -1,0 +1,88 @@
+@model Control_flota.Models.Operaciones.Orden
+@{
+    ViewData["Title"] = "Reportar Gasto";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="m-0">Reportar Gasto</h3>
+        <span class="badge bg-primary">Orden @Model.Codigo</span>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["Error"]</div>
+    }
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success"><i class="fa-solid fa-circle-check me-2"></i>@TempData["Exito"]</div>
+    }
+
+    <div class="card p-4 shadow-sm" style="border-radius: 12px; border: 1px solid #e2e8f0;">
+        <form asp-action="ReportarGasto" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="ordenId" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 500; color: #475569;">Concepto (Peaje, Viático, etc.)</label>
+                <input type="text" name="concepto" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 500; color: #475569;">Monto</label>
+                <div class="input-group">
+                    <span class="input-group-text">S/</span>
+                    <input type="number" name="monto" class="form-control" step="0.01" min="0.01" required />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" style="font-weight: 500; color: #475569;">Comprobante (Obligatorio, máx. 5MB)</label>
+                <input type="file" name="comprobante" class="form-control" accept="image/*" capture="environment" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" style="font-weight: 600; padding: 10px;">
+                <i class="fa-solid fa-floppy-disk me-2"></i> Guardar Gasto
+            </button>
+        </form>
+    </div>
+
+    @if (Model.Gastos != null && Model.Gastos.Any())
+    {
+        <h5 class="mt-5 mb-3" style="font-weight: 700; color: #0f172a;">Tus gastos en este viaje</h5>
+        <div class="list-group shadow-sm" style="border-radius: 12px;">
+            @foreach(var gasto in Model.Gastos.OrderByDescending(g => g.FechaRegistro))
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center" style="padding: 16px;">
+                    <div>
+                        <div style="font-weight: 600; color: #1e293b;">@gasto.Concepto</div>
+                        <div style="font-size: 0.85rem; color: #64748b;">
+                            <span class="fw-bold text-dark">S/ @gasto.Monto.ToString("0.00")</span> • @gasto.FechaRegistro.ToString("HH:mm")
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        @if (!string.IsNullOrEmpty(gasto.RutaComprobante))
+                        {
+                            <a href="@gasto.RutaComprobante" target="_blank" class="btn btn-sm btn-light border">
+                                <i class="fa-solid fa-eye text-primary"></i>
+                            </a>
+                        }
+                        <form asp-action="EliminarGasto" method="post" onsubmit="return confirm('¿Seguro que deseas borrar este gasto? No podrás recuperarlo.');">
+                            <input type="hidden" name="id" value="@gasto.Id" />
+                            <input type="hidden" name="ordenId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    
+    <div class="mt-4 text-center">
+        <a href="@Url.Action("PanelConductor")" class="text-decoration-none text-muted" style="font-weight: 500;">
+            <i class="fa-solid fa-arrow-left me-1"></i> Volver a mis viajes
+        </a>
+    </div>
+</div>
