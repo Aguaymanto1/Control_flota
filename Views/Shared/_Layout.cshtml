@@ -61,9 +61,12 @@
                                 <div class="menu-left"><i class="fa-regular fa-paper-plane"></i><span>Despacho</span></div>
                                 <div class="badge-menu">5</div>
                             </a>
-                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "EnDesarrollo" && ViewContext.RouteData.Values["action"]?.ToString() == "Rastreo" ? "active" : "")"
-                            asp-controller="EnDesarrollo" asp-action="Rastreo">
-                                <div class="menu-left"><i class="fa-solid fa-location-dot"></i><span>Rastreo</span></div>
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Rastreo" ? "active" : "")"
+                            asp-controller="Rastreo" asp-action="Consultar">
+                                <div class="menu-left">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>Rastreo</span>
+                                </div>
                             </a>
                             <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "EnDesarrollo" && ViewContext.RouteData.Values["action"]?.ToString() == "Finanzas" ? "active" : "")"
                             asp-controller="EnDesarrollo" asp-action="Finanzas">

@@ -581,4 +581,19 @@ public class OrdenesController : Controller
         var pdfBytes = pdf.GeneratePdf();
         return File(pdfBytes, "application/pdf", $"Constancia_{orden.Codigo}.pdf");
     }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> ReportarUbicacion(int id, string ciudad)
+    {
+        var orden = await _context.Ordenes.FindAsync(id);
+        if (orden == null) return NotFound();
+
+        orden.UltimaCiudad = ciudad;
+        _context.Update(orden);
+        await _context.SaveChangesAsync();
+
+        TempData["Exito"] = $"Ubicación actualizada: {ciudad}";
+        return RedirectToAction(nameof(PanelConductor));
+    }
 }

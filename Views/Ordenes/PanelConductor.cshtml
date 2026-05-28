@@ -187,17 +187,24 @@
                             }
                             else if (orden.Estado == "En Tránsito")
                             {
-                                <a href="@Url.Action("ReportarGasto", new { id = orden.Id })" class="action-btn" style="background:#f59e0b; color:white; justify-content:center; margin-bottom: 8px; text-decoration:none;">
-                                    <i class="fa-solid fa-receipt"></i> Adjuntar Gasto
-                                </a>
-
-                                <form method="post" asp-action="FinalizarRuta" asp-route-id="@orden.Id"
-                                      onsubmit="return confirm('¿Confirmar llegada al destino?');">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="action-btn btn-finalizar" style="width:100%; justify-content:center;">
-                                        <i class="fa-solid fa-flag-checkered"></i> Finalizar Ruta
-                                    </button>
-                                </form>
+                                <div style="display:flex; flex-direction:column; gap:6px;">
+                                    <form method="post" asp-action="FinalizarRuta" asp-route-id="@orden.Id"
+                                        onsubmit="return confirm('¿Confirmar llegada al destino?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="action-btn btn-finalizar">
+                                            <i class="fa-solid fa-flag-checkered"></i> Finalizar Ruta
+                                        </button>
+                                    </form>
+                                    <form method="post" asp-action="ReportarUbicacion" asp-route-id="@orden.Id"
+                                        style="display:flex; gap:4px;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="text" name="ciudad" placeholder="Ciudad actual..."
+                                            style="border:1px solid #e2e8f0; border-radius:6px; padding:5px 10px; font-size:0.8rem; width:130px;" required />
+                                        <button type="submit" class="action-btn" style="background:#eff6ff; color:#2563eb;">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             }
                             else
                             {

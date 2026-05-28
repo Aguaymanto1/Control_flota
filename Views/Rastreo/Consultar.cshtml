@@ -1,0 +1,343 @@
+@{
+    ViewData["Title"] = "Consultar Carga";
+    Layout = "_Layout";
+}
+
+<style>
+    .rastreo-wrap {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+
+    .search-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+    }
+
+    .search-card h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 6px;
+    }
+
+    .search-card p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .input-group-custom {
+        display: flex;
+        gap: 10px;
+    }
+
+    .input-group-custom input {
+        flex: 1;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        outline: none;
+        text-transform: uppercase;
+    }
+
+    .input-group-custom input:focus {
+        border-color: #2563eb;
+    }
+
+    .btn-consultar {
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+    }
+
+    .btn-consultar:hover { background: #1d4ed8; }
+
+    .result-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .result-header {
+        background: #0f172a;
+        color: white;
+        padding: 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .result-header .codigo {
+        font-family: monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .badge-estado {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .badge-emitida    { background: #eff6ff; color: #2563eb; }
+    .badge-transito   { background: #fff7ed; color: #ea580c; }
+    .badge-completado { background: #f0fdf4; color: #16a34a; }
+    .badge-pendiente  { background: #f1f5f9; color: #64748b; }
+    .badge-asignado   { background: #eff6ff; color: #2563eb; }
+
+    .result-body {
+        padding: 24px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: #64748b; }
+    .info-row .valor { font-weight: 600; color: #0f172a; }
+
+    .ubicacion-card {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 16px;
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .ubicacion-card i {
+        color: #2563eb;
+        font-size: 1.4rem;
+    }
+
+    .timeline {
+        margin-top: 20px;
+    }
+
+    .timeline-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        align-items: flex-start;
+    }
+
+    .timeline-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-top: 4px;
+        flex-shrink: 0;
+    }
+
+    .dot-done  { background: #16a34a; }
+    .dot-active { background: #2563eb; }
+    .dot-pending { background: #e2e8f0; }
+
+    .timeline-line {
+        width: 2px;
+        height: 20px;
+        background: #e2e8f0;
+        margin-left: 4px;
+        margin-bottom: 0;
+    }
+
+    .error-card {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        color: #dc2626;
+    }
+</style>
+
+<div class="rastreo-wrap">
+
+    <!-- BUSCADOR -->
+    <div class="search-card">
+        <h2><i class="fa-solid fa-location-dot me-2" style="color:#2563eb;"></i>Consultar Estado de Carga</h2>
+        <p>Ingresa el código de tu servicio u orden de viaje para ver el estado actual.</p>
+
+        <form method="get" asp-action="Consultar">
+            <div class="input-group-custom">
+                <input type="text" name="codigo"
+                       value="@ViewBag.Codigo"
+                       placeholder="Ej: SRV-20260519-EFB5 o ORD-2026-05-0001" />
+                <button type="submit" class="btn-consultar">
+                    <i class="fa-solid fa-magnifying-glass"></i> Consultar Carga
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="error-card">
+            <i class="fa-solid fa-circle-xmark" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
+            <strong>@ViewBag.Error</strong>
+            <p style="margin-top:8px; font-size:0.85rem; color:#ef4444;">Verifica el código e intenta nuevamente.</p>
+        </div>
+    }
+
+    @if (ViewBag.EsOrden == true && Model != null)
+    {
+        var orden = Model as Control_flota.Models.Operaciones.Orden;
+        string badgeClass = orden!.Estado switch {
+            "Emitida"     => "badge-emitida",
+            "En Tránsito" => "badge-transito",
+            "Completado"  => "badge-completado",
+            _ => "badge-pendiente"
+        };
+
+        <div class="result-card">
+            <div class="result-header">
+                <div>
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:4px;">ORDEN DE VIAJE</div>
+                    <div class="codigo">@orden.Codigo</div>
+                </div>
+                <span class="badge-estado @badgeClass">
+                    <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> @orden.Estado
+                </span>
+            </div>
+            <div class="result-body">
+                <div class="info-row">
+                    <span class="label">Cliente</span>
+                    <span class="valor">@orden.Cliente?.Nombre</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Origen</span>
+                    <span class="valor">@orden.Origen</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Destino</span>
+                    <span class="valor">@orden.Destino</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Conductor</span>
+                    <span class="valor">@orden.NombreConductor</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Placa</span>
+                    <span class="valor">@orden.PlacaCamion</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Fecha de Emisión</span>
+                    <span class="valor">@orden.FechaEmision.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(orden.UltimaCiudad))
+                {
+                    <div class="ubicacion-card">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div>
+                            <div style="font-size:0.75rem; color:#2563eb; font-weight:600;">ÚLTIMA UBICACIÓN REPORTADA</div>
+                            <div style="font-size:1rem; font-weight:700; color:#0f172a;">@orden.UltimaCiudad</div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Timeline de estados -->
+                <div class="timeline" style="margin-top:24px;">
+                    <div style="font-size:0.75rem; font-weight:600; color:#64748b; margin-bottom:12px;">PROGRESO DEL VIAJE</div>
+
+                    @{
+                        var estados = new[] { "Emitida", "En Tránsito", "Completado" };
+                        int actual = Array.IndexOf(estados, orden.Estado);
+                    }
+
+                    @for (int i = 0; i < estados.Length; i++)
+                    {
+                        string dotClass = i < actual ? "dot-done" : (i == actual ? "dot-active" : "dot-pending");
+                        string textColor = i <= actual ? "#0f172a" : "#94a3b8";
+                        <div class="timeline-item">
+                            <div>
+                                <div class="timeline-dot @dotClass"></div>
+                                @if (i < estados.Length - 1)
+                                {
+                                    <div class="timeline-line"></div>
+                                }
+                            </div>
+                            <div style="color:@textColor; font-size:0.875rem; font-weight: @(i == actual ? "700" : "400");">
+                                @estados[i]
+                                @if (i == actual)
+                                {
+                                    <span style="font-size:0.75rem; color:#2563eb; font-weight:600;"> ← Estado actual</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.EsSolicitud == true && Model != null)
+    {
+        var sol = Model as Control_flota.Models.Operaciones.SolicitudServicio;
+        string badgeClass = sol!.EstadoSolicitud switch {
+            "Asignado" => "badge-asignado",
+            "Pendiente de Asignación" => "badge-pendiente",
+            _ => "badge-pendiente"
+        };
+
+        <div class="result-card">
+            <div class="result-header">
+                <div>
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:4px;">SOLICITUD DE SERVICIO</div>
+                    <div class="codigo">@sol.Codigo</div>
+                </div>
+                <span class="badge-estado @badgeClass">
+                    <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> @sol.EstadoSolicitud
+                </span>
+            </div>
+            <div class="result-body">
+                <div class="info-row">
+                    <span class="label">Cliente</span>
+                    <span class="valor">@sol.Cliente?.Nombre</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Origen</span>
+                    <span class="valor">@sol.Origen</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Destino</span>
+                    <span class="valor">@sol.Destino</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Tipo de Carga</span>
+                    <span class="valor">@sol.TipoCarga</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Peso</span>
+                    <span class="valor">@sol.PesoKg kg</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
