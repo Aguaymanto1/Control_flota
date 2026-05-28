@@ -1,0 +1,200 @@
+@model Control_flota.Models.Operaciones.Orden
+@{
+    ViewData["Title"] = "Tomar Foto";
+}
+
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Tomar foto de la ruta</h2>
+            <p class="text-muted mb-0">Orden <strong>@Model.Codigo</strong> — @Model.Origen a @Model.Destino</p>
+        </div>
+        <a href="@Url.Action("PanelConductor", "Ordenes")" class="btn btn-outline-secondary">Volver al panel</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="captureInfo" class="alert alert-info">
+                La cámara se activará automáticamente. Presiona "Tomar Foto" cuando estés listo.
+            </div>
+
+            <div id="captureError" class="alert alert-danger d-none" role="alert"></div>
+
+            <div class="mb-3">
+                <video id="cameraVideo" autoplay playsinline style="width:100%; max-height:70vh; border-radius:12px; background:#000;"></video>
+                <img id="cameraPreview" style="width:100%; max-height:70vh; border-radius:12px; display:none; object-fit:contain;" />
+            </div>
+
+            <form id="camaraForm" asp-action="TomarFotoRuta" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ordenId" value="@Model.Id" />
+                <input type="file" id="fotoRutaInput" name="fotoRuta" accept="image/jpeg,image/png" style="display:none;" />
+
+                <div class="d-flex gap-2 flex-wrap mb-3">
+                    <button type="button" id="captureButton" class="btn btn-primary">Tomar Foto</button>
+                    <button type="button" id="acceptButton" class="btn btn-success d-none">Aceptar</button>
+                    <button type="button" id="deleteButton" class="btn btn-outline-danger d-none">Eliminar</button>
+                    <a href="@Url.Action("PanelConductor", "Ordenes")" class="btn btn-secondary">Cancelar</a>
+                </div>
+
+                <div id="previewContainer" class="mb-3 d-none">
+                    <div class="border rounded p-3">
+                        <p class="mb-2"><strong>Vista previa de la evidencia</strong></p>
+                        <img id="finalPreview" style="width:100%; border-radius:12px; object-fit:contain; max-height:60vh;" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="button" id="submitButton" class="btn btn-success d-none">Subir evidencia</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var video = document.getElementById('cameraVideo');
+        var cameraPreview = document.getElementById('cameraPreview');
+        var errorBox = document.getElementById('captureError');
+        var captureInfo = document.getElementById('captureInfo');
+        var captureButton = document.getElementById('captureButton');
+        var acceptButton = document.getElementById('acceptButton');
+        var deleteButton = document.getElementById('deleteButton');
+        var submitButton = document.getElementById('submitButton');
+        var fotoRutaInput = document.getElementById('fotoRutaInput');
+        var form = document.getElementById('camaraForm');
+        var previewContainer = document.getElementById('previewContainer');
+        var finalPreview = document.getElementById('finalPreview');
+
+        var stream = null;
+        var capturedBlob = null;
+
+        function showError(message) {
+            errorBox.textContent = message;
+            errorBox.classList.remove('d-none');
+        }
+
+        function clearError() {
+            errorBox.textContent = '';
+            errorBox.classList.add('d-none');
+        }
+
+        function stopStream() {
+            if (stream) {
+                stream.getTracks().forEach(function (track) { track.stop(); });
+                stream = null;
+            }
+        }
+
+        async function startCamera() {
+            clearError();
+            cameraPreview.style.display = 'none';
+            video.style.display = 'block';
+            acceptButton.classList.add('d-none');
+            captureButton.disabled = false;
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showError('El navegador no soporta cámara. Usa otro equipo o navegador con cámara.');
+                captureButton.disabled = true;
+                return;
+            }
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                video.srcObject = stream;
+                await video.play();
+            } catch (err) {
+                showError('No se pudo activar la cámara. Comprueba permisos o intenta con otro navegador.');
+                captureButton.disabled = true;
+            }
+        }
+
+        function capturePhoto() {
+            if (!stream || video.videoWidth === 0) {
+                showError('La cámara no está lista. Espera a que se active o recarga la página.');
+                return;
+            }
+
+            clearError();
+            var width = video.videoWidth;
+            var height = video.videoHeight;
+            var maxWidth = 1280;
+            if (width > maxWidth) {
+                height = Math.round(height * (maxWidth / width));
+                width = maxWidth;
+            }
+
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            var context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, width, height);
+            canvas.toBlob(function (blob) {
+                capturedBlob = blob;
+                video.style.display = 'none';
+                finalPreview.src = URL.createObjectURL(blob);
+                previewContainer.classList.remove('d-none');
+                captureButton.classList.add('d-none');
+                acceptButton.classList.remove('d-none');
+                deleteButton.classList.remove('d-none');
+                submitButton.classList.add('d-none');
+                stopStream();
+            }, 'image/jpeg', 0.75);
+        }
+
+        function acceptPhoto() {
+            if (!capturedBlob) {
+                showError('No hay foto tomada. Presiona Tomar Foto primero.');
+                return;
+            }
+
+            clearError();
+            video.style.display = 'none';
+            finalPreview.style.display = 'block';
+            submitButton.classList.remove('d-none');
+            acceptButton.classList.add('d-none');
+            captureInfo.textContent = 'Vista previa aprobada. Presiona Subir evidencia para terminar.';
+        }
+
+        function deletePhoto() {
+            capturedBlob = null;
+            finalPreview.src = '';
+            previewContainer.classList.add('d-none');
+            submitButton.classList.add('d-none');
+            acceptButton.classList.add('d-none');
+            deleteButton.classList.add('d-none');
+            captureButton.classList.remove('d-none');
+            clearError();
+            startCamera();
+        }
+
+        captureButton.addEventListener('click', async function () {
+            if (!stream) {
+                await startCamera();
+            }
+            capturePhoto();
+        });
+        acceptButton.addEventListener('click', acceptPhoto);
+        deleteButton.addEventListener('click', deletePhoto);
+        submitButton.addEventListener('click', function () {
+            if (!capturedBlob) {
+                showError('No hay evidencia para subir.');
+                return;
+            }
+            try {
+                var file = new File([capturedBlob], 'ruta.jpg', { type: 'image/jpeg' });
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fotoRutaInput.files = dataTransfer.files;
+                form.submit();
+            } catch (err) {
+                showError('No se pudo preparar la evidencia. Intenta recargar la página.');
+            }
+        });
+
+        window.addEventListener('beforeunload', stopStream);
+
+        startCamera();
+    })();
+</script>

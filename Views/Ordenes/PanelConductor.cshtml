@@ -187,8 +187,12 @@
                             }
                             else if (orden.Estado == "En Tránsito")
                             {
-                                <a href="@Url.Action("ReportarGasto", new { id = orden.Id })" class="action-btn" style="background:#f59e0b; color:white; justify-content:center; margin-bottom: 8px; text-decoration:none;">
+                                <a href="@Url.Action("ReportarGasto", new { id = orden.Id })" class="action-btn" style="background:#f59e0b; color:white; justify-content:center; margin-bottom: 8px; text-decoration:none; width:100%;">
                                     <i class="fa-solid fa-receipt"></i> Adjuntar Gasto
+                                </a>
+
+                                <a href="@Url.Action("TomarFoto", new { id = orden.Id })" class="action-btn" style="background:#2563eb; color:white; justify-content:center; margin-bottom: 8px; text-decoration:none; width:100%;">
+                                    <i class="fa-solid fa-camera"></i> Tomar Foto
                                 </a>
 
                                 <form method="post" asp-action="FinalizarRuta" asp-route-id="@orden.Id"

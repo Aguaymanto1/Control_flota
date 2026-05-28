@@ -79,6 +79,17 @@ public class OrdenesController : Controller
             .OrderByDescending(e => e.FechaRegistro)
             .FirstOrDefaultAsync();
         ViewBag.EstadoInicial = estadoInicial;
+        string? rutaEvidencia = null;
+        var rutasFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "rutas");
+        if (Directory.Exists(rutasFolder))
+        {
+            var evidenceFile = Directory.GetFiles(rutasFolder, $"evidencia_orden_{orden.Id}.*").OrderByDescending(f => System.IO.File.GetLastWriteTimeUtc(f)).FirstOrDefault();
+            if (!string.IsNullOrEmpty(evidenceFile))
+            {
+                rutaEvidencia = "/rutas/" + Path.GetFileName(evidenceFile);
+            }
+        }
+        ViewBag.RutaEvidencia = rutaEvidencia;
 
         return View(orden);
     }
@@ -311,6 +322,65 @@ public class OrdenesController : Controller
         }
 
         TempData["Exito"] = "Ruta finalizada. Conductor y unidad liberados.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+// HU-21 Prender cámara
+    [HttpGet]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> TomarFoto(int id)
+    {
+        var orden = await _context.Ordenes.FindAsync(id);
+        if (orden == null) return NotFound();
+
+        if (orden.Estado != "En Tránsito")
+        {
+            TempData["Error"] = "Solo puedes tomar foto cuando la orden está en estado 'En Tránsito'.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        return View(orden);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> TomarFotoRuta(int ordenId, IFormFile fotoRuta)
+    {
+        var orden = await _context.Ordenes.FindAsync(ordenId);
+        if (orden == null) return NotFound();
+
+        if (orden.Estado != "En Tránsito")
+        {
+            TempData["Error"] = "Solo puedes tomar foto cuando la orden está en estado 'En Tránsito'.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        if (fotoRuta == null || fotoRuta.Length == 0)
+        {
+            TempData["Error"] = "No se seleccionó ninguna foto.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        if (fotoRuta.Length > 5 * 1024 * 1024)
+        {
+            TempData["Error"] = "La foto supera el peso máximo de 5MB permitido.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/rutas");
+        Directory.CreateDirectory(folder);
+
+        string extension = Path.GetExtension(fotoRuta.FileName);
+        string fileName = $"evidencia_orden_{ordenId}{extension}";
+        string path = Path.Combine(folder, fileName);
+
+        using (var stream = new FileStream(path, FileMode.Create))
+        {
+            await fotoRuta.CopyToAsync(stream);
+        }
+
+        TempData["Exito"] = "Foto tomada correctamente.";
         return RedirectToAction(nameof(PanelConductor));
     }
 

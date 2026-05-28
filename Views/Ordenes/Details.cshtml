@@ -189,6 +189,20 @@
             </div>
         </div>
     }
+    @if (!string.IsNullOrEmpty((string?)ViewBag.RutaEvidencia))
+    {
+        <div class="info-card">
+            <div class="card-title-custom">
+                <i class="fa-solid fa-camera" style="color: #9333ea;"></i> Evidencia de la Orden
+            </div>
+            <div class="data-row">
+                <span class="data-label">Foto de evidencia:</span>
+                <span class="data-value">
+                    <a href="@ViewBag.RutaEvidencia" target="_blank" class="btn btn-sm btn-outline-primary">Ver evidencia</a>
+                </span>
+            </div>
+        </div>
+    }
 </div>
 
 @if (Model.Gastos != null && Model.Gastos.Any())
