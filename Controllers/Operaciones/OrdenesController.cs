@@ -73,6 +73,13 @@ public class OrdenesController : Controller
         ViewBag.Conductor = solicitud?.Conductor;
         ViewBag.Unidad = solicitud?.Unidad;
 
+        // Cargar datos iniciales de ruta si existen (último registro)
+        var estadoInicial = await _context.EstadosInicialesRuta
+            .Where(e => e.OrdenId == orden.Id)
+            .OrderByDescending(e => e.FechaRegistro)
+            .FirstOrDefaultAsync();
+        ViewBag.EstadoInicial = estadoInicial;
+
         return View(orden);
     }
 
@@ -162,6 +169,105 @@ public class OrdenesController : Controller
         return RedirectToAction(nameof(PanelConductor));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> IniciarRutaConDatos(int ordenId, decimal combustibleInicial, int kilometrajeInicial, string? observacion, IFormFile? fotoInicio)
+    {
+        var orden = await _context.Ordenes.FindAsync(ordenId);
+        if (orden == null) return NotFound();
+
+        if (orden.Estado != "Emitida")
+        {
+            TempData["Error"] = "Solo puedes iniciar una orden en estado 'Emitida'.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        // Validación server-side: no aceptar valores negativos
+        if (combustibleInicial < 0 || kilometrajeInicial < 0)
+        {
+            TempData["Error"] = "Los valores no pueden ser negativos.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        // Validación de ModelState para capturar posibles problemas de binding (ej. formatos inválidos)
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            var rawComb = Request.Form["combustibleInicial"].ToString();
+            var rawKm = Request.Form["kilometrajeInicial"].ToString();
+            var msg = "Entrada inválida: ";
+            if (errors.Any()) msg += string.Join("; ", errors);
+            msg += $" (combustible='{rawComb}', km='{rawKm}')";
+            TempData["Error"] = msg;
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        string? rutaImagen = null;
+        if (fotoInicio != null)
+        {
+            if (fotoInicio.Length > 5 * 1024 * 1024)
+            {
+                TempData["Error"] = "La imagen supera el peso máximo de 5MB permitido";
+                return RedirectToAction(nameof(PanelConductor));
+            }
+
+            string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/inicios");
+            Directory.CreateDirectory(folder);
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(fotoInicio.FileName);
+            string path = Path.Combine(folder, fileName);
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await fotoInicio.CopyToAsync(stream);
+            }
+            rutaImagen = "/inicios/" + fileName;
+        }
+
+        var estado = new EstadoInicialRuta
+        {
+            OrdenId = ordenId,
+            CombustibleInicial = combustibleInicial,
+            KilometrajeInicial = kilometrajeInicial,
+            Observacion = observacion,
+            RutaImagen = rutaImagen,
+            FechaRegistro = DateTime.UtcNow
+        };
+
+        _context.EstadosInicialesRuta.Add(estado);
+
+        orden.Estado = "En Tránsito";
+        _context.Update(orden);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            TempData["Exito"] = "Ruta iniciada correctamente y datos iniciales guardados.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error guardando EstadoInicialRuta (intento 1): " + ex.Message);
+            // Intentar asegurar la base de datos y reintentar (útil en desarrollo cuando faltan tablas)
+            try
+            {
+                _context.Database.EnsureCreated();
+                await _context.SaveChangesAsync();
+                TempData["Exito"] = "Ruta iniciada correctamente y datos iniciales guardados.";
+                return RedirectToAction(nameof(PanelConductor));
+            }
+            catch (Exception ex2)
+            {
+                Console.WriteLine("Error guardando EstadoInicialRuta (intento 2): " + ex2.Message);
+                // Intentar mostrar inner exception si existe para diagnóstico
+                var inner = ex2.InnerException?.Message;
+                var detalle = inner ?? ex2.Message;
+                if (detalle.Length > 300) detalle = detalle.Substring(0, 300) + "...";
+                TempData["Error"] = "No se pudo guardar los datos iniciales. Detalle: " + detalle;
+                return RedirectToAction(nameof(PanelConductor));
+            }
+        }
+    }
+
     // Finalizar Ruta
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -226,7 +332,7 @@ public class OrdenesController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Conductor")]
-    public async Task<IActionResult> ReportarGasto(int ordenId, decimal monto, string concepto, IFormFile comprobante)
+    public async Task<IActionResult> ReportarGasto(int ordenId, decimal monto, string concepto, IFormFile comprobante, bool esCombustible = false, decimal? galones = null)
     {
         if (monto <= 0)
         {
@@ -234,7 +340,13 @@ public class OrdenesController : Controller
             return RedirectToAction("ReportarGasto", new { id = ordenId });
         }
 
-        string rutaImagen = null;
+        if (esCombustible && (!galones.HasValue || galones.Value <= 0))
+        {
+            TempData["Error"] = "Los galones deben ser un número mayor a cero";
+            return RedirectToAction("ReportarGasto", new { id = ordenId });
+        }
+
+        string? rutaImagen = null;
 
         if (comprobante != null)
         {
@@ -266,6 +378,18 @@ public class OrdenesController : Controller
         };
 
         _context.GastosRuta.Add(gasto);
+        // Si se reporta combustible, crear también el registro de ConsumoCombustible
+        if (esCombustible)
+        {
+            var consumo = new ConsumoCombustible
+            {
+                OrdenId = ordenId,
+                Galones = galones.GetValueOrDefault(),
+                Monto = monto,
+                Fecha = DateTime.UtcNow
+            };
+            _context.ConsumosCombustible.Add(consumo);
+        }
         await _context.SaveChangesAsync();
 
         TempData["Exito"] = "Gasto registrado correctamente.";

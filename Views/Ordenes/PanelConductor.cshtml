@@ -180,13 +180,10 @@
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             @if (orden.Estado == "Emitida")
                             {
-                                <form method="post" asp-action="IniciarRuta" asp-route-id="@orden.Id"
-                                      onsubmit="return confirm('¿Iniciar ruta para @orden.Codigo?');">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="action-btn btn-iniciar" style="width:100%; justify-content:center;">
-                                        <i class="fa-solid fa-play"></i> Iniciar Ruta
-                                    </button>
-                                </form>
+                                <!-- Botón que abre modal para ingresar datos iniciales -->
+                                <button type="button" class="action-btn btn-iniciar" style="width:100%; justify-content:center;" data-bs-toggle="modal" data-bs-target="#iniciarModal" data-ordenid="@orden.Id" data-codigo="@orden.Codigo">
+                                    <i class="fa-solid fa-play"></i> Iniciar Ruta
+                                </button>
                             }
                             else if (orden.Estado == "En Tránsito")
                             {
@@ -221,3 +218,106 @@
         </table>
     }
 </div>
+
+<!-- Modal: Iniciar Ruta - datos iniciales -->
+<div class="modal fade" id="iniciarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="IniciarRutaConDatos" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ordenId" id="modalOrdenId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Datos iniciales de la unidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Combustible disponible (galones)</label>
+                        <input type="text" inputmode="decimal" name="combustibleInicial" id="combustibleInicial" class="form-control" placeholder="Ej. 45.5" required />
+                        <div class="form-text text-danger" id="combustibleError" style="display:none;">Ingrese un número válido >= 0</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kilometraje actual</label>
+                        <input type="text" inputmode="numeric" name="kilometrajeInicial" id="kilometrajeInicial" class="form-control" placeholder="Ej. 120345" required />
+                        <div class="form-text text-danger" id="kmError" style="display:none;">Ingrese un número entero válido >= 0</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observación (opcional)</label>
+                        <textarea name="observacion" id="observacion" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Foto (opcional, máx. 5MB)</label>
+                        <input type="file" name="fotoInicio" id="fotoInicio" class="form-control" accept="image/*" capture="environment" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" id="modalSubmit" class="btn btn-primary">Iniciar Ruta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        var iniciarModal = document.getElementById('iniciarModal');
+        if(!iniciarModal) return;
+
+        var modalSubmit = document.getElementById('modalSubmit');
+        var combustibleInput = document.getElementById('combustibleInicial');
+        var kmInput = document.getElementById('kilometrajeInicial');
+        var combustibleError = document.getElementById('combustibleError');
+        var kmError = document.getElementById('kmError');
+
+        function isDecimal(value){
+            return /^\d+(?:[\.,]\d+)?$/.test(value.trim());
+        }
+        function isInteger(value){
+            return /^\d+$/.test(value.trim());
+        }
+
+        function validarModal(){
+            var cVal = (combustibleInput.value || '').trim();
+            var kmVal = (kmInput.value || '').trim();
+
+            var combustibleValido = isDecimal(cVal) && parseFloat(cVal.replace(',', '.')) >= 0;
+            var kmValido = isInteger(kmVal) && parseInt(kmVal, 10) >= 0;
+
+            if(!combustibleValido){
+                combustibleError.style.display = 'block';
+                combustibleError.textContent = 'Ingrese un número válido >= 0 (solo dígitos y opcionalmente "." o ",")';
+            } else {
+                combustibleError.style.display = 'none';
+            }
+
+            if(!kmValido){
+                kmError.style.display = 'block';
+                kmError.textContent = 'Ingrese un número entero válido >= 0 (solo dígitos)';
+            } else {
+                kmError.style.display = 'none';
+            }
+
+            modalSubmit.disabled = !(combustibleValido && kmValido);
+        }
+
+        iniciarModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var ordenId = button.getAttribute('data-ordenid');
+            var codigo = button.getAttribute('data-codigo');
+            document.getElementById('modalOrdenId').value = ordenId;
+            // reset valores del modal
+            combustibleInput.value = '';
+            kmInput.value = '';
+            document.getElementById('observacion').value = '';
+            document.getElementById('fotoInicio').value = '';
+            validarModal();
+        });
+
+        combustibleInput.addEventListener('input', validarModal);
+        kmInput.addEventListener('input', validarModal);
+
+        // inicializar
+        validarModal();
+    })();
+</script>

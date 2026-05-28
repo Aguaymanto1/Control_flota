@@ -150,6 +150,45 @@
             <span class="data-value">@(ViewBag.Unidad != null ? (ViewBag.Unidad.Marca + " " + ViewBag.Unidad.Modelo) : "-")</span>
         </div>
     </div>
+
+    @if (ViewBag.EstadoInicial != null)
+    {
+        var est = (Control_flota.Models.Operaciones.EstadoInicialRuta)ViewBag.EstadoInicial;
+        <div class="info-card">
+            <div class="card-title-custom">
+                <i class="fa-solid fa-circle-dot" style="color: #06b6d4;"></i> Datos iniciales de ruta
+            </div>
+            <div class="data-row">
+                <span class="data-label">Fecha registro:</span>
+                <span class="data-value">@est.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Combustible inicial (gal):</span>
+                <span class="data-value">@est.CombustibleInicial.ToString("0.00")</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Kilometraje inicial:</span>
+                <span class="data-value">@est.KilometrajeInicial</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Observación:</span>
+                <span class="data-value">@(string.IsNullOrEmpty(est.Observacion) ? "-" : est.Observacion)</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Foto de inicio:</span>
+                <span class="data-value">
+                    @if (!string.IsNullOrEmpty(est.RutaImagen))
+                    {
+                        <a href="@est.RutaImagen" target="_blank" class="btn btn-sm btn-outline-primary">Ver foto</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin imagen</span>
+                    }
+                </span>
+            </div>
+        </div>
+    }
 </div>
 
 @if (Model.Gastos != null && Model.Gastos.Any())

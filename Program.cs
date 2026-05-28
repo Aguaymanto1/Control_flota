@@ -59,6 +59,18 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    // Asegurar que la base de datos exista y las tablas básicas estén creadas (útil en desarrollo)
+    try
+    {
+        var db = services.GetRequiredService<ApplicationDbContext>();
+        db.Database.EnsureCreated();
+        Console.WriteLine("✅ Base de datos asegurada (EnsureCreated)");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("⚠️ No se pudo asegurar la base de datos: " + ex.Message);
+    }
+
     await CrearRolesYAdmin(services);
 }
 
