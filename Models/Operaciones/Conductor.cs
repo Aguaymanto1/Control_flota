@@ -33,7 +33,7 @@ public class Conductor
 
     public string EstadoOperativo { get; set; } = "Activo";
 
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }= false;
 
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
 

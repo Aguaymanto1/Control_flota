@@ -22,78 +22,95 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
 
         // LISTAR
         public async Task<IActionResult> Index()
-        {
-            var conductores = await _context.Conductores.ToListAsync();
-            return View(conductores);
-        }
+{
+    var conductores = await _context.Conductores
+        .Where(c => !c.IsDeleted)
+        .ToListAsync();
+
+    return View(conductores);
+}
 
         // CREAR (GET)
         public IActionResult Create() => View();
 
         // CREAR (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Conductor conductor, string email, string password, string confirmPassword)
+        // CREAR (POST)
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create(Conductor conductor, string email, string password, string confirmPassword)
+{
+    if (password != confirmPassword)
+    {
+        ModelState.AddModelError(string.Empty, "Las contraseñas no coinciden");
+        return View(conductor);
+    }
+
+    // VALIDAR LICENCIA VENCIDA
+    if (conductor.VencimientoLicencia < DateTime.Today)
+    {
+        ModelState.AddModelError("VencimientoLicencia",
+            "La licencia no puede estar vencida.");
+
+        return View(conductor);
+    }
+
+    // 🔴 SOLUCIÓN: Dile a ASP.NET que no valide el UserId porque lo crearemos después
+    ModelState.Remove("UserId");
+
+    if (ModelState.IsValid)
+    {
+        var existingUser = await _userManager.FindByEmailAsync(email);
+
+        if (existingUser != null)
         {
-            if (password != confirmPassword)
-            {
-                ModelState.AddModelError(string.Empty, "Las contraseñas no coinciden");
-                return View(conductor);
-            }
+            ModelState.AddModelError(string.Empty,
+                "El correo electrónico ya está registrado");
 
-            // 🔴 SOLUCIÓN: Dile a ASP.NET que no valide el UserId porque lo crearemos después
-            ModelState.Remove("UserId");
-            
-            // Si tienes alguna propiedad de navegación hacia el Usuario en tu modelo Conductor (ej. public Usuario Usuario {get;set;}), 
-            // también debes ignorarla así: ModelState.Remove("Usuario");
-
-            if (ModelState.IsValid)
-            {
-                var existingUser = await _userManager.FindByEmailAsync(email);
-                if (existingUser != null)
-                {
-                    ModelState.AddModelError(string.Empty, "El correo electrónico ya está registrado");
-                    return View(conductor);
-                }
-
-                var usuario = new Usuario
-                {
-                    UserName = email,
-                    Email = email,
-                    Estado = true,
-                    EmailConfirmed = true,
-                    ConductorId = null
-                };
-
-                var result = await _userManager.CreateAsync(usuario, password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(usuario, "Conductor");
-                    conductor.IsDeleted = false;
-                    
-                    _context.Add(conductor);
-                    await _context.SaveChangesAsync(); // Se crea el conductor y se le asigna un Id
-
-                    usuario.ConductorId = conductor.Id;
-                    await _userManager.UpdateAsync(usuario); // Actualizamos el usuario con el Id del conductor
-
-                    conductor.UserId = usuario.Id;
-                    _context.Update(conductor);
-                    await _context.SaveChangesAsync(); // Actualizamos el conductor con el Id del usuario
-
-                    return RedirectToAction(nameof(Index));
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-            
             return View(conductor);
         }
 
+        var usuario = new Usuario
+        {
+            UserName = email,
+            Email = email,
+            Estado = true,
+            EmailConfirmed = true,
+            ConductorId = null
+        };
+
+        var result = await _userManager.CreateAsync(usuario, password);
+
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(usuario, "Conductor");
+
+            conductor.IsDeleted = false;
+
+            _context.Add(conductor);
+
+            await _context.SaveChangesAsync();
+
+            usuario.ConductorId = conductor.Id;
+
+            await _userManager.UpdateAsync(usuario);
+
+            conductor.UserId = usuario.Id;
+
+            _context.Update(conductor);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+    }
+
+    return View(conductor);
+}
         // EDITAR (GET)
         public async Task<IActionResult> Edit(int id)
         {
@@ -103,51 +120,98 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
         }
 
         // EDITAR (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Conductor conductor)
-        {
-            if (id != conductor.Id) return NotFound();
+        // EDITAR (POST)
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Edit(int id, Conductor conductor)
+{
+    if (id != conductor.Id)
+        return NotFound();
 
-            if (ModelState.IsValid)
-            {
-                _context.Update(conductor);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(conductor);
-        }
+    var conductorDb = await _context.Conductores.FindAsync(id);
+
+    if (conductorDb == null)
+        return NotFound();
+
+    // VALIDAR LICENCIA VENCIDA
+    if (conductor.VencimientoLicencia < DateTime.Today)
+    {
+        ModelState.AddModelError("VencimientoLicencia",
+            "La licencia no puede estar vencida.");
+
+        return View(conductor);
+    }
+
+    if (ModelState.IsValid)
+    {
+        conductorDb.Nombres = conductor.Nombres;
+        conductorDb.Apellidos = conductor.Apellidos;
+        conductorDb.Dni = conductor.Dni;
+        conductorDb.Celular = conductor.Celular;
+        conductorDb.NumeroLicencia = conductor.NumeroLicencia;
+        conductorDb.VencimientoLicencia = conductor.VencimientoLicencia;
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    return View(conductor);
+}
 
         // ELIMINAR
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Delete(int id)
+{
+    var conductor = await _context.Conductores.FindAsync(id);
+
+    if (conductor == null)
+        return NotFound();
+
+    try
+    {
+        // Buscar solicitudes donde esté asignado el conductor
+        var solicitudes = await _context.SolicitudesServicio
+            .Where(s => s.ConductorId == id)
+            .ToListAsync();
+
+        foreach (var solicitud in solicitudes)
         {
-            var conductor = await _context.Conductores.FindAsync(id);
-            if (conductor == null) return NotFound();
-
-            try
+            // Liberar unidad si existe
+            if (solicitud.UnidadId != null)
             {
-                if (!string.IsNullOrEmpty(conductor.UserId))
+                var unidad = await _context.Unidades
+                    .FindAsync(solicitud.UnidadId);
+
+                if (unidad != null)
                 {
-                    var usuario = await _userManager.FindByIdAsync(conductor.UserId);
-                    if (usuario != null)
-                    {
-                        await _userManager.DeleteAsync(usuario);
-                    }
+                    unidad.Actividad = "Libre";
                 }
-
-                _context.Conductores.Remove(conductor);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return View("Error");
             }
 
-            return RedirectToAction(nameof(Index));
+            // Quitar asignaciones
+            solicitud.ConductorId = null;
+            solicitud.UnidadId = null;
+
+            // Cambiar estado de la solicitud
+            solicitud.EstadoSolicitud = "Pendiente de Asignación";
         }
+
+        // Eliminación lógica del conductor
+        conductor.IsDeleted = true;
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error: {ex.Message}");
+
+        return View("Error");
+    }
+}
         // GET: Vista de alertas de licencias próximas a vencer
         [HttpGet]
         public IActionResult AlertasLicencias()

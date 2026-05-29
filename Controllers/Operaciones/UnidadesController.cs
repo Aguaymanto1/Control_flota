@@ -23,18 +23,40 @@ public class UnidadesController : Controller
     public IActionResult Create() => View();
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Unidad unidad)
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Create(Unidad unidad)
+{
+    if (ModelState.IsValid)
     {
-        if (ModelState.IsValid)
+        // Verificar si la placa ya existe
+        var placaExistente = await _context.Unidades
+            .AnyAsync(u => u.Placa == unidad.Placa);
+
+        if (placaExistente)
+        {
+            ModelState.AddModelError("Placa", "La placa ya está registrada.");
+            return View(unidad);
+        }
+
+        try
         {
             _context.Add(unidad);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
-        return View(unidad);
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al registrar la unidad: {ex.Message}");
+
+            ModelState.AddModelError("", "Ocurrió un error al registrar la unidad.");
+
+            return View(unidad);
+        }
     }
 
+    return View(unidad);
+}
     // Editar unidad
     public async Task<IActionResult> Edit(int id)
     {
@@ -43,28 +65,62 @@ public class UnidadesController : Controller
         return View(unidad);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, Unidad unidad)
-    {
-        if (id != unidad.Id) return NotFound();
+   [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Edit(int id, Unidad unidad)
+{
+    if (id != unidad.Id)
+        return NotFound();
 
-        if (ModelState.IsValid)
+    var unidadDb = await _context.Unidades.FindAsync(id);
+
+    if (unidadDb == null)
+        return NotFound();
+
+    if (ModelState.IsValid)
+    {
+        var placaNormalizada = unidad.Placa.Trim().ToUpper();
+
+        var placaExistente = await _context.Unidades
+            .AnyAsync(u => u.Id != unidad.Id &&
+                           u.Placa.ToUpper() == placaNormalizada);
+
+        if (placaExistente)
         {
-            try
-            {
-                _context.Update(unidad);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al actualizar la unidad: {ex.Message}");
-                return View("Error");
-            }
+            ModelState.AddModelError("Placa", "La placa ya está registrada.");
+            return View(unidad);
         }
-        return View(unidad);
+
+        try
+        {
+            unidadDb.Placa = placaNormalizada;
+            unidadDb.Tipo = unidad.Tipo;
+            unidadDb.Marca = unidad.Marca;
+            unidadDb.Modelo = unidad.Modelo;
+            unidadDb.Anio = unidad.Anio;
+            unidadDb.CapacidadKg = unidad.CapacidadKg;
+            unidadDb.EstadoOperativo = unidad.EstadoOperativo;
+            unidadDb.VencimientoSoat = unidad.VencimientoSoat;
+            unidadDb.VencimientoRevisionTecnica = unidad.VencimientoRevisionTecnica;
+            unidadDb.VencimientoMtc = unidad.VencimientoMtc;
+            unidadDb.Actividad = unidad.Actividad;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al actualizar la unidad: {ex.Message}");
+
+            ModelState.AddModelError("", "Ocurrió un error al actualizar la unidad.");
+
+            return View(unidad);
+        }
     }
+
+    return View(unidad);
+}
 
     // Eliminar unidad
 [HttpPost]
