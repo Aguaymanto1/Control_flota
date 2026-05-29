@@ -51,6 +51,18 @@
         <span asp-validation-for="TipoCarga" class="text-danger"></span>
     </div>
 
+    <div class="form-group">
+        <label for="NombreReceptor">Nombre Completo del Receptor:</label>
+        <input type="text" name="NombreReceptor" class="form-control" value="@Model?.NombreReceptor" required />
+        <span asp-validation-for="NombreReceptor" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="DniReceptor">DNI del Receptor:</label>
+        <input type="text" name="DniReceptor" class="form-control" value="@Model?.DniReceptor" required />
+        <span asp-validation-for="DniReceptor" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-success">Guardar</button>
 </form>
 
