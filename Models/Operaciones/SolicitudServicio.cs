@@ -37,4 +37,6 @@ public class SolicitudServicio
 
     [ValidateNever]
     public virtual Conductor? Conductor { get; set; }
+    public string? NombreReceptor { get; set; }
+    public string? DniReceptor { get; set; }
 }

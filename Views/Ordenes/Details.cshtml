@@ -139,6 +139,20 @@
 
     <div class="info-card">
         <div class="card-title-custom">
+            <i class="fa-solid fa-handshake-angle" style="color: #0f766e;"></i> Receptor del Pedido
+        </div>
+        <div class="data-row">
+            <span class="data-label">Nombre:</span>
+            <span class="data-value">@(ViewBag.Solicitud != null ? (ViewBag.Solicitud.NombreReceptor ?? "-") : "-")</span>
+        </div>
+        <div class="data-row">
+            <span class="data-label">DNI:</span>
+            <span class="data-value">@(ViewBag.Solicitud != null ? (ViewBag.Solicitud.DniReceptor ?? "-") : "-")</span>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <div class="card-title-custom">
             <i class="fa-solid fa-truck" style="color: #4f46e5;"></i> Unidad de Transporte
         </div>
         <div class="data-row">

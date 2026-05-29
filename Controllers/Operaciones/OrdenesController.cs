@@ -7,6 +7,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.IO; // Necesario para guardar las imágenes de los gastos
+using System.Text.RegularExpressions;
 
 public class OrdenesController : Controller
 {
@@ -272,9 +273,9 @@ public class OrdenesController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Conductor")]
-    public async Task<IActionResult> FinalizarRuta(int id)
+    public async Task<IActionResult> FinalizarRuta(int ordenId, string recepcionistaNombre, string recepcionistaDni)
     {
-        var orden = await _context.Ordenes.FindAsync(id);
+        var orden = await _context.Ordenes.FindAsync(ordenId);
         if (orden == null) return NotFound();
 
         if (orden.Estado != "En Tránsito")
@@ -283,32 +284,53 @@ public class OrdenesController : Controller
             return RedirectToAction(nameof(PanelConductor));
         }
 
-        orden.Estado = "Completado";
-        _context.Update(orden);
-        await _context.SaveChangesAsync();
-
-        // Liberar conductor y unidad
         var solicitud = await _context.SolicitudesServicio
             .Include(s => s.Conductor)
             .Include(s => s.Unidad)
             .FirstOrDefaultAsync(s => s.Id == orden.SolicitudServicioId);
 
-        if (solicitud != null)
+        if (solicitud == null)
         {
-            solicitud.EstadoSolicitud = "Completado";
-
-            if (solicitud.Conductor != null)
-            {
-                solicitud.Conductor.Actividad = "Libre";
-                _context.Update(solicitud.Conductor);
-            }
-            if (solicitud.Unidad != null)
-            {
-                solicitud.Unidad.Actividad = "Libre";
-                _context.Update(solicitud.Unidad);
-            }
-            await _context.SaveChangesAsync();
+            TempData["Error"] = "No se encontró la solicitud de servicio asociada.";
+            return RedirectToAction(nameof(PanelConductor));
         }
+
+        if (string.IsNullOrWhiteSpace(solicitud.NombreReceptor) || string.IsNullOrWhiteSpace(solicitud.DniReceptor))
+        {
+            TempData["Error"] = "La solicitud no contiene datos de receptor para validar.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        if (!Regex.IsMatch(recepcionistaNombre?.Trim() ?? string.Empty, @"^[A-Za-zÀ-ÿÑñ ]+$"))
+        {
+            TempData["Error"] = "El nombre del recepcionista no puede contener números ni símbolos.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        if (!string.Equals(solicitud.NombreReceptor?.Trim(), recepcionistaNombre?.Trim(), StringComparison.OrdinalIgnoreCase)
+            || !string.Equals(solicitud.DniReceptor?.Trim(), recepcionistaDni?.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            TempData["Error"] = "Los datos del recepcionista no coinciden con la solicitud de servicio.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        orden.Estado = "Completado";
+        _context.Update(orden);
+
+        solicitud.EstadoSolicitud = "Completado";
+
+        if (solicitud.Conductor != null)
+        {
+            solicitud.Conductor.Actividad = "Libre";
+            _context.Update(solicitud.Conductor);
+        }
+        if (solicitud.Unidad != null)
+        {
+            solicitud.Unidad.Actividad = "Libre";
+            _context.Update(solicitud.Unidad);
+        }
+
+        await _context.SaveChangesAsync();
 
         TempData["Exito"] = "Ruta finalizada. Conductor y unidad liberados.";
         return RedirectToAction(nameof(PanelConductor));
