@@ -8,6 +8,16 @@
         max-width: 680px;
         margin: 0 auto;
         padding: 20px 0;
+        transition: max-width 0.3s ease;
+    }
+
+    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Administrador"))
+    {
+        <text>
+        .rastreo-wrap {
+            max-width: 1000px !important;
+        }
+        </text>
     }
 
     .search-card {
@@ -16,6 +26,7 @@
         border-radius: 16px;
         padding: 32px;
         margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
     }
 
     .search-card h2 {
@@ -71,6 +82,7 @@
         border: 1px solid #e2e8f0;
         border-radius: 16px;
         overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
     }
 
     .result-header {
@@ -175,169 +187,270 @@
         text-align: center;
         color: #dc2626;
     }
+
+    /* Estilos Premium para Pestañas */
+    .nav-tabs .nav-link {
+        border: none !important;
+        border-bottom: 2px solid transparent !important;
+        background: none !important;
+        color: #64748b !important;
+        font-weight: 600;
+        padding: 12px 20px;
+        transition: all 0.2s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        color: #2563eb !important;
+        border-bottom-color: #cbd5e1 !important;
+    }
+    .nav-tabs .nav-link.active {
+        color: #2563eb !important;
+        border-bottom: 2px solid #2563eb !important;
+    }
 </style>
 
 <div class="rastreo-wrap">
 
-    <!-- BUSCADOR -->
-    <div class="search-card">
-        <h2><i class="fa-solid fa-location-dot me-2" style="color:#2563eb;"></i>Consultar Estado de Carga</h2>
-        <p>Ingresa el código de tu servicio u orden de viaje para ver el estado actual.</p>
-
-        <form method="get" asp-action="Consultar">
-            <div class="input-group-custom">
-                <input type="text" name="codigo"
-                       value="@ViewBag.Codigo"
-                       placeholder="Ej: SRV-20260519-EFB5 o ORD-2026-05-0001" />
-                <button type="submit" class="btn-consultar">
-                    <i class="fa-solid fa-magnifying-glass"></i> Consultar Carga
+    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Administrador"))
+    {
+        <!-- PESTAÑAS PARA EL ADMINISTRADOR -->
+        <ul class="nav nav-tabs mb-4" id="trackingTabs" role="tablist" style="border-bottom: 2px solid #e2e8f0;">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="consulta-tab" data-bs-toggle="tab" data-bs-target="#consulta-pane" type="button" role="tab" aria-controls="consulta-pane" aria-selected="true">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Consulta de Carga
                 </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="mapa-tab" data-bs-toggle="tab" data-bs-target="#mapa-pane" type="button" role="tab" aria-controls="mapa-pane" aria-selected="false" onclick="clickMapaTab()">
+                    <i class="fa-solid fa-map-location-dot me-2"></i>Mapa de Flota
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="trackingTabsContent">
+            <!-- PANEL: CONSULTA INDIVIDUAL -->
+            <div class="tab-pane fade show active" id="consulta-pane" role="tabpanel" aria-labelledby="consulta-tab">
+                <partial name="_BuscadorYResultados" />
             </div>
-        </form>
-    </div>
 
-    @if (ViewBag.Error != null)
-    {
-        <div class="error-card">
-            <i class="fa-solid fa-circle-xmark" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
-            <strong>@ViewBag.Error</strong>
-            <p style="margin-top:8px; font-size:0.85rem; color:#ef4444;">Verifica el código e intenta nuevamente.</p>
-        </div>
-    }
-
-    @if (ViewBag.EsOrden == true && Model != null)
-    {
-        var orden = Model as Control_flota.Models.Operaciones.Orden;
-        string badgeClass = orden!.Estado switch {
-            "Emitida"     => "badge-emitida",
-            "En Tránsito" => "badge-transito",
-            "Completado"  => "badge-completado",
-            _ => "badge-pendiente"
-        };
-
-        <div class="result-card">
-            <div class="result-header">
-                <div>
-                    <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:4px;">ORDEN DE VIAJE</div>
-                    <div class="codigo">@orden.Codigo</div>
-                </div>
-                <span class="badge-estado @badgeClass">
-                    <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> @orden.Estado
-                </span>
-            </div>
-            <div class="result-body">
-                <div class="info-row">
-                    <span class="label">Cliente</span>
-                    <span class="valor">@orden.Cliente?.Nombre</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Origen</span>
-                    <span class="valor">@orden.Origen</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Destino</span>
-                    <span class="valor">@orden.Destino</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Conductor</span>
-                    <span class="valor">@orden.NombreConductor</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Placa</span>
-                    <span class="valor">@orden.PlacaCamion</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Fecha de Emisión</span>
-                    <span class="valor">@orden.FechaEmision.ToString("dd/MM/yyyy HH:mm")</span>
-                </div>
-
-                @if (!string.IsNullOrEmpty(orden.UltimaCiudad))
-                {
-                    <div class="ubicacion-card">
-                        <i class="fa-solid fa-location-dot"></i>
+            <!-- PANEL: MAPA GENERAL -->
+            <div class="tab-pane fade" id="mapa-pane" role="tabpanel" aria-labelledby="mapa-tab">
+                <div class="search-card" style="padding: 24px; margin-bottom: 20px;">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <div>
-                            <div style="font-size:0.75rem; color:#2563eb; font-weight:600;">ÚLTIMA UBICACIÓN REPORTADA</div>
-                            <div style="font-size:1rem; font-weight:700; color:#0f172a;">@orden.UltimaCiudad</div>
+                            <h2 style="margin-bottom: 4px;"><i class="fa-solid fa-map-location-dot me-2" style="color:#2563eb;"></i>Monitoreo de Flota en Tiempo Real</h2>
+                            <p style="margin-bottom: 0;">Ubicación estimada de las unidades actualmente en ruta.</p>
+                        </div>
+                        <span class="badge bg-secondary px-3 py-2" id="contador-unidades" style="border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                            0 Unidades Activas
+                        </span>
+                    </div>
+
+                    <div id="tracking-map" style="height: 500px; width: 100%; border-radius: 12px; border: 1px solid #cbd5e1; background-color: #e2e8f0; position: relative;">
+                        <!-- Loader del Mapa -->
+                        <div id="map-loader" class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(248, 250, 252, 0.8); z-index: 10; border-radius: 12px;">
+                            <div class="spinner-border text-primary mb-2" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <span class="text-muted fw-bold">Inicializando mapa de Google...</span>
                         </div>
                     </div>
+
+                    <!-- Leyenda -->
+                    <div class="d-flex gap-4 mt-3 p-3 bg-light rounded flex-wrap" style="font-size: 0.85rem; border: 1px solid #e2e8f0;">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="https://maps.google.com/mapfiles/ms/icons/green-dot.png" height="24" alt="Pin Verde" />
+                            <span class="fw-bold" style="color: #334155;">Pin Verde:</span>
+                            <span class="text-muted">Unidad transitando a tiempo (Normal)</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" height="24" alt="Pin Rojo" />
+                            <span class="fw-bold" style="color: #334155;">Pin Rojo:</span>
+                            <span class="text-muted">Unidad con incidencia reportada</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- VISTA DE CONSULTA PÚBLICA (SIN PESTAÑAS) -->
+        <partial name="_BuscadorYResultados" />
+    }
+
+</div>
+
+@section Scripts {
+    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Administrador"))
+    {
+        <!-- Cargar API de Google Maps de forma asíncrona -->
+        <script src="https://maps.googleapis.com/maps/api/js?key=" async defer></script>
+        <script>
+            let map;
+            let markers = {};
+            let mapInitialized = false;
+            let updateInterval;
+
+            function clickMapaTab() {
+                // Dar un breve retraso para que Bootstrap renderice el panel y calcule correctamente el tamaño del div
+                setTimeout(initTrackingMap, 200);
+            }
+
+            function initTrackingMap() {
+                if (mapInitialized) {
+                    if (map && typeof google !== 'undefined' && google.maps) {
+                        google.maps.event.trigger(map, 'resize');
+                    }
+                    return;
                 }
 
-                <!-- Timeline de estados -->
-                <div class="timeline" style="margin-top:24px;">
-                    <div style="font-size:0.75rem; font-weight:600; color:#64748b; margin-bottom:12px;">PROGRESO DEL VIAJE</div>
+                const loader = document.getElementById('map-loader');
 
-                    @{
-                        var estados = new[] { "Emitida", "En Tránsito", "Completado" };
-                        int actual = Array.IndexOf(estados, orden.Estado);
-                    }
-
-                    @for (int i = 0; i < estados.Length; i++)
-                    {
-                        string dotClass = i < actual ? "dot-done" : (i == actual ? "dot-active" : "dot-pending");
-                        string textColor = i <= actual ? "#0f172a" : "#94a3b8";
-                        <div class="timeline-item">
-                            <div>
-                                <div class="timeline-dot @dotClass"></div>
-                                @if (i < estados.Length - 1)
-                                {
-                                    <div class="timeline-line"></div>
-                                }
-                            </div>
-                            <div style="color:@textColor; font-size:0.875rem; font-weight: @(i == actual ? "700" : "400");">
-                                @estados[i]
-                                @if (i == actual)
-                                {
-                                    <span style="font-size:0.75rem; color:#2563eb; font-weight:600;"> ← Estado actual</span>
-                                }
-                            </div>
+                if (typeof google === 'undefined' || !google.maps) {
+                    document.getElementById('tracking-map').innerHTML = `
+                        <div class="d-flex flex-column justify-content-center align-items-center h-100 p-4 text-center" style="background:#f8fafc; border-radius:12px;">
+                            <i class="fa-solid fa-triangle-exclamation text-warning mb-3" style="font-size:3rem;"></i>
+                            <h5 class="fw-bold text-dark">La API de Google Maps no se pudo cargar</h5>
+                            <p class="text-muted" style="max-width:400px; font-size:0.9rem; margin-bottom:15px;">
+                                Asegúrate de estar conectado a Internet para inicializar el mapa. Si no tienes una clave de API configurada, cargará en modo de desarrollo.
+                            </p>
+                            <button class="btn btn-primary btn-sm" onclick="location.reload()">
+                                <i class="fa-solid fa-rotate-right me-1"></i> Recargar
+                            </button>
                         </div>
+                    `;
+                    return;
+                }
+
+                // Centrado en el Perú
+                const centroPeru = { lat: -9.5, lng: -76.0 };
+
+                const mapOptions = {
+                    zoom: 6,
+                    center: centroPeru,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: true,
+                    zoomControl: true,
+                    styles: [
+                        { "featureType": "administrative", "elementType": "labels.text.fill", "color": "#444444" },
+                        { "featureType": "landscape", "elementType": "all", "color": "#f2f2f2" },
+                        { "featureType": "poi", "elementType": "all", "visibility": "off" },
+                        { "featureType": "road", "elementType": "all", "saturation": -100, "lightness": 45 },
+                        { "featureType": "road.highway", "elementType": "all", "visibility": "simplified" },
+                        { "featureType": "road.arterial", "elementType": "labels.icon", "visibility": "off" },
+                        { "featureType": "transit", "elementType": "all", "visibility": "off" },
+                        { "featureType": "water", "elementType": "all", "color": "#cbd5e1" }
+                    ]
+                };
+
+                map = new google.maps.Map(document.getElementById('tracking-map'), mapOptions);
+                mapInitialized = true;
+                if (loader) loader.style.display = 'none';
+
+                cargarDatosFlota();
+
+                if (updateInterval) clearInterval(updateInterval);
+                updateInterval = setInterval(cargarDatosFlota, 10000);
+            }
+
+            function cargarDatosFlota() {
+                fetch('/Rastreo/ObtenerFlotaActiva')
+                    .then(response => response.json())
+                    .then(data => {
+                        actualizarMarcadores(data);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener datos de la flota:', error);
+                    });
+            }
+
+            function actualizarMarcadores(flota) {
+                const activeIds = new Set();
+                let totalActivas = 0;
+
+                flota.forEach(camion => {
+                    activeIds.add(camion.id);
+                    totalActivas++;
+
+                    const pos = { lat: parseFloat(camion.latitud), lng: parseFloat(camion.longitud) };
+                    const pinUrl = camion.tieneIncidencia 
+                        ? 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                        : 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
+
+                    if (markers[camion.id]) {
+                        markers[camion.id].setPosition(pos);
+                    } else {
+                        const marker = new google.maps.Marker({
+                            position: pos,
+                            map: map,
+                            title: camion.placa,
+                            icon: pinUrl,
+                            animation: google.maps.Animation.DROP
+                        });
+
+                        const contentString = `
+                            <div style="padding: 10px; font-family: 'Inter', sans-serif; max-width: 220px; line-height: 1.4;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">
+                                    <span style="font-weight:700; color:#0f172a; font-size:0.95rem;">🚚 ${camion.placa}</span>
+                                    <span style="font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:10px; background:${camion.tieneIncidencia ? '#fef2f2' : '#f0fdf4'}; color:${camion.tieneIncidencia ? '#dc2626' : '#16a34a'};">
+                                        ${camion.tieneIncidencia ? 'Incidencia' : 'En Ruta'}
+                                    </span>
+                                </div>
+                                <div style="font-size:0.75rem; color:#64748b; margin-bottom:1px;">Conductor:</div>
+                                <div style="font-size:0.85rem; font-weight:600; color:#1e293b; margin-bottom:6px;">${camion.conductor}</div>
+                                
+                                <div style="font-size:0.75rem; color:#64748b; margin-bottom:1px;">Ruta:</div>
+                                <div style="font-size:0.85rem; font-weight:600; color:#1e293b; margin-bottom:6px;">
+                                    ${camion.origen} ➔ ${camion.destino}
+                                </div>
+
+                                <div style="font-size:0.75rem; color:#64748b; margin-bottom:1px;">Última posición:</div>
+                                <div style="font-size:0.85rem; font-weight:600; color:#2563eb;">
+                                    📍 ${camion.ultimaCiudad}
+                                </div>
+                            </div>
+                        `;
+
+                        const infowindow = new google.maps.InfoWindow({
+                            content: contentString
+                        });
+
+                        marker.addListener('click', () => {
+                            if (window.currentInfoWindow) {
+                                window.currentInfoWindow.close();
+                            }
+                            infowindow.open(map, marker);
+                            window.currentInfoWindow = infowindow;
+                        });
+
+                        markers[camion.id] = marker;
                     }
-                </div>
-            </div>
-        </div>
-    }
+                });
 
-    @if (ViewBag.EsSolicitud == true && Model != null)
-    {
-        var sol = Model as Control_flota.Models.Operaciones.SolicitudServicio;
-        string badgeClass = sol!.EstadoSolicitud switch {
-            "Asignado" => "badge-asignado",
-            "Pendiente de Asignación" => "badge-pendiente",
-            _ => "badge-pendiente"
-        };
+                // Remover los que ya no están activos
+                for (const id in markers) {
+                    if (!activeIds.has(parseInt(id))) {
+                        markers[id].setMap(null);
+                        delete markers[id];
+                    }
+                }
 
-        <div class="result-card">
-            <div class="result-header">
-                <div>
-                    <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:4px;">SOLICITUD DE SERVICIO</div>
-                    <div class="codigo">@sol.Codigo</div>
-                </div>
-                <span class="badge-estado @badgeClass">
-                    <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> @sol.EstadoSolicitud
-                </span>
-            </div>
-            <div class="result-body">
-                <div class="info-row">
-                    <span class="label">Cliente</span>
-                    <span class="valor">@sol.Cliente?.Nombre</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Origen</span>
-                    <span class="valor">@sol.Origen</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Destino</span>
-                    <span class="valor">@sol.Destino</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Tipo de Carga</span>
-                    <span class="valor">@sol.TipoCarga</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Peso</span>
-                    <span class="valor">@sol.PesoKg kg</span>
-                </div>
-            </div>
-        </div>
+                // Actualizar contador
+                const contador = document.getElementById('contador-unidades');
+                if (contador) {
+                    contador.innerText = `${totalActivas} Unidad${totalActivas === 1 ? '' : 'es'} Activa${totalActivas === 1 ? '' : 's'}`;
+                    if (totalActivas > 0) {
+                        contador.className = "badge bg-success px-3 py-2";
+                    } else {
+                        contador.className = "badge bg-secondary px-3 py-2";
+                    }
+                }
+            }
+
+            window.addEventListener('beforeunload', () => {
+                if (updateInterval) clearInterval(updateInterval);
+            });
+        </script>
     }
-</div>
+}
