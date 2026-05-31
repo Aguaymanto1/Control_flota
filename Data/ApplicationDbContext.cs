@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<Usuario>
     public DbSet<Cliente> Clientes => Set<Cliente>();
     public DbSet<SolicitudServicio> SolicitudesServicio => Set<SolicitudServicio>();
     public DbSet<Orden> Ordenes => Set<Orden>();
+    public DbSet<IncidenciaRuta> IncidenciasRuta { get; set; }
     public DbSet<GastoRuta> GastosRuta => Set<GastoRuta>();
     public DbSet<ConsumoCombustible> ConsumosCombustible => Set<ConsumoCombustible>();
     public DbSet<EstadoInicialRuta> EstadosInicialesRuta => Set<EstadoInicialRuta>();
