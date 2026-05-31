@@ -618,4 +618,53 @@ public class OrdenesController : Controller
         TempData["Exito"] = $"Ubicación actualizada: {ciudad}";
         return RedirectToAction(nameof(PanelConductor));
     }
+
+    [HttpPost]
+[ValidateAntiForgeryToken]
+[Authorize(Roles = "Conductor")]
+public async Task<IActionResult> ReportarIncidencia(
+    int OrdenId,
+    string TipoIncidencia,
+    string Descripcion,
+    double? Latitud,
+    double? Longitud)
+{
+    var user = await _context.Users
+        .Include(u => u.Conductor)
+        .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+    if (user?.Conductor == null)
+    {
+        TempData["Error"] = "No se encontró el conductor.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+    var orden = await _context.Ordenes.FindAsync(OrdenId);
+
+    if (orden == null)
+    {
+        TempData["Error"] = "La orden no existe.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+    var incidencia = new IncidenciaRuta
+    {
+        OrdenId = OrdenId,
+        ConductorId = user.Conductor.Id,
+        TipoIncidencia = TipoIncidencia,
+        Descripcion = Descripcion,
+        Latitud = Latitud,
+        Longitud = Longitud,
+        FechaReporte = DateTime.Now,
+        Estado = "Pendiente"
+    };
+
+    _context.IncidenciasRuta.Add(incidencia);
+
+    await _context.SaveChangesAsync();
+
+    TempData["Exito"] = "Alerta registrada correctamente.";
+
+    return RedirectToAction(nameof(PanelConductor));
+}
 }

@@ -1,0 +1,63 @@
+@model IEnumerable<Control_flota.Models.ViewModels.IncidenciaResumenViewModel>
+
+@{
+    ViewData["Title"] = "Incidencias";
+}
+
+<h2>Alertas de Incidencias</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Orden</th>
+            <th>Conductor</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    @foreach(var item in Model)
+    {
+        <tr>
+            <td>@item.FechaUltimaIncidencia</td>
+
+            <td>@item.CodigoOrden</td>
+
+            <td>@item.NombreConductor</td>
+
+            <td>
+                <span class="badge bg-warning text-dark">
+                    @item.CantidadIncidencias incidencia(s)
+                </span>
+            </td>
+
+            <td>
+                @if(item.Estado == "Pendiente")
+                {
+                    <span class="badge bg-danger">
+                        Pendiente
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-success">
+                        Atendido
+                    </span>
+                }
+            </td>
+
+            <td>
+                <a asp-action="Detalles"
+                   asp-route-conductorId="@item.ConductorId"
+                   asp-route-ordenId="@item.OrdenId"
+                   class="btn btn-primary btn-sm">
+                    Ver detalles
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

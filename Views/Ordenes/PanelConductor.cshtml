@@ -193,6 +193,11 @@
                                             data-ordenid="@orden.Id" data-codigo="@orden.Codigo">
                                         <i class="fa-solid fa-flag-checkered"></i> Finalizar Ruta
                                     </button>
+                                    <button type="button"class="action-btn"style="background:#fee2e2; color:#dc2626; width:100%; justify-content:center;"
+                                             data-bs-toggle="modal"data-bs-target="#incidenciaModal"
+                                             data-ordenid="@orden.Id">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Reportar Incidencia
+                                    </button>
                                     <form method="post" asp-action="ReportarUbicacion" asp-route-id="@orden.Id"
                                         style="display:flex; gap:4px;">
                                         @Html.AntiForgeryToken()
@@ -302,6 +307,102 @@
     </div>
 </div>
 
+<!-- Modal: REPORTAR INCIDENCIA-->
+<div class="modal fade" id="incidenciaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form asp-action="ReportarIncidencia" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" id="incidenciaOrdenId" name="OrdenId" />
+                <input type="hidden" id="latitud" name="Latitud" />
+                <input type="hidden" id="longitud" name="Longitud" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Reportar Incidencia
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Tipo de Incidencia
+                        </label>
+
+                        <select id="tipoIncidencia"
+                                name="TipoIncidencia"
+                                class="form-control"
+                                required>
+
+                            <option value="">
+                                Seleccione...
+                            </option>
+
+                            <option value="Tráfico">
+                                Tráfico
+                            </option>
+
+                            <option value="Falla Mecánica">
+                                Falla Mecánica
+                            </option>
+
+                            <option value="Accidente">
+                                Accidente
+                            </option>
+
+                            <option value="Otro">
+                                Otro
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Descripción
+                        </label>
+
+                        <textarea id="descripcionIncidencia"
+                                  name="Descripcion"
+                                  class="form-control"
+                                  rows="4"
+                                  disabled
+                                  required></textarea>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Enviar Alerta
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
 <script>
     (function(){
         var iniciarModal = document.getElementById('iniciarModal');
@@ -400,4 +501,46 @@
         validarModal();
         validarFinalizarModal();
     })();
+
+    var incidenciaModal = document.getElementById('incidenciaModal');
+
+if (incidenciaModal) {
+
+    incidenciaModal.addEventListener('show.bs.modal', function (event) {
+
+        var button = event.relatedTarget;
+
+        var ordenId = button.getAttribute('data-ordenid');
+
+        document.getElementById('incidenciaOrdenId').value = ordenId;
+
+        document.getElementById('tipoIncidencia').value = '';
+        document.getElementById('descripcionIncidencia').value = '';
+        document.getElementById('descripcionIncidencia').disabled = true;
+
+        if (navigator.geolocation) {
+
+            navigator.geolocation.getCurrentPosition(function(position) {
+
+                document.getElementById('latitud').value =
+                    position.coords.latitude;
+
+                document.getElementById('longitud').value =
+                    position.coords.longitude;
+
+            });
+
+        }
+
+    });
+
+    document.getElementById('tipoIncidencia')
+        .addEventListener('change', function() {
+
+            document.getElementById('descripcionIncidencia')
+                .disabled = this.value === '';
+
+        });
+
+}
 </script>
