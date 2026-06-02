@@ -76,6 +76,35 @@
         padding-top: 20px;
         border-top: 1px solid #e2e8f0;
     }
+
+    /* ===== NUEVOS ESTILOS PARA MENSAJES FLOTANTES ===== */
+    .toast-mensaje {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideInOut 3s ease-in-out forwards;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+    
+    .toast-exito {
+        background-color: #10b981;
+        border-left: 4px solid #047857;
+    }
+    
+    .toast-error {
+        background-color: #ef4444;
+        border-left: 4px solid #b91c1c;
+    }
+
 </style>
 
 <div style="margin-bottom:24px; display: flex; justify-content: space-between; align-items: flex-start;">
@@ -266,11 +295,27 @@ else
     <a class="btn btn-secondary" href="@Url.Action("Index")" style="border-radius: 8px; padding: 8px 20px; font-weight: 600;">
         <i class="fa-solid fa-arrow-left me-2"></i> Volver al Listado
     </a>
-
+    
+    <button type="button" 
+            id="btnEnviarCorreo" 
+            class="btn btn-primary"
+            data-url="@Url.Action("EnviarConstanciaPorCorreo", "Ordenes")" 
+            data-id="@Model.Id"
+            style="border-radius: 8px; padding: 8px 20px; font-weight: 600;">
+        <i class="fa-regular fa-envelope me-2"></i> Enviar Correo
+    </button>
+    
     <form method="post" asp-action="Eliminar" asp-route-id="@Model.Id" onsubmit="return confirm('¿Eliminar esta orden? Esta acción no se puede deshacer y liberará los recursos.');" style="display:inline;">
         @Html.AntiForgeryToken()
         <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 8px 20px; font-weight: 600;">
             <i class="fa-solid fa-trash-can me-2"></i> Eliminar Orden
         </button>
     </form>
+
 </div>
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/confirmacionCorreo.js"></script>
+}

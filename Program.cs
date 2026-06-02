@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Control_flota.Data;
 using Control_flota.Models.Login;
 using QuestPDF.Infrastructure;
+using Resend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,18 +12,36 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-//relacion usuario , role
+//relacion usuario , role================================================
 builder.Services.AddIdentity<Usuario, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+//============================================================
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 QuestPDF.Settings.License = LicenseType.Community;
+
+
+//Configuracion Resend=========================================================
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(o =>
+{
+    o.ApiToken = builder.Configuration["Resend:ApiToken"] ?? Environment.GetEnvironmentVariable("RESEND_APITOKEN");
+});
+builder.Services.AddTransient<IResend, ResendClient>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 var app = builder.Build();
 var cultureInfo = new System.Globalization.CultureInfo("es-PE");
+
 cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
 cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
+
+
+
 
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
