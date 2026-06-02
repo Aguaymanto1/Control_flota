@@ -6,16 +6,21 @@ using Microsoft.AspNetCore.Authorization;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using System.IO; // Necesario para guardar las imágenes de los gastos
+using System.IO;
 using System.Text.RegularExpressions;
+using Control_flota.CreatePdf;
+
+namespace Control_flota.Services;
 
 public class OrdenesController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public OrdenesController(ApplicationDbContext context)
+    public OrdenesController(ApplicationDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     // Lista general de órdenes y solicitudes pendientes en despacho
@@ -52,19 +57,17 @@ public class OrdenesController : Controller
         return View(model);
     }
 
-    // Detalle de orden
-// Detalle de orden (Vista del Administrador)
+    // Detalle de orden (Vista del Administrador)
     public async Task<IActionResult> Details(int id)
     {
         var orden = await _context.Ordenes
             .Include(o => o.Cliente)
-            .Include(o => o.Gastos) // <-- AGREGA ESTA LÍNEA AQUÍ
+            .Include(o => o.Gastos)
             .FirstOrDefaultAsync(o => o.Id == id);
 
         if (orden == null)
             return NotFound();
 
-        // Cargar la solicitud relacionada y sus datos de conductor/unidad si existen
         var solicitud = await _context.SolicitudesServicio
             .Include(s => s.Conductor)
             .Include(s => s.Unidad)
@@ -74,7 +77,6 @@ public class OrdenesController : Controller
         ViewBag.Conductor = solicitud?.Conductor;
         ViewBag.Unidad = solicitud?.Unidad;
 
-        // Cargar datos iniciales de ruta si existen (último registro)
         var estadoInicial = await _context.EstadosInicialesRuta
             .Where(e => e.OrdenId == orden.Id)
             .OrderByDescending(e => e.FechaRegistro)
@@ -92,7 +94,6 @@ public class OrdenesController : Controller
         if (orden == null)
             return NotFound();
 
-        // 1. Rescatamos la solicitud original ANTES de borrar la orden
         var solicitud = await _context.SolicitudesServicio
             .Include(s => s.Conductor)
             .Include(s => s.Unidad)
@@ -100,17 +101,14 @@ public class OrdenesController : Controller
 
         if (solicitud != null)
         {
-            // 2. Devolvemos la solicitud a estado pendiente para que puedas asignarle otra flota
             solicitud.EstadoSolicitud = "Pendiente de Asignación";
 
-            // 3. Liberamos al conductor
             if (solicitud.Conductor != null)
             {
                 solicitud.Conductor.Actividad = "Libre";
                 _context.Update(solicitud.Conductor);
             }
 
-            // 4. Liberamos a la unidad
             if (solicitud.Unidad != null)
             {
                 solicitud.Unidad.Actividad = "Libre";
@@ -118,7 +116,6 @@ public class OrdenesController : Controller
             }
         }
 
-        // 5. Ahora sí, borramos la orden
         _context.Ordenes.Remove(orden);
         await _context.SaveChangesAsync();
 
@@ -184,14 +181,12 @@ public class OrdenesController : Controller
             return RedirectToAction(nameof(PanelConductor));
         }
 
-        // Validación server-side: no aceptar valores negativos
         if (combustibleInicial < 0 || kilometrajeInicial < 0)
         {
             TempData["Error"] = "Los valores no pueden ser negativos.";
             return RedirectToAction(nameof(PanelConductor));
         }
 
-        // Validación de ModelState para capturar posibles problemas de binding (ej. formatos inválidos)
         if (!ModelState.IsValid)
         {
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -235,7 +230,6 @@ public class OrdenesController : Controller
         };
 
         _context.EstadosInicialesRuta.Add(estado);
-
         orden.Estado = "En Tránsito";
         _context.Update(orden);
 
@@ -248,7 +242,6 @@ public class OrdenesController : Controller
         catch (Exception ex)
         {
             Console.WriteLine("Error guardando EstadoInicialRuta (intento 1): " + ex.Message);
-            // Intentar asegurar la base de datos y reintentar (útil en desarrollo cuando faltan tablas)
             try
             {
                 _context.Database.EnsureCreated();
@@ -259,7 +252,6 @@ public class OrdenesController : Controller
             catch (Exception ex2)
             {
                 Console.WriteLine("Error guardando EstadoInicialRuta (intento 2): " + ex2.Message);
-                // Intentar mostrar inner exception si existe para diagnóstico
                 var inner = ex2.InnerException?.Message;
                 var detalle = inner ?? ex2.Message;
                 if (detalle.Length > 300) detalle = detalle.Substring(0, 300) + "...";
@@ -336,12 +328,11 @@ public class OrdenesController : Controller
         return RedirectToAction(nameof(PanelConductor));
     }
 
-// --- NUEVAS ACCIONES DE GASTOS (HU-12) ---
+    // --- NUEVAS ACCIONES DE GASTOS (HU-12) ---
     [HttpGet]
     [Authorize(Roles = "Conductor")]
     public async Task<IActionResult> ReportarGasto(int id)
     {
-        // Cambiamos el FindAsync por un Include para traer los gastos que ya existen
         var orden = await _context.Ordenes
             .Include(o => o.Gastos)
             .FirstOrDefaultAsync(o => o.Id == id);
@@ -400,7 +391,7 @@ public class OrdenesController : Controller
         };
 
         _context.GastosRuta.Add(gasto);
-        // Si se reporta combustible, crear también el registro de ConsumoCombustible
+        
         if (esCombustible)
         {
             var consumo = new ConsumoCombustible
@@ -427,7 +418,6 @@ public class OrdenesController : Controller
         var gasto = await _context.GastosRuta.FindAsync(id);
         if (gasto != null)
         {
-            // Borrar el archivo físico para no saturar el servidor
             if (!string.IsNullOrEmpty(gasto.RutaComprobante))
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", gasto.RutaComprobante.TrimStart('/'));
@@ -444,165 +434,96 @@ public class OrdenesController : Controller
 
         return RedirectToAction("ReportarGasto", new { id = ordenId });
     }
-    // -----------------------------------------
+
+    // ==================== MÉTODOS DE CONSTANCIA ====================
+    
     [Authorize(Roles = "Conductor")]
     public async Task<IActionResult> DescargarConstancia(int id)
     {
-        var orden = await _context.Ordenes
-            .Include(o => o.Cliente)
-            .FirstOrDefaultAsync(o => o.Id == id);
-
-        if (orden == null) return NotFound();
-
-        var solicitud = await _context.SolicitudesServicio
-            .Include(s => s.Conductor)
-            .Include(s => s.Unidad)
-            .FirstOrDefaultAsync(s => s.Id == orden.SolicitudServicioId);
-
-        var conductorNombre = solicitud?.Conductor != null
-            ? $"{solicitud.Conductor.Nombres} {solicitud.Conductor.Apellidos}"
-            : orden.NombreConductor;
-
-        var conductorDni = solicitud?.Conductor?.Dni ?? "-";
-        var unidadDesc  = solicitud?.Unidad != null
-            ? $"{solicitud.Unidad.Marca} {solicitud.Unidad.Modelo}"
-            : "-";
-
-        var pdf = Document.Create(container =>
-        {
-            container.Page(page =>
-            {
-                page.Size(PageSizes.A4);
-                page.Margin(40);
-                page.DefaultTextStyle(x => x.FontFamily("Arial").FontSize(11));
-
-                // HEADER
-                page.Header().Column(col =>
-                {
-                    col.Item().Row(row =>
-                    {
-                        row.RelativeItem().Column(c =>
-                        {
-                            c.Item().Text("De La Sota S.A.C.")
-                                .FontSize(20).Bold().FontColor("#002d62");
-                            c.Item().Text("Sistema Integrado de Operaciones Logísticas")
-                                .FontSize(10).FontColor("#64748b");
-                        });
-                        row.ConstantItem(80).AlignRight().Column(c =>
-                        {
-                            c.Item().Text("🚛").FontSize(36);
-                        });
-                    });
-
-                    col.Item().PaddingTop(8).BorderBottom(2).BorderColor("#002d62");
-
-                    col.Item().PaddingTop(12).AlignCenter()
-                        .Text("CONSTANCIA DE VIAJE")
-                        .FontSize(16).Bold().FontColor("#002d62");
-                });
-
-                // CONTENT
-                page.Content().PaddingTop(20).Column(col =>
-                {
-                    // Sección: Datos de la Orden
-                    col.Item().Background("#f8fafc").Padding(12).Column(c =>
-                    {
-                        c.Item().Text("DATOS DE LA ORDEN")
-                            .FontSize(9).Bold().FontColor("#64748b");
-                        c.Item().PaddingTop(8).Row(r =>
-                        {
-                            r.RelativeItem().Text("Código de Orden:").FontColor("#64748b");
-                            r.RelativeItem().Text(orden.Codigo).Bold();
-                        });
-                        c.Item().PaddingTop(4).Row(r =>
-                        {
-                            r.RelativeItem().Text("Fecha de Emisión:").FontColor("#64748b");
-                            r.RelativeItem().Text(orden.FechaEmision.ToString("dd/MM/yyyy HH:mm")).Bold();
-                        });
-                        c.Item().PaddingTop(4).Row(r =>
-                        {
-                            r.RelativeItem().Text("Estado:").FontColor("#64748b");
-                            r.RelativeItem().Text(orden.Estado).Bold().FontColor("#16a34a");
-                        });
-                    });
-
-                    col.Item().PaddingTop(16).Column(c =>
-                    {
-                        c.Item().Text("CLIENTE Y RUTA")
-                            .FontSize(9).Bold().FontColor("#64748b");
-                        c.Item().BorderBottom(1).BorderColor("#e2e8f0").PaddingBottom(4);
-                        c.Item().PaddingTop(8).Row(r =>
-                        {
-                            r.RelativeItem().Text("Cliente:").FontColor("#64748b");
-                            r.RelativeItem().Text(orden.Cliente?.Nombre ?? "-").Bold();
-                        });
-                        c.Item().PaddingTop(4).Row(r =>
-                        {
-                            r.RelativeItem().Text("Origen:").FontColor("#64748b");
-                            r.RelativeItem().Text(orden.Origen).Bold();
-                        });
-                        c.Item().PaddingTop(4).Row(r =>
-                        {
-                            r.RelativeItem().Text("Destino:").FontColor("#64748b");
-                            r.RelativeItem().Text(orden.Destino).Bold();
-                        });
-                    });
-
-                    col.Item().PaddingTop(16).Column(c =>
-                    {
-                        c.Item().Text("CONDUCTOR Y UNIDAD")
-                            .FontSize(9).Bold().FontColor("#64748b");
-                        c.Item().BorderBottom(1).BorderColor("#e2e8f0").PaddingBottom(4);
-                        c.Item().PaddingTop(8).Row(r =>
-                        {
-                            r.RelativeItem().Text("Conductor:").FontColor("#64748b");
-                            r.RelativeItem().Text(conductorNombre).Bold();
-                        });
-                        c.Item().PaddingTop(4).Row(r =>
-                        {
-                            r.RelativeItem().Text("DNI:").FontColor("#64748b");
-                            r.RelativeItem().Text(conductorDni).Bold();
-                        });
-                        c.Item().PaddingTop(4).Row(r =>
-                        {
-                            r.RelativeItem().Text("Placa:").FontColor("#64748b");
-                            r.RelativeItem().Text(orden.PlacaCamion).Bold();
-                        });
-                        c.Item().PaddingTop(4).Row(r =>
-                        {
-                            r.RelativeItem().Text("Unidad:").FontColor("#64748b");
-                            r.RelativeItem().Text(unidadDesc).Bold();
-                        });
-                    });
-
-                    // Firma
-                    col.Item().PaddingTop(40).Row(row =>
-                    {
-                        row.RelativeItem().Column(c =>
-                        {
-                            c.Item().BorderBottom(1).BorderColor("#1a1a1a").Width(150);
-                            c.Item().PaddingTop(4).Text("Firma del Conductor").FontSize(10).FontColor("#64748b");
-                        });
-                        row.RelativeItem().AlignRight().Column(c =>
-                        {
-                            c.Item().BorderBottom(1).BorderColor("#1a1a1a").Width(150);
-                            c.Item().PaddingTop(4).Text("Sello de la Empresa").FontSize(10).FontColor("#64748b");
-                        });
-                    });
-                });
-
-                // FOOTER
-                page.Footer().AlignCenter().Text(text =>
-                {
-                    text.Span($"Documento generado el {DateTime.Now:dd/MM/yyyy HH:mm} — FleetOps Pro © {DateTime.Now.Year}")
-                        .FontSize(9).FontColor("#94a3b8");
-                });
-            });
-        });
-
-        var pdfBytes = pdf.GeneratePdf();
-        return File(pdfBytes, "application/pdf", $"Constancia_{orden.Codigo}.pdf");
+        var pdfBytes = await PdfConstancia.Generar(id, _context);
+        if (pdfBytes == null || pdfBytes.Length == 0)
+            return NotFound();
+        var orden = await _context.Ordenes.FindAsync(id);
+        return File(pdfBytes, "application/pdf", $"Constancia_{orden?.Codigo}.pdf");
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EnviarConstanciaPorCorreo(int id)
+    {
+        try
+        {
+            var orden = await _context.Ordenes
+                .Include(o => o.Cliente)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (orden == null)
+                return Json(new { success = false, message = "Orden no encontrada" });
+
+            if (orden.Cliente == null || string.IsNullOrEmpty(orden.Cliente.Correo))
+                return Json(new { success = false, message = "El cliente no tiene un correo registrado" });
+
+            var pdfBytes = await PdfConstancia.Generar(id, _context);
+            if (pdfBytes == null || pdfBytes.Length == 0)
+                return Json(new { success = false, message = "Error al generar el PDF" });
+
+            // HTML del correo
+            var mensajeHtml = $@"
+                <html>
+                <head>
+                    <meta charset='utf-8'>
+                    <style>
+                        body {{ font-family: 'Segoe UI', Arial, sans-serif; }}
+                        .container {{ max-width: 600px; margin: auto; }}
+                        .header {{ background: #002d62; color: white; padding: 20px; text-align: center; }}
+                        .content {{ padding: 20px; }}
+                        .footer {{ background: #f1f1f1; padding: 10px; text-align: center; font-size: 12px; }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='header'>
+                            <h2>🚛 De La Sota S.A.C.</h2>
+                            <p>Constancia de Viaje</p>
+                        </div>
+                        <div class='content'>
+                            <h3>Estimado(a) {orden.Cliente.Nombre},</h3>
+                            <p>Adjunto encontrará la constancia de su servicio de transporte.</p>
+                            <p><strong>📄 Orden:</strong> {orden.Codigo}</p>
+                            <p><strong>📍 Ruta:</strong> {orden.Origen} → {orden.Destino}</p>
+                            <p><strong>📅 Fecha:</strong> {orden.FechaEmision:dd/MM/yyyy HH:mm}</p>
+                            <p><strong>📊 Estado:</strong> {orden.Estado}</p>
+                            <p>Saludos cordiales,<br><strong>Departamento de Logística</strong></p>
+                        </div>
+                        <div class='footer'>
+                            <p>© {DateTime.Now.Year} De La Sota S.A.C.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>";
+
+            // Enviar correo
+             var exito = await _emailService.EnviarCorreoConConstanciaAsync(
+                orden.Cliente.Correo,
+                $"Constancia de Viaje - Orden {orden.Codigo}",
+                mensajeHtml,
+                pdfBytes,
+                $"Constancia_{orden.Codigo}.pdf"
+            );
+
+            if (exito)
+                return Json(new { success = true, message = $"Constancia enviada a: {orden.Cliente.Correo}" });
+            else
+                return Json(new { success = false, message = $" Error al enviar el correo" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = $"❌ Error: {ex.Message}" });
+        }
+    }
+
+    // ==================== OTROS MÉTODOS ====================
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Conductor")]
@@ -620,51 +541,49 @@ public class OrdenesController : Controller
     }
 
     [HttpPost]
-[ValidateAntiForgeryToken]
-[Authorize(Roles = "Conductor")]
-public async Task<IActionResult> ReportarIncidencia(
-    int OrdenId,
-    string TipoIncidencia,
-    string Descripcion,
-    double? Latitud,
-    double? Longitud)
-{
-    var user = await _context.Users
-        .Include(u => u.Conductor)
-        .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
-
-    if (user?.Conductor == null)
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Conductor")]
+    public async Task<IActionResult> ReportarIncidencia(
+        int OrdenId,
+        string TipoIncidencia,
+        string Descripcion,
+        double? Latitud,
+        double? Longitud)
     {
-        TempData["Error"] = "No se encontró el conductor.";
+        var user = await _context.Users
+            .Include(u => u.Conductor)
+            .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+        if (user?.Conductor == null)
+        {
+            TempData["Error"] = "No se encontró el conductor.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        var orden = await _context.Ordenes.FindAsync(OrdenId);
+
+        if (orden == null)
+        {
+            TempData["Error"] = "La orden no existe.";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+
+        var incidencia = new IncidenciaRuta
+        {
+            OrdenId = OrdenId,
+            ConductorId = user.Conductor.Id,
+            TipoIncidencia = TipoIncidencia,
+            Descripcion = Descripcion,
+            Latitud = Latitud,
+            Longitud = Longitud,
+            FechaReporte = DateTime.Now,
+            Estado = "Pendiente"
+        };
+
+        _context.IncidenciasRuta.Add(incidencia);
+        await _context.SaveChangesAsync();
+
+        TempData["Exito"] = "Alerta registrada correctamente.";
         return RedirectToAction(nameof(PanelConductor));
     }
-
-    var orden = await _context.Ordenes.FindAsync(OrdenId);
-
-    if (orden == null)
-    {
-        TempData["Error"] = "La orden no existe.";
-        return RedirectToAction(nameof(PanelConductor));
-    }
-
-    var incidencia = new IncidenciaRuta
-    {
-        OrdenId = OrdenId,
-        ConductorId = user.Conductor.Id,
-        TipoIncidencia = TipoIncidencia,
-        Descripcion = Descripcion,
-        Latitud = Latitud,
-        Longitud = Longitud,
-        FechaReporte = DateTime.Now,
-        Estado = "Pendiente"
-    };
-
-    _context.IncidenciasRuta.Add(incidencia);
-
-    await _context.SaveChangesAsync();
-
-    TempData["Exito"] = "Alerta registrada correctamente.";
-
-    return RedirectToAction(nameof(PanelConductor));
-}
 }
