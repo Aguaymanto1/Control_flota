@@ -297,6 +297,17 @@
                     <div class="alert alert-info" role="alert" style="font-size:0.9rem; margin-bottom:0;">
                         Se validará el nombre y DNI del recepcionista con los datos registrados en la solicitud de servicio.
                     </div>
+                        <div class="mb-3" style="margin-top:12px;">
+                            <div class="form-text" style="font-size:0.9rem; color:#0f172a; margin-bottom:6px;">
+                                Debe tomar una foto de la constancia de viaje con la cámara.
+                            </div>
+                            <button type="button" class="action-btn" style="background:#e2e8f0; color:#2563eb; width:100%; justify-content:center;" id="btnTomarFoto">
+                                <i class="fa-solid fa-camera"></i> Tomar foto
+                            </button>
+                            <div class="form-text" style="font-size:0.8rem; color:#94a3b8; margin-top:6px;" id="fotoStatus">No se ha tomado foto aún.</div>
+                            <input type="hidden" name="fotoFinal" id="fotoFinal" />
+                            <div class="form-text text-danger" id="fotoFinalError" style="display:none; font-size:0.8rem; margin-top:4px;">Debe tomar una foto antes de finalizar la ruta.</div>
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -306,6 +317,48 @@
         </div>
     </div>
 </div>
+
+<!-- Modales para cámara y previsualización (solo conductor) -->
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tomar foto de la constancia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <video id="cameraVideo" autoplay playsinline style="width:100%; max-height:480px; background:#000;"></video>
+                <canvas id="cameraCanvas" style="display:none;"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnStopCamera">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnCapture">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="previewFotoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Previsualizar foto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="previewImage" src="" style="width:100%; height:auto;" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnRetake">Volver a tomar</button>
+                <button type="button" class="btn btn-success" id="btnUsePhoto">Subir evidencia</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="openCameraModalBtn" type="button" data-bs-toggle="modal" data-bs-target="#cameraModal" style="display:none;"></button>
+<button id="openPreviewModalBtn" type="button" data-bs-toggle="modal" data-bs-target="#previewFotoModal" style="display:none;"></button>
+<button id="openFinalizarModalBtn" type="button" data-bs-toggle="modal" data-bs-target="#finalizarModal" style="display:none;"></button>
 
 <!-- Modal: REPORTAR INCIDENCIA-->
 <div class="modal fade" id="incidenciaModal" tabindex="-1">
@@ -398,12 +451,60 @@
                 </div>
 
             </form>
-
         </div>
     </div>
 </div>
 
+<!-- Modales para cámara y previsualización (solo conductor) -->
+
 <script>
+    var skipFinalizarReset = false;
+    
+    // Variables globales para validación
+    var fotoFinalInput = document.getElementById('fotoFinal');
+    var fotoFinalError = document.getElementById('fotoFinalError');
+    var recepcionistaNombre = document.getElementById('recepcionistaNombre');
+    var recepcionistaDni = document.getElementById('recepcionistaDni');
+    var recepcionistaNombreError = document.getElementById('recepcionistaNombreError');
+    var recepcionistaDniError = document.getElementById('recepcionistaDniError');
+    var finalizarSubmit = document.getElementById('finalizarSubmit');
+
+    // Función global para validar modal de finalización
+    function validarFinalizarModal(){
+        if(!recepcionistaNombre || !recepcionistaDni || !finalizarSubmit) return;
+        
+        var nombreVal = (recepcionistaNombre.value || '').trim();
+        var dniVal = (recepcionistaDni.value || '').trim();
+        var fotoVal = (fotoFinalInput && fotoFinalInput.value) ? (fotoFinalInput.value || '').trim() : '';
+        var nombreValido = /^[A-Za-zÀ-ÿÑñ ]{3,}$/.test(nombreVal);
+        var dniValido = /^\d{8}$/.test(dniVal);
+        var fotoValida = fotoVal.length > 0;
+
+        if(recepcionistaNombreError){
+            if(!nombreValido){
+                recepcionistaNombreError.style.display = 'block';
+            } else {
+                recepcionistaNombreError.style.display = 'none';
+            }
+        }
+        if(recepcionistaDniError){
+            if(!dniValido){
+                recepcionistaDniError.style.display = 'block';
+            } else {
+                recepcionistaDniError.style.display = 'none';
+            }
+        }
+        if(fotoFinalError){
+            if(!fotoValida){
+                fotoFinalError.style.display = 'block';
+            } else {
+                fotoFinalError.style.display = 'none';
+            }
+        }
+
+        finalizarSubmit.disabled = !(nombreValido && dniValido && fotoValida);
+    }
+    
     (function(){
         var iniciarModal = document.getElementById('iniciarModal');
         if(!iniciarModal) return;
@@ -414,11 +515,6 @@
         var combustibleError = document.getElementById('combustibleError');
         var kmError = document.getElementById('kmError');
         var finalizarModal = document.getElementById('finalizarModal');
-        var recepcionistaNombre = document.getElementById('recepcionistaNombre');
-        var recepcionistaDni = document.getElementById('recepcionistaDni');
-        var recepcionistaNombreError = document.getElementById('recepcionistaNombreError');
-        var recepcionistaDniError = document.getElementById('recepcionistaDniError');
-        var finalizarSubmit = document.getElementById('finalizarSubmit');
 
         function isDecimal(value){
             return /^\d+(?:[\.,]\d+)?$/.test(value.trim());
@@ -451,26 +547,6 @@
             modalSubmit.disabled = !(combustibleValido && kmValido);
         }
 
-        function validarFinalizarModal(){
-            var nombreVal = (recepcionistaNombre.value || '').trim();
-            var dniVal = (recepcionistaDni.value || '').trim();
-            var nombreValido = /^[A-Za-zÀ-ÿÑñ ]{3,}$/.test(nombreVal);
-            var dniValido = /^\d{8}$/.test(dniVal);
-
-            if(!nombreValido){
-                recepcionistaNombreError.style.display = 'block';
-            } else {
-                recepcionistaNombreError.style.display = 'none';
-            }
-            if(!dniValido){
-                recepcionistaDniError.style.display = 'block';
-            } else {
-                recepcionistaDniError.style.display = 'none';
-            }
-
-            finalizarSubmit.disabled = !(nombreValido && dniValido);
-        }
-
         iniciarModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             var ordenId = button.getAttribute('data-ordenid');
@@ -484,15 +560,22 @@
 
         if(finalizarModal){
             finalizarModal.addEventListener('show.bs.modal', function (event) {
+                if (skipFinalizarReset) {
+                    skipFinalizarReset = false;
+                    validarFinalizarModal();
+                    return;
+                }
                 var button = event.relatedTarget;
-                var ordenId = button.getAttribute('data-ordenid');
-                document.getElementById('finalizarOrdenId').value = ordenId;
-                recepcionistaNombre.value = '';
-                recepcionistaDni.value = '';
+                if (button) {
+                    var ordenId = button.getAttribute('data-ordenid');
+                    document.getElementById('finalizarOrdenId').value = ordenId;
+                }
+                if(recepcionistaNombre) recepcionistaNombre.value = '';
+                if(recepcionistaDni) recepcionistaDni.value = '';
                 validarFinalizarModal();
             });
-            recepcionistaNombre.addEventListener('input', validarFinalizarModal);
-            recepcionistaDni.addEventListener('input', validarFinalizarModal);
+            if(recepcionistaNombre) recepcionistaNombre.addEventListener('input', validarFinalizarModal);
+            if(recepcionistaDni) recepcionistaDni.addEventListener('input', validarFinalizarModal);
         }
 
         combustibleInput.addEventListener('input', validarModal);
@@ -500,6 +583,167 @@
 
         validarModal();
         validarFinalizarModal();
+    })();
+
+    (function(){
+        // Esperar a que el DOM esté completamente cargado
+        if(document.readyState === 'loading'){
+            document.addEventListener('DOMContentLoaded', initCamera);
+        } else {
+            initCamera();
+        }
+
+        function initCamera(){
+            var btnTomarFoto = document.getElementById('btnTomarFoto');
+            var cameraModalEl = document.getElementById('cameraModal');
+            var previewModalEl = document.getElementById('previewFotoModal');
+            var openCameraModalBtn = document.getElementById('openCameraModalBtn');
+            var openPreviewModalBtn = document.getElementById('openPreviewModalBtn');
+            var openFinalizarModalBtn = document.getElementById('openFinalizarModalBtn');
+            
+            console.log('Camera init - btnTomarFoto:', !!btnTomarFoto, 'cameraModalEl:', !!cameraModalEl, 
+                        'previewModalEl:', !!previewModalEl, 'openCameraModalBtn:', !!openCameraModalBtn,
+                        'openPreviewModalBtn:', !!openPreviewModalBtn, 'openFinalizarModalBtn:', !!openFinalizarModalBtn);
+            
+            if(!btnTomarFoto || !cameraModalEl || !previewModalEl || !openCameraModalBtn || !openPreviewModalBtn || !openFinalizarModalBtn){
+                console.error('Camera: Falta un elemento requerido');
+                return;
+            }
+
+            var video = document.getElementById('cameraVideo');
+            var canvas = document.getElementById('cameraCanvas');
+            var previewImage = document.getElementById('previewImage');
+            var btnCapture = document.getElementById('btnCapture');
+            var btnStopCamera = document.getElementById('btnStopCamera');
+            var btnRetake = document.getElementById('btnRetake');
+            var btnUsePhoto = document.getElementById('btnUsePhoto');
+            var fotoStatus = document.getElementById('fotoStatus');
+            var finalizarModal = document.getElementById('finalizarModal');
+            var stream = null;
+            var lastDataUrl = '';
+            var preserveFinalizar = false;
+            var openingPreview = false;
+            var reopenFinalizarOnPreviewClose = false;
+
+            function isModalShown(modalEl){
+                return modalEl && modalEl.classList.contains('show');
+            }
+
+            function closeModal(modalEl){
+                if(!modalEl) return;
+                var closeBtn = modalEl.querySelector('.btn-close, [data-bs-dismiss="modal"]');
+                if(closeBtn) closeBtn.click();
+            }
+
+            function stopStream(){
+                if(stream){
+                    stream.getTracks().forEach(function(t){ t.stop(); });
+                    stream = null;
+                }
+                if(video){
+                    try{ video.pause(); video.srcObject = null; }catch(e){}
+                }
+            }
+
+            function openModalByButton(button){
+                if(!button) return;
+                button.click();
+            }
+
+            function startCamera(){
+                if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+                    alert('El navegador no soporta acceso a la cámara.');
+                    return;
+                }
+                preserveFinalizar = isModalShown(finalizarModal);
+                if (preserveFinalizar) {
+                    closeModal(finalizarModal);
+                }
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then(function(s){
+                        stream = s;
+                        video.srcObject = stream;
+                        video.play();
+                        openModalByButton(openCameraModalBtn);
+                    })
+                    .catch(function(err){
+                        alert('No se pudo acceder a la cámara: ' + (err.message || err));
+                    });
+            }
+
+            btnTomarFoto.addEventListener('click', function(){ 
+                console.log('btnTomarFoto clicked');
+                startCamera(); 
+            });
+
+            if(btnStopCamera){
+                btnStopCamera.addEventListener('click', function(){
+                    stopStream();
+                    closeModal(cameraModalEl);
+                    if(preserveFinalizar) openModalByButton(openFinalizarModalBtn);
+                });
+            }
+
+            if(btnCapture){
+                btnCapture.addEventListener('click', function(){
+                    if(!video) return;
+                    var w = video.videoWidth || 1280;
+                    var h = video.videoHeight || 720;
+                    var maxW = 1280;
+                    var ratio = w / (h || 1);
+                    var targetW = w;
+                    var targetH = h;
+                    if(w > maxW){ targetW = maxW; targetH = Math.round(targetW / ratio); }
+                    canvas.width = targetW; canvas.height = targetH;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, targetW, targetH);
+                    var dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    lastDataUrl = dataUrl;
+                    if(previewImage) previewImage.src = dataUrl;
+                    stopStream();
+                    openingPreview = true;
+                    closeModal(cameraModalEl);
+                    openModalByButton(openPreviewModalBtn);
+                });
+            }
+
+            if(btnRetake){
+                btnRetake.addEventListener('click', function(){
+                    closeModal(previewModalEl);
+                    startCamera();
+                });
+            }
+
+            if(btnUsePhoto){
+                btnUsePhoto.addEventListener('click', function(){
+                    if(!lastDataUrl) return;
+                    if(fotoFinalInput) fotoFinalInput.value = lastDataUrl;
+                    if(fotoStatus) fotoStatus.textContent = 'Foto tomada correctamente.';
+                    reopenFinalizarOnPreviewClose = preserveFinalizar;
+                    skipFinalizarReset = true;
+                    // Validar para habilitar botón de finalizar
+                    validarFinalizarModal();
+                    closeModal(previewModalEl);
+                });
+            }
+
+            cameraModalEl.addEventListener('hidden.bs.modal', function(){
+                if(openingPreview){
+                    openingPreview = false;
+                    return;
+                }
+                if(preserveFinalizar){
+                    openModalByButton(document.getElementById('finalizarModal') ? document.getElementById('finalizarModal') : null);
+                }
+            });
+
+            previewModalEl.addEventListener('hidden.bs.modal', function(){
+                if(reopenFinalizarOnPreviewClose){
+                    reopenFinalizarOnPreviewClose = false;
+                    openModalByButton(openFinalizarModalBtn);
+                }
+            });
+        }
     })();
 
     var incidenciaModal = document.getElementById('incidenciaModal');
