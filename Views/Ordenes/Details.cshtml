@@ -230,6 +230,19 @@
                     }
                 </span>
             </div>
+            <div class="data-row">
+                <span class="data-label">Foto final:</span>
+                <span class="data-value">
+                    @if (!string.IsNullOrEmpty(ViewBag.RutaFotoFinal as string))
+                    {
+                        <a href="@(ViewBag.RutaFotoFinal as string)" target="_blank" class="btn btn-sm btn-outline-primary">Ver evidencia final</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin evidencia final</span>
+                    }
+                </span>
+            </div>
         </div>
     }
 </div>

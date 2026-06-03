@@ -82,45 +82,30 @@ public class OrdenesController : Controller
             .OrderByDescending(e => e.FechaRegistro)
             .FirstOrDefaultAsync();
         ViewBag.EstadoInicial = estadoInicial;
+        ViewBag.RutaFotoFinal = GetRutaFotoFinal(orden.Id);
 
         return View(orden);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Eliminar(int id)
+    private string? GetRutaFotoFinal(int ordenId)
     {
-        var orden = await _context.Ordenes.FindAsync(id);
-        if (orden == null)
-            return NotFound();
-
-        var solicitud = await _context.SolicitudesServicio
-            .Include(s => s.Conductor)
-            .Include(s => s.Unidad)
-            .FirstOrDefaultAsync(s => s.Id == orden.SolicitudServicioId);
-
-        if (solicitud != null)
+        var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "finales");
+        if (!Directory.Exists(folder))
         {
-            solicitud.EstadoSolicitud = "Pendiente de Asignación";
-
-            if (solicitud.Conductor != null)
-            {
-                solicitud.Conductor.Actividad = "Libre";
-                _context.Update(solicitud.Conductor);
-            }
-
-            if (solicitud.Unidad != null)
-            {
-                solicitud.Unidad.Actividad = "Libre";
-                _context.Update(solicitud.Unidad);
-            }
+            return null;
         }
 
-        _context.Ordenes.Remove(orden);
-        await _context.SaveChangesAsync();
+        var files = Directory.GetFiles(folder, $"orden-{ordenId}-*.*");
+        if (files.Length == 0)
+        {
+            return null;
+        }
 
-        TempData["Exito"] = "Orden eliminada. El conductor y la unidad han sido liberados.";
-        return RedirectToAction(nameof(Index));
+        var latestFile = files
+            .OrderByDescending(f => System.IO.File.GetCreationTimeUtc(f))
+            .FirstOrDefault();
+
+        return latestFile != null ? "/finales/" + Path.GetFileName(latestFile) : null;
     }
 
     // Panel del conductor - solo sus órdenes
@@ -265,7 +250,7 @@ public class OrdenesController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Conductor")]
-    public async Task<IActionResult> FinalizarRuta(int ordenId, string recepcionistaNombre, string recepcionistaDni)
+    public async Task<IActionResult> FinalizarRuta(int ordenId, string recepcionistaNombre, string recepcionistaDni, string? fotoFinal)
     {
         var orden = await _context.Ordenes.FindAsync(ordenId);
         if (orden == null) return NotFound();
@@ -306,6 +291,48 @@ public class OrdenesController : Controller
             return RedirectToAction(nameof(PanelConductor));
         }
 
+        string? rutaFotoFinal = null;
+        if (!string.IsNullOrWhiteSpace(fotoFinal) && fotoFinal.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
+        {
+            var commaIndex = fotoFinal.IndexOf(',');
+            if (commaIndex > 0)
+            {
+                var header = fotoFinal.Substring(11, commaIndex - 11); // e.g. jpeg;base64
+                var base64Data = fotoFinal.Substring(commaIndex + 1);
+
+                byte[] imageBytes;
+                try
+                {
+                    imageBytes = Convert.FromBase64String(base64Data);
+                }
+                catch
+                {
+                    imageBytes = Array.Empty<byte>();
+                }
+
+                if (imageBytes.Length > 0)
+                {
+                    if (imageBytes.Length > 5 * 1024 * 1024)
+                    {
+                        TempData["Error"] = "La imagen supera el peso máximo de 5MB permitido.";
+                        return RedirectToAction(nameof(PanelConductor));
+                    }
+
+                    var extension = ".jpg";
+                    if (header.Contains("png", StringComparison.OrdinalIgnoreCase)) extension = ".png";
+                    else if (header.Contains("jpeg", StringComparison.OrdinalIgnoreCase) || header.Contains("jpg", StringComparison.OrdinalIgnoreCase)) extension = ".jpg";
+                    else if (header.Contains("gif", StringComparison.OrdinalIgnoreCase)) extension = ".gif";
+
+                    var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "finales");
+                    Directory.CreateDirectory(folder);
+                    var fileName = $"orden-{ordenId}-{Guid.NewGuid()}{extension}";
+                    var path = Path.Combine(folder, fileName);
+                    await System.IO.File.WriteAllBytesAsync(path, imageBytes);
+                    rutaFotoFinal = "/finales/" + fileName;
+                }
+            }
+        }
+
         orden.Estado = "Completado";
         _context.Update(orden);
 
@@ -324,7 +351,7 @@ public class OrdenesController : Controller
 
         await _context.SaveChangesAsync();
 
-        TempData["Exito"] = "Ruta finalizada. Conductor y unidad liberados.";
+        TempData["Exito"] = rutaFotoFinal != null ? "Ruta finalizada y evidencia guardada." : "Ruta finalizada. No se guardó evidencia final.";
         return RedirectToAction(nameof(PanelConductor));
     }
 
