@@ -29,7 +29,7 @@ public class Unidad
     [Required(ErrorMessage = "La capacidad es obligatoria.")]
     public decimal? CapacidadKg { get; set; }
 
-    public string EstadoOperativo { get; set; } = "Activo";
+    public string EstadoOperativo { get; set; } = "SIN INSPECCION";
 
     [Required(ErrorMessage = "La fecha de vencimiento del SOAT es obligatoria.")]
     [DataType(DataType.Date)]

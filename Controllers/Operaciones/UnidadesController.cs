@@ -13,19 +13,76 @@ public class UnidadesController : Controller
     }
 
     // Index para mostrar todas las unidades
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? capacidad)
+{
+    var query = _context.Unidades.AsQueryable();
+
+    if (!string.IsNullOrEmpty(capacidad))
     {
-        var unidades = await _context.Unidades.ToListAsync();
-        return View(unidades); 
+        switch (capacidad)
+        {
+            case "2":
+                query = query.Where(u => u.CapacidadKg <= 2000);
+                break;
+
+            case "5":
+                query = query.Where(u => u.CapacidadKg > 2000 &&
+                                         u.CapacidadKg <= 5000);
+                break;
+
+            case "10":
+                query = query.Where(u => u.CapacidadKg > 5000);
+                break;
+        }
     }
 
-    // Crear unidad
-    public IActionResult Create() => View();
+    ViewBag.Capacidad = capacidad;
+
+    var unidades = await query.ToListAsync();
+
+    return View(unidades);
+}
+
+// Crear unidad (GET)
+[HttpGet]
+public IActionResult Create()
+{
+    return View();
+}
 
     [HttpPost]
 [ValidateAntiForgeryToken]
 public async Task<IActionResult> Create(Unidad unidad)
 {
+    var hoy = DateTime.Today;
+
+if (unidad.VencimientoSoat < hoy)
+{
+    ModelState.AddModelError("VencimientoSoat",
+        "La fecha de vencimiento del SOAT no puede ser anterior a hoy.");
+}
+
+if (unidad.VencimientoRevisionTecnica < hoy)
+{
+    ModelState.AddModelError("VencimientoRevisionTecnica",
+        "La fecha de vencimiento de la revisión técnica no puede ser anterior a hoy.");
+}
+
+if (unidad.VencimientoMtc < hoy)
+{
+    ModelState.AddModelError("VencimientoMtc",
+        "La fecha de vencimiento del MTC no puede ser anterior a hoy.");
+}
+
+if (unidad.CapacidadKg != 2000 &&
+    unidad.CapacidadKg != 5000 &&
+    unidad.CapacidadKg != 10000)
+{
+    ModelState.AddModelError(
+        "CapacidadKg",
+        "Seleccione una capacidad válida."
+    );
+}
     if (ModelState.IsValid)
     {
         // Verificar si la placa ya existe
@@ -76,6 +133,16 @@ public async Task<IActionResult> Edit(int id, Unidad unidad)
 
     if (unidadDb == null)
         return NotFound();
+
+    if (unidad.CapacidadKg != 2000 &&
+    unidad.CapacidadKg != 5000 &&
+    unidad.CapacidadKg != 10000)
+{
+    ModelState.AddModelError(
+        "CapacidadKg",
+        "Seleccione una capacidad válida."
+    );
+}
 
     if (ModelState.IsValid)
     {

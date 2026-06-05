@@ -11,9 +11,9 @@ public class SolicitudServicio
     [Required]
     public string Destino { get; set; } = string.Empty;
 
-    [Required]
-    [Range(0.1, double.MaxValue)]
-    public double PesoKg { get; set; }
+   [Range(0.01, double.MaxValue,
+    ErrorMessage = "El peso debe ser un valor positivo.")]
+   public double PesoKg { get; set; }
 
     public string EstadoSolicitud { get; set; } = "Pendiente"; // Estado predeterminado
 

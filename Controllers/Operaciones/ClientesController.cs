@@ -14,21 +14,31 @@ public class ClientesController : Controller
 
     // INDEX con búsqueda
     public async Task<IActionResult> Index(string? buscar)
+{
+    var clientes = _context.Clientes.AsQueryable();
+
+    // Si presionó Buscar sin escribir nada
+    if (buscar != null && string.IsNullOrWhiteSpace(buscar))
     {
-        var clientes = _context.Clientes.AsQueryable();
-
-        if (!string.IsNullOrEmpty(buscar) && buscar.Length >= 3)
-            clientes = clientes.Where(c =>
-                c.Nombre.Contains(buscar) ||
-                (c.Ruc != null && c.Ruc.Contains(buscar)));
-
-        var lista = await clientes
-            .OrderBy(c => c.Nombre)
-            .ToListAsync();
-
-        ViewBag.Buscar = buscar;
-        return View(lista);
+        return View(new List<Cliente>());
     }
+
+    // Buscar normalmente
+    if (!string.IsNullOrWhiteSpace(buscar))
+    {
+        clientes = clientes.Where(c =>
+            c.Nombre.Contains(buscar) ||
+            (c.Ruc != null && c.Ruc.Contains(buscar)));
+    }
+
+    var lista = await clientes
+        .OrderBy(c => c.Nombre)
+        .ToListAsync();
+
+    ViewBag.Buscar = buscar;
+
+    return View(lista);
+}
 
     // REGISTRAR (GET)
     [HttpGet]
