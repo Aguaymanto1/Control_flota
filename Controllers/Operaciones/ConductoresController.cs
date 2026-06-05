@@ -33,7 +33,7 @@ namespace Control_flota.Controllers  // ← Agrega el namespace
         // CREAR (GET)
         public IActionResult Create() => View();
 
-        // CREAR (POST)
+        
         // CREAR (POST)
 [HttpPost]
 [ValidateAntiForgeryToken]
@@ -59,6 +59,16 @@ public async Task<IActionResult> Create(Conductor conductor, string email, strin
 
     if (ModelState.IsValid)
     {
+        var conductorExistente = await _context.Conductores
+    .FirstOrDefaultAsync(c => c.Dni == conductor.Dni && !c.IsDeleted);
+
+if (conductorExistente != null)
+{
+    ModelState.AddModelError("Dni",
+        "Ya existe un conductor registrado con este DNI.");
+
+    return View(conductor);
+}
         var existingUser = await _userManager.FindByEmailAsync(email);
 
         if (existingUser != null)
@@ -81,49 +91,96 @@ public async Task<IActionResult> Create(Conductor conductor, string email, strin
         var result = await _userManager.CreateAsync(usuario, password);
 
         if (result.Succeeded)
-        {
-            await _userManager.AddToRoleAsync(usuario, "Conductor");
+{
+    try
+    {
+        await _userManager.AddToRoleAsync(usuario, "Conductor");
 
-            conductor.IsDeleted = false;
+        conductor.IsDeleted = false;
 
-            _context.Add(conductor);
+        _context.Add(conductor);
 
-            await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
-            usuario.ConductorId = conductor.Id;
+        usuario.ConductorId = conductor.Id;
 
-            await _userManager.UpdateAsync(usuario);
+        await _userManager.UpdateAsync(usuario);
 
-            conductor.UserId = usuario.Id;
+        conductor.UserId = usuario.Id;
 
-            _context.Update(conductor);
+        _context.Update(conductor);
 
-            await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
-        }
+        return RedirectToAction(nameof(Index));
+    }
+    catch (Exception)
+    {
+        // Si falla el registro del conductor,
+        // eliminar el usuario creado previamente
+        await _userManager.DeleteAsync(usuario);
 
+        ModelState.AddModelError(
+            string.Empty,
+            "Ocurrió un error al registrar el conductor."
+        );
+    }
+}
         foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
+{
+    string mensaje = error.Description;
+
+    if (error.Code == "PasswordRequiresUpper")
+        mensaje = "La contraseña debe contener al menos una letra mayúscula.";
+
+    else if (error.Code == "PasswordRequiresLower")
+        mensaje = "La contraseña debe contener al menos una letra minúscula.";
+
+    else if (error.Code == "PasswordRequiresDigit")
+        mensaje = "La contraseña debe contener al menos un número.";
+
+    else if (error.Code == "PasswordRequiresNonAlphanumeric")
+        mensaje = "La contraseña debe contener al menos un carácter especial.";
+
+    else if (error.Code == "PasswordTooShort")
+        mensaje = "La contraseña es demasiado corta.";
+
+    else if (error.Code == "DuplicateEmail")
+        mensaje = "El correo electrónico ya está registrado.";
+
+    ModelState.AddModelError(string.Empty, mensaje);
+}
     }
 
     return View(conductor);
 }
         // EDITAR (GET)
         public async Task<IActionResult> Edit(int id)
-        {
-            var conductor = await _context.Conductores.FindAsync(id);
-            if (conductor == null) return NotFound();
-            return View(conductor);
-        }
+{
+    var conductor = await _context.Conductores.FindAsync(id);
 
-        // EDITAR (POST)
+    if (conductor == null)
+        return NotFound();
+
+    if (!string.IsNullOrEmpty(conductor.UserId))
+    {
+        var usuario = await _userManager.FindByIdAsync(conductor.UserId);
+
+        ViewBag.Email = usuario?.Email;
+    }
+
+    return View(conductor);
+}
+
         // EDITAR (POST)
 [HttpPost]
 [ValidateAntiForgeryToken]
-public async Task<IActionResult> Edit(int id, Conductor conductor)
+public async Task<IActionResult> Edit(
+    int id,
+    Conductor conductor,
+    string email,
+    string? nuevaPassword,
+    string? confirmarPassword)
 {
     if (id != conductor.Id)
         return NotFound();
@@ -133,7 +190,6 @@ public async Task<IActionResult> Edit(int id, Conductor conductor)
     if (conductorDb == null)
         return NotFound();
 
-    // VALIDAR LICENCIA VENCIDA
     if (conductor.VencimientoLicencia < DateTime.Today)
     {
         ModelState.AddModelError("VencimientoLicencia",
@@ -142,14 +198,65 @@ public async Task<IActionResult> Edit(int id, Conductor conductor)
         return View(conductor);
     }
 
+    // Validar contraseñas
+    if (!string.IsNullOrWhiteSpace(nuevaPassword))
+    {
+        if (nuevaPassword != confirmarPassword)
+        {
+            ModelState.AddModelError(string.Empty,
+                "Las contraseñas no coinciden.");
+
+            return View(conductor);
+        }
+    }
+
     if (ModelState.IsValid)
     {
+        // Actualizar conductor
         conductorDb.Nombres = conductor.Nombres;
         conductorDb.Apellidos = conductor.Apellidos;
         conductorDb.Dni = conductor.Dni;
         conductorDb.Celular = conductor.Celular;
         conductorDb.NumeroLicencia = conductor.NumeroLicencia;
+        conductorDb.CategoriaLicencia = conductor.CategoriaLicencia;
         conductorDb.VencimientoLicencia = conductor.VencimientoLicencia;
+
+        // Actualizar usuario de Identity
+        if (!string.IsNullOrEmpty(conductorDb.UserId))
+        {
+            var usuario = await _userManager.FindByIdAsync(conductorDb.UserId);
+
+            if (usuario != null)
+            {
+                // Actualizar correo
+                usuario.Email = email;
+                usuario.UserName = email;
+
+                await _userManager.UpdateAsync(usuario);
+
+                // Actualizar contraseña si ingresó una nueva
+                if (!string.IsNullOrWhiteSpace(nuevaPassword))
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(usuario);
+
+                    var resultadoPassword =
+                        await _userManager.ResetPasswordAsync(
+                            usuario,
+                            token,
+                            nuevaPassword);
+
+                    if (!resultadoPassword.Succeeded)
+                    {
+                        foreach (var error in resultadoPassword.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+
+                        return View(conductor);
+                    }
+                }
+            }
+        }
 
         await _context.SaveChangesAsync();
 
@@ -158,7 +265,6 @@ public async Task<IActionResult> Edit(int id, Conductor conductor)
 
     return View(conductor);
 }
-
         // ELIMINAR
         [HttpPost]
 [ValidateAntiForgeryToken]

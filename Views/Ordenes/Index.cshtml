@@ -179,8 +179,12 @@
 <!-- FILTROS -->
 <div class="filter-bar">
     <form method="get" style="display:flex; align-items:center; gap:10px; flex:1; flex-wrap:wrap;">
+    <input type="hidden" name="busquedaRealizada" value="true" />
         <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8;"></i>
-        <input type="text" name="buscar" placeholder="Buscar por cliente, origen o destino..." />
+        <input type="text"
+       name="buscar"
+       value="@ViewBag.Buscar"
+       placeholder="Buscar por cliente, origen o destino..." />
         <div style="display:flex; gap:6px;">
             <button type="submit" name="peso" value=""      class="weight-btn">Todos</button>
             <button type="submit" name="peso" value="2000"  class="weight-btn">2T</button>
@@ -254,13 +258,22 @@
         <i class="fa-regular fa-file-lines" style="color:#2563eb;"></i>
         Órdenes de viaje
     </div>
+
     @if (!Model.Ordenes.Any())
-    {
-        <div style="text-align:center; padding:50px; color:#94a3b8;">
-            <i class="fa-regular fa-file-lines" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
+{
+    <div style="text-align:center; padding:50px; color:#94a3b8;">
+        <i class="fa-solid fa-magnifying-glass" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
+
+        @if (ViewBag.BusquedaRealizada == true)
+        {
+            <p>No existen resultados.</p>
+        }
+        else
+        {
             <p>No hay órdenes generadas aún.</p>
-        </div>
-    }
+        }
+    </div>
+}
     else
     {
         <table class="table">

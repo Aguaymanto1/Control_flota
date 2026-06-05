@@ -24,38 +24,61 @@ public class OrdenesController : Controller
     }
 
     // Lista general de órdenes y solicitudes pendientes en despacho
-    public async Task<IActionResult> Index()
+  public async Task<IActionResult> Index(string? buscar, bool busquedaRealizada = false)
+{
+    ViewBag.Clientes = _context.Clientes.ToList();
+
+    ViewBag.TipoCargaOptions = new List<string>
     {
-        ViewBag.Clientes = _context.Clientes.ToList();
+        "Carga General",
+        "Carga Refrigerada",
+        "Carga Peligrosa"
+    };
 
-        ViewBag.TipoCargaOptions = new List<string>
+    var queryOrdenes = _context.Ordenes
+        .Include(o => o.Cliente)
+        .AsQueryable();
+
+    // Solo filtrar cuando realmente se presionó Buscar
+    if (busquedaRealizada)
+    {
+        if (string.IsNullOrWhiteSpace(buscar))
         {
-            "Carga General",
-            "Carga Refrigerada",
-            "Carga Peligrosa"
-        };
-
-        var ordenes = await _context.Ordenes
-            .Include(o => o.Cliente)
-            .OrderByDescending(o => o.FechaEmision)
-            .ToListAsync();
-
-        var solicitudesPendientes = await _context.SolicitudesServicio
-            .Include(s => s.Cliente)
-            .Include(s => s.Conductor)
-            .Include(s => s.Unidad)
-            .Where(s => s.EstadoSolicitud == "Pendiente de Asignación" || s.EstadoSolicitud == "Pendiente")
-            .OrderByDescending(s => s.FechaDespacho)
-            .ToListAsync();
-
-        var model = new DespachoViewModel
+            queryOrdenes = queryOrdenes.Where(o => false);
+        }
+        else
         {
-            Ordenes = ordenes,
-            SolicitudesPendientes = solicitudesPendientes
-        };
-
-        return View(model);
+            queryOrdenes = queryOrdenes.Where(o =>
+                (o.Cliente != null && o.Cliente.Nombre.Contains(buscar)) ||
+                o.Origen.Contains(buscar) ||
+                o.Destino.Contains(buscar));
+        }
     }
+
+    var ordenes = await queryOrdenes
+        .OrderByDescending(o => o.FechaEmision)
+        .ToListAsync();
+
+    var solicitudesPendientes = await _context.SolicitudesServicio
+        .Include(s => s.Cliente)
+        .Include(s => s.Conductor)
+        .Include(s => s.Unidad)
+        .Where(s => s.EstadoSolicitud == "Pendiente de Asignación"
+                 || s.EstadoSolicitud == "Pendiente")
+        .OrderByDescending(s => s.FechaDespacho)
+        .ToListAsync();
+
+    var model = new DespachoViewModel
+    {
+        Ordenes = ordenes,
+        SolicitudesPendientes = solicitudesPendientes
+    };
+
+    ViewBag.BusquedaRealizada = busquedaRealizada;
+    ViewBag.Buscar = buscar;
+
+    return View(model);
+}
 
     // Detalle de orden (Vista del Administrador)
     public async Task<IActionResult> Details(int id)

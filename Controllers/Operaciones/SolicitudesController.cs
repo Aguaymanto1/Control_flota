@@ -214,25 +214,54 @@ public async Task<IActionResult> Index()
         // Redirigir a la vista detalle de la orden recién creada
         return RedirectToAction("Details", "Ordenes", new { id = orden.Id });
     }
-    [HttpPost]
+
+
+   [HttpPost]
 [ValidateAntiForgeryToken]
 public async Task<IActionResult> Eliminar(int id)
 {
-    // Buscar la solicitud con el ID proporcionado
+    // Buscar la solicitud
     var solicitud = await _context.SolicitudesServicio.FindAsync(id);
 
     if (solicitud == null)
     {
-        return NotFound();  // Si no se encuentra la solicitud, retorna 404
+        return NotFound();
     }
 
-    // Eliminar la solicitud de la base de datos
+    // Liberar conductor
+    if (solicitud.ConductorId != null)
+    {
+        var conductor = await _context.Conductores
+            .FindAsync(solicitud.ConductorId);
+
+        if (conductor != null)
+        {
+            conductor.Actividad = "Libre";
+        }
+    }
+
+    // Liberar unidad
+    if (solicitud.UnidadId != null)
+    {
+        var unidad = await _context.Unidades
+            .FindAsync(solicitud.UnidadId);
+
+        if (unidad != null)
+        {
+            unidad.Actividad = "Libre";
+        }
+    }
+
+    // Eliminar solicitud
     _context.SolicitudesServicio.Remove(solicitud);
+
     await _context.SaveChangesAsync();
 
-    // Redirigir de vuelta a la lista de solicitudes
     return RedirectToAction(nameof(Index));
 }
+
+
+
 [HttpGet]
 public IActionResult AsignarFlota(int id)
 {
@@ -250,14 +279,17 @@ public IActionResult AsignarFlota(int id)
         .ToList();
 
     // SOLO UNIDADES APTAS Y LIBRES
-    var unidades = _context.Unidades
-        .Where(u =>
-            u.Actividad == "Libre"
-            && u.EstadoOperativo == "Inspeccionado - Apto"
-        )
-        .OrderBy(u => u.Placa)
-        .ToList();
-
+   var unidades = _context.Unidades
+    .Where(u =>
+        u.Actividad == "Libre"
+        && u.EstadoOperativo == "Inspeccionado - Apto"
+        && u.CapacidadKg.HasValue
+        && (double)u.CapacidadKg.Value >= solicitud.PesoKg
+    )
+    .OrderBy(u => u.Placa)
+    .ToList();
+    
+   
     // SI NO HAY UNIDADES APTAS
     if (!unidades.Any())
     {

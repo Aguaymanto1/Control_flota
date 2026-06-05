@@ -230,6 +230,47 @@
     </div>
 </div>
 
+<div style="margin-bottom:20px;">
+    <form method="get" asp-action="Index"
+          style="display:flex; gap:10px; align-items:center;">
+
+        <select name="capacidad" class="form-control" style="max-width:250px;">
+            <option value="">Filtrar por capacidad</option>
+
+            <option value="2"
+                selected="@(ViewBag.Capacidad == "2")">
+                2 Toneladas
+            </option>
+
+            <option value="5"
+                selected="@(ViewBag.Capacidad == "5")">
+                5 Toneladas
+            </option>
+
+            <option value="10"
+                selected="@(ViewBag.Capacidad == "10")">
+                10 Toneladas
+            </option>
+        </select>
+
+        <button type="submit" class="btn-primary-custom">
+            Filtrar
+        </button>
+
+        <a asp-action="Index" class="action-btn edit">
+            Limpiar filtros
+        </a>
+    </form>
+</div>
+@if (!string.IsNullOrEmpty(ViewBag.Capacidad))
+{
+    <div class="alert alert-info mb-3">
+        Filtro activo:
+        @(ViewBag.Capacidad == "2" ? "2 Toneladas" :
+          ViewBag.Capacidad == "5" ? "5 Toneladas" :
+          "10 Toneladas")
+    </div>
+}
 <!-- TABLA -->
 <div class="table-card">
     @if (!Model.Any())
@@ -239,6 +280,7 @@
             <p>No hay unidades registradas.</p>
             <a href="@Url.Action("Create")" class="btn-primary-custom">Registrar la primera</a>
         </div>
+        
     }
     else
     {
