@@ -93,10 +93,11 @@ public class SolicitudesController : Controller
 public async Task<IActionResult> Index()
 {
     var solicitudes = await _context.Set<SolicitudServicio>()
-        .Include(s => s.Cliente)
-        .Include(s => s.Conductor)
-        .Include(s => s.Unidad)
-        .ToListAsync();
+    .Include(s => s.Cliente)
+    .Include(s => s.Conductor)
+    .Include(s => s.Unidad)
+    .OrderByDescending(s => s.Id)
+    .ToListAsync();
 
     // Obtener los IDs de solicitudes que ya tienen órdenes emitidas
     var ordenesEmitidas = await _context.Ordenes

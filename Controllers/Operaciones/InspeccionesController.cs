@@ -69,5 +69,19 @@ public IActionResult Create(Inspeccion inspeccion)
     // VOLVER A UNIDADES
     return RedirectToAction("Index", "Unidades");
 }
+
+public IActionResult Historial(string placa)
+{
+    var historial = _context.Inspecciones
+        .Where(i => i.Placa == placa)
+        .OrderByDescending(i => i.FechaInspeccion)
+        .ToList();
+
+    ViewBag.Placa = placa;
+
+    return View(historial);
+}
+
     }
+    
 }

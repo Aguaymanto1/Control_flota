@@ -342,6 +342,9 @@
                                 <a href="@Url.Action("Create", "Inspecciones", new { placa = u.Placa })" class="action-btn inspect">
                                     <i class="fa-solid fa-clipboard-check"></i> Inspección
                                 </a>
+                                <a href="@Url.Action("Historial", "Inspecciones", new { placa = u.Placa })"
+                                class="action-btn inspect"><i class="fa-solid fa-clock-rotate-left"></i> Historial
+                                </a>
                                 <form method="post" action="@Url.Action("Delete", new { id = u.Id })" style="display:inline;"
                                       onsubmit="return confirm('¿Eliminar la unidad @u.Placa?');">
                                     @Html.AntiForgeryToken()

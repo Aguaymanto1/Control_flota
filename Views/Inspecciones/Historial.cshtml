@@ -1,0 +1,43 @@
+@using Control_flota.Models.Operaciones
+@model IEnumerable<Inspeccion>
+
+@{
+    ViewData["Title"] = "Historial de Inspecciones";
+}
+
+<h2>Historial de Inspecciones</h2>
+
+<h4>Vehículo: @ViewBag.Placa</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Luces</th>
+            <th>Llantas</th>
+            <th>Frenos</th>
+            <th>Fluidos</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach(var item in Model)
+        {
+            <tr>
+                <td>@item.FechaInspeccion</td>
+                <td>@item.Luces</td>
+                <td>@item.Llantas</td>
+                <td>@item.Frenos</td>
+                <td>@item.Fluidos</td>
+                <td>@item.EstadoVehiculo</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Unidades"
+   asp-action="Index"
+   class="btn btn-secondary">
+    Volver
+</a>
