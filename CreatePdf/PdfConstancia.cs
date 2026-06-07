@@ -162,4 +162,123 @@ public static class PdfConstancia
 
         return pdf.GeneratePdf();
     }
+
+    public static async Task<byte[]> GenerarFactura(int ordenId, ApplicationDbContext context)
+    {
+        var orden = await context.Ordenes
+            .Include(o => o.Cliente)
+            .Include(o => o.Gastos)
+            .FirstOrDefaultAsync(o => o.Id == ordenId);
+
+        if (orden == null) return null!;
+
+        var gastos = orden.Gastos.ToList();
+        var peajes = gastos
+            .Where(g => g.Concepto.Contains("peaje", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        var peajeTotal = peajes.Sum(g => g.Monto);
+        var totalGastos = gastos.Sum(g => g.Monto);
+        var baseFlete = totalGastos - peajeTotal;
+        if (baseFlete < 0) baseFlete = 0;
+
+        var pdf = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(40);
+                page.DefaultTextStyle(x => x.FontFamily("Arial").FontSize(11));
+
+                page.Header().Column(col =>
+                {
+                    col.Item().Row(row =>
+                    {
+                        row.RelativeItem().Column(c =>
+                        {
+                            c.Item().Text("DE LA SOTA S.A.C.")
+                                .FontSize(20).Bold().FontColor("#002d62");
+                            c.Item().Text("Factura de Venta - Pre-factura")
+                                .FontSize(10).FontColor("#64748b");
+                        });
+                        row.ConstantItem(80).AlignRight().Column(c =>
+                        {
+                            c.Item().Text("🚛").FontSize(36);
+                        });
+                    });
+
+                    col.Item().PaddingTop(8).BorderBottom(2).BorderColor("#002d62");
+                });
+
+                page.Content().PaddingTop(20).Column(col =>
+                {
+                    col.Item().Row(r =>
+                    {
+                        r.RelativeItem().Column(c =>
+                        {
+                            c.Item().Text("Cliente:").FontColor("#64748b");
+                            c.Item().Text(orden.Cliente?.Nombre ?? "-").Bold();
+                            c.Item().PaddingTop(8).Text("Ruta:").FontColor("#64748b");
+                            c.Item().Text($"{orden.Origen} → {orden.Destino}").Bold();
+                        });
+                        r.RelativeItem().Column(c =>
+                        {
+                            c.Item().Text("Orden N°:").FontColor("#64748b");
+                            c.Item().Text(orden.Codigo).Bold();
+                            c.Item().PaddingTop(8).Text("Fecha:").FontColor("#64748b");
+                            c.Item().Text(orden.FechaEmision.ToString("dd/MM/yyyy HH:mm")).Bold();
+                        });
+                    });
+
+                    col.Item().PaddingTop(20).Text("DESGLOSE DE COSTOS")
+                        .FontSize(9).Bold().FontColor("#64748b");
+
+                    col.Item().PaddingTop(8).Column(c =>
+                    {
+                        c.Item().Row(r =>
+                        {
+                            r.RelativeItem().Text("Flete base").FontColor("#334155");
+                            r.ConstantItem(120).AlignRight().Text($"S/ {baseFlete:F2}").Bold();
+                        });
+                        c.Item().PaddingTop(4).Row(r =>
+                        {
+                            r.RelativeItem().Text("Sobrecostos (peajes)").FontColor("#334155");
+                            r.ConstantItem(120).AlignRight().Text($"S/ {peajeTotal:F2}").Bold();
+                        });
+                        c.Item().PaddingTop(4).Row(r =>
+                        {
+                            r.RelativeItem().Text("Total a facturar").FontColor("#0f172a").Bold();
+                            r.ConstantItem(120).AlignRight().Text($"S/ {totalGastos:F2}").Bold();
+                        });
+                    });
+
+                    if (gastos.Any())
+                    {
+                        col.Item().PaddingTop(20).Text("DETALLE DE GASTOS")
+                            .FontSize(9).Bold().FontColor("#64748b");
+
+                        gastos.ForEach(gasto =>
+                        {
+                            col.Item().PaddingTop(8).Row(r =>
+                            {
+                                r.RelativeItem().Text(gasto.Concepto).FontSize(9).FontColor("#334155");
+                                r.ConstantItem(120).AlignRight().Text($"S/ {gasto.Monto:F2}").FontSize(9).Bold();
+                            });
+                        });
+                    }
+
+                    col.Item().PaddingTop(24).Text("Observación: Esta es una pre-factura con desglose de flete base y peajes.")
+                        .FontSize(9).FontColor("#475569");
+                });
+
+                page.Footer().AlignCenter().Text(text =>
+                {
+                    text.Span($"Documento generado el {DateTime.Now:dd/MM/yyyy HH:mm} — De La Sota S.A.C.")
+                        .FontSize(9).FontColor("#94a3b8");
+                });
+            });
+        });
+
+        return pdf.GeneratePdf();
+    }
 }

@@ -1,5 +1,6 @@
 namespace Control_flota.Models.Operaciones;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 public class SolicitudServicio
 {
@@ -39,4 +40,8 @@ public class SolicitudServicio
     public virtual Conductor? Conductor { get; set; }
     public string? NombreReceptor { get; set; }
     public string? DniReceptor { get; set; }
+
+    [Column(TypeName = "decimal(18,2)")]
+    [Range(0, double.MaxValue, ErrorMessage = "El monto debe ser un valor no negativo.")]
+    public decimal? Monto { get; set; }
 }

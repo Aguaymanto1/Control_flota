@@ -121,6 +121,10 @@ namespace Control_flota.Areas.Identity.Pages.Account
                             {
                                 return LocalRedirect("/Ordenes/PanelConductor");
                             }
+                            else if (primerRol == "AdministradorFinanzas")
+                            {
+                                return LocalRedirect("/Finanzas/ServiciosPorCobrar");
+                            }
                         }
                     }
                     

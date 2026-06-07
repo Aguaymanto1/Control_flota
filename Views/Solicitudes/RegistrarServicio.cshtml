@@ -17,9 +17,13 @@
             }
         </select>
         <span asp-validation-for="ClienteId" class="text-danger"></span>
+        
     </div>
-
-
+     <div class="form-group">
+        <label for="Monto">Monto (flete):</label>
+        <input type="number" step="0.01" name="Monto" class="form-control" placeholder="Calculado según peso y distancia" />
+        <span asp-validation-for="Monto" class="text-danger"></span>
+    </div>
 
     <div class="form-group">
         <label for="origen">Origen:</label>
