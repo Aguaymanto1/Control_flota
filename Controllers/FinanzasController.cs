@@ -52,6 +52,7 @@ namespace Control_flota.Controllers
             var orden = await _context.Ordenes
                 .Include(o => o.Cliente)
                 .Include(o => o.Gastos)
+                .Include(o => o.SolicitudServicio)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (orden == null)
@@ -67,6 +68,10 @@ namespace Control_flota.Controllers
             var totalGastos = gastos.Sum(g => g.Monto);
             var fleteBase = totalGastos - peajeTotal;
             if (fleteBase < 0) fleteBase = 0;
+
+            // Si la solicitud incluyó un monto solicitado, úsalo como monto a facturar; si no, usar el total de gastos
+            decimal? montoSolicitado = orden.SolicitudServicio?.Monto;
+            var montoAPagar = montoSolicitado ?? totalGastos;
 
             return Json(new
             {
@@ -87,7 +92,8 @@ namespace Control_flota.Controllers
                     Peajes = peajes,
                     TotalGastos = totalGastos,
                     FleteBase = fleteBase,
-                    TotalAPagar = totalGastos
+                    MontoSolicitado = montoSolicitado,
+                    TotalAPagar = montoAPagar
                 }
             });
         }
@@ -232,6 +238,7 @@ namespace Control_flota.Controllers
             var viajesCompletados = await _context.Ordenes
                 .Include(o => o.Cliente)
                 .Include(o => o.Gastos)
+                .Include(o => o.SolicitudServicio)
                 .Where(o => o.Estado == "Completado") // Ajusta el estado según tu aplicación
                 .OrderByDescending(o => o.FechaEmision)
                 .ToListAsync();

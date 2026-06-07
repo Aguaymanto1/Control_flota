@@ -1,0 +1,1173 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solicitudes de Servicio - De la Sota SAC</title>
+
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=0Fj5gdtKZM6T5xmI7aI4zFmbRT7guAgjTpQ56xpC1EA" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div b-f1k3rq2i7v class="layout-wrapper">
+
+
+        <div b-f1k3rq2i7v class="main-content">
+            
+            <div b-f1k3rq2i7v class="workspace-container">
+                <main b-f1k3rq2i7v role="main" class="pb-3">
+                    
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .page-subtitle { color: #64748b; margin: 0; font-size: 0.9rem; }
+
+    .header-actions { display: flex; gap: 10px; }
+
+    .btn-primary-custom, .btn-secondary-custom, .btn-success-custom {
+        border: none;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-primary-custom { background-color: #2563eb; color: white; }
+    .btn-primary-custom:hover { background-color: #1d4ed8; color: white; }
+
+    .btn-secondary-custom { background-color: #f1f5f9; color: #475569; }
+    .btn-secondary-custom:hover { background-color: #e2e8f0; color: #1e293b; }
+
+    .btn-success-custom { background-color: #16a34a; color: white; }
+    .btn-success-custom:hover { background-color: #15803d; color: white; }
+
+    .stats-row { display: flex; gap: 16px; margin-bottom: 24px; }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 24px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.2s ease;
+    }
+    
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+
+    .stat-icon {
+        width: 42px; height: 42px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+    }
+    .stat-icon.blue   { background: #eff6ff; color: #2563eb; }
+    .stat-icon.orange { background: #fff7ed; color: #ea580c; }
+    .stat-icon.green  { background: #f0fdf4; color: #16a34a; }
+
+    .stat-info .number { font-size: 1.4rem; font-weight: 700; color: #0f172a; line-height: 1; }
+    .stat-info .label  { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; font-weight: 600; }
+
+    .table-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-card table { margin: 0; }
+
+    .table-card thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 13px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        border-top: none;
+    }
+
+    .table-card tbody td {
+        padding: 13px 20px;
+        color: #1e293b;
+        font-size: 0.875rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table-card tbody tr:last-child td { border-bottom: none; }
+    .table-card tbody tr:hover { background: #f8fafc; }
+
+    .codigo { font-weight: 700; color: #0f172a; font-family: monospace; font-size: 0.85rem; }
+    .ruta-sub { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+
+    .badge-estado {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 10px; border-radius: 20px;
+        font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-emitida     { background: #f0fdf4; color: #16a34a; }
+    .badge-noemitida   { background: #f1f5f9; color: #64748b; }
+    .badge-asignado    { background: #eff6ff; color: #2563eb; }
+    .badge-pendiente   { background: #fff7ed; color: #ea580c; }
+    .badge-completado  { background: #dcfce7; color: #15803d; }
+
+    .action-btn {
+        border: none; padding: 5px 12px; border-radius: 6px;
+        font-size: 0.78rem; font-weight: 600; cursor: pointer;
+        text-decoration: none; display: inline-flex; align-items: center;
+        gap: 4px; transition: all 0.15s;
+    }
+    .action-btn.assign  { background: #eff6ff; color: #2563eb; }
+    .action-btn.assign:hover { background: #dbeafe; }
+    .action-btn.view    { background: #f1f5f9; color: #475569; }
+    .action-btn.view:hover { background: #e2e8f0; }
+    .action-btn.delete  { background: #fef2f2; color: #dc2626; }
+    .action-btn.delete:hover { background: #fee2e2; }
+</style>
+
+
+<div class="page-header">
+    <div>
+        <h2 style="font-size:1.75rem; font-weight:700; color:#0f172a; margin:0;">Solicitudes de Servicio</h2>
+        <p class="page-subtitle">Gestión de solicitudes y asignaciones</p>
+    </div>
+    <div class="header-actions">
+        <a href="/Ordenes" class="btn-secondary-custom">
+            <i class="fa-regular fa-paper-plane"></i> Centro de Despacho
+        </a>
+        <a href="/Clientes/RegistrarCliente" class="btn-secondary-custom">
+            <i class="fa-solid fa-building"></i> Nuevo Cliente
+        </a>
+        <button type="button" class="btn-success-custom" data-bs-toggle="modal" data-bs-target="#nuevaSolicitudModal">
+            <i class="fa-solid fa-plus"></i> Nueva Solicitud
+        </button>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card" id="filtro-TODOS" onclick="filtrarTabla('TODOS')" style="cursor:pointer; border-color:#2563eb; background-color:#f8fafc;">
+        <div class="stat-icon blue"><i class="fa-regular fa-file-lines"></i></div>
+        <div class="stat-info">
+            <div class="number">23</div>
+            <div class="label">Todas</div>
+        </div>
+    </div>
+    <div class="stat-card" id="filtro-Pendiente" onclick="filtrarTabla('Pendiente')" style="cursor:pointer;">
+        <div class="stat-icon orange"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-info">
+            <div class="number">3</div>
+            <div class="label">Pendientes</div>
+        </div>
+    </div>
+    <div class="stat-card" id="filtro-Asignado" onclick="filtrarTabla('Asignado')" style="cursor:pointer;">
+        <div class="stat-icon blue"><i class="fa-solid fa-truck"></i></div>
+        <div class="stat-info">
+            <div class="number">11</div>
+            <div class="label">Asignadas</div>
+        </div>
+    </div>
+    <div class="stat-card" id="filtro-Completado" onclick="filtrarTabla('Completado')" style="cursor:pointer;">
+        <div class="stat-icon green"><i class="fa-solid fa-check-double"></i></div>
+        <div class="stat-info">
+            <div class="number">9</div>
+            <div class="label">Completadas</div>
+        </div>
+    </div>
+</div>
+
+<div class="table-card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Cliente</th>
+                    <th>Ruta</th>
+                    <th>Conductor / Placa</th>
+                    <th>Orden</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="fila-solicitud" data-estado="Pendiente">
+                    <td><span class="codigo">SRV-20260607-D8FE</span></td>
+                    <td>sdasdasda</td>
+                    <td>
+                        <div style="font-weight:500;">Lima. Miraflores.. C.P. 15304, Lima, Lima.</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Santa Anita</div>
+                    </td>
+                    <td>
+                        <div>-</div>
+                        <div class="ruta-sub">-</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-pendiente">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Pendiente de Asignaci&#xF3;n
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/32" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                    <a class="action-btn assign" href="/Solicitudes/AsignarFlota/32">
+                                        <i class="fa-solid fa-truck"></i> Asignar
+                                    </a>
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/32">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Pendiente">
+                    <td><span class="codigo">SRV-20260606-806F</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">Lima. Miraflores.. C.P. 15304, Lima, Lima.</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Santa Anita</div>
+                    </td>
+                    <td>
+                        <div>-</div>
+                        <div class="ruta-sub">-</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-pendiente">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Pendiente de Asignaci&#xF3;n
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/31" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                    <a class="action-btn assign" href="/Solicitudes/AsignarFlota/31">
+                                        <i class="fa-solid fa-truck"></i> Asignar
+                                    </a>
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/31">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260603-D553</span></td>
+                    <td>Importaciones Garc&#xED;a EIRL</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Javier Prado 170</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Jir&#xF3;n PortoCarrero 261</div>
+                    </td>
+                    <td>
+                        <div>Maria Camayoc</div>
+                        <div class="ruta-sub">TAM-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/29" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260603-55B6</span></td>
+                    <td>Bulmur S.A.C.</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Javier Prado 179</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Jir&#xF3;n PortoCarrero 261</div>
+                    </td>
+                    <td>
+                        <div>Maria Camayoc</div>
+                        <div class="ruta-sub">TAM-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/28" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260603-597B</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Javier Prado 179</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Jir&#xF3;n PortoCarrero 260</div>
+                    </td>
+                    <td>
+                        <div>Carlos Ramirez</div>
+                        <div class="ruta-sub">SIE-562</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-emitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> Emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/27" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/27">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260603-346F</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Javier Prado 179</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Jir&#xF3;n PortoCarrero 261</div>
+                    </td>
+                    <td>
+                        <div>Maria Camayoc</div>
+                        <div class="ruta-sub">TAM-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/26" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260603-1A96</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Javier Prado 190</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Jir&#xF3;n PortoCarrero 223</div>
+                    </td>
+                    <td>
+                        <div>Clairo Llamocca</div>
+                        <div class="ruta-sub">TMM-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/25" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/25">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260603-CCAC</span></td>
+                    <td>Bulmur S.A.C.</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Javier Prado 172</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Jir&#xF3;n PortoCarrero 261</div>
+                    </td>
+                    <td>
+                        <div>Clairo Llamocca</div>
+                        <div class="ruta-sub">TMM-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/24" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260603-8CEE</span></td>
+                    <td>Importaciones Garc&#xED;a EIRL</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Javier Prado 170</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Jir&#xF3;n PortoCarrero 265</div>
+                    </td>
+                    <td>
+                        <div>Clairo Llamocca</div>
+                        <div class="ruta-sub">TMM-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/23" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260602-A46B</span></td>
+                    <td>Feeling SAC</td>
+                    <td>
+                        <div style="font-weight:500;">Puerto callao</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Portocarreo 252</div>
+                    </td>
+                    <td>
+                        <div>Jumin Han</div>
+                        <div class="ruta-sub">ABD-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/22" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/22">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260602-318E</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">Av. proceres 276</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Javier Prado oeste 123</div>
+                    </td>
+                    <td>
+                        <div>sdasd asdas</div>
+                        <div class="ruta-sub">ACD-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/21" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/21">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Pendiente">
+                    <td><span class="codigo">SRV-20260601-18D3</span></td>
+                    <td>Importaciones Garc&#xED;a EIRL</td>
+                    <td>
+                        <div style="font-weight:500;">Av. Proceres de la Independencia 274</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Av. Miguel Grau 987</div>
+                    </td>
+                    <td>
+                        <div>Jumin Han</div>
+                        <div class="ruta-sub">ABD-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-pendiente">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Pendiente de Asignaci&#xF3;n
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/20" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                    <a class="action-btn assign" href="/Solicitudes/AsignarFlota/20">
+                                        <i class="fa-solid fa-truck"></i> Asignar
+                                    </a>
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/20">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260528-F65E</span></td>
+                    <td>Bulmur S.A.C.</td>
+                    <td>
+                        <div style="font-weight:500;">Lima. Miraflores.. C.P. 15304, Lima, Lima.</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Santa Anita</div>
+                    </td>
+                    <td>
+                        <div>Jumin Han</div>
+                        <div class="ruta-sub">ANB-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/19" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260528-361B</span></td>
+                    <td>Bulmur S.A.C.</td>
+                    <td>
+                        <div style="font-weight:500;">Lima. Miraflores.. C.P. 15304, Lima, Lima.</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Callao</div>
+                    </td>
+                    <td>
+                        <div>Jumin Han</div>
+                        <div class="ruta-sub">ANB-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/18" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260528-1147</span></td>
+                    <td>Bulmur S.A.C.</td>
+                    <td>
+                        <div style="font-weight:500;">Lima. Miraflores.. C.P. 15304, Lima, Lima.</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Santa Anita</div>
+                    </td>
+                    <td>
+                        <div>Jumin Han</div>
+                        <div class="ruta-sub">ANB-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/17" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260527-AF89</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">lima</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> huacho</div>
+                    </td>
+                    <td>
+                        <div>josue bordita</div>
+                        <div class="ruta-sub">ABC-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/14" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/14">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Completado">
+                    <td><span class="codigo">SRV-20260525-D61D</span></td>
+                    <td>Importaciones Garc&#xED;a EIRL</td>
+                    <td>
+                        <div style="font-weight:500;">Callao</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> La Molina</div>
+                    </td>
+                    <td>
+                        <div>Gabriel Emilio Le&#xF3;n Cangalaya</div>
+                        <div class="ruta-sub">XYZ-789</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-completado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Completado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/10" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <span class="action-btn" style="background:#f8fafc; border:1px solid #e2e8f0; color:#94a3b8; cursor:not-allowed;">
+                                    <i class="fa-solid fa-lock"></i> Cerrada
+                                </span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260520-A524</span></td>
+                    <td>sdasdasda</td>
+                    <td>
+                        <div style="font-weight:500;">s</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> ssd</div>
+                    </td>
+                    <td>
+                        <div>fabio SAAVEDRA GARCIA</div>
+                        <div class="ruta-sub">ABC-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/8" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/8">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260519-B7CA</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">La victoria</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Santa Anita</div>
+                    </td>
+                    <td>
+                        <div>Juan Carlos P&#xE9;rez G&#xF3;mez</div>
+                        <div class="ruta-sub">ABC-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/6" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/6">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260519-40A6</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">La victoria</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Santa Anita</div>
+                    </td>
+                    <td>
+                        <div>Mar&#xED;a Elena Rodr&#xED;guez L&#xF3;pez</div>
+                        <div class="ruta-sub">ABC-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/4" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/4">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SRV-20260519-EFB5</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">La victoria</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Santa Anita</div>
+                    </td>
+                    <td>
+                        <div>Gabriel Emilio Le&#xF3;n Cangalaya</div>
+                        <div class="ruta-sub">ABC-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/3" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/3">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SOL-002</span></td>
+                    <td>Importaciones Garc&#xED;a EIRL</td>
+                    <td>
+                        <div style="font-weight:500;">Callao</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Trujillo</div>
+                    </td>
+                    <td>
+                        <div>Nanami Kento</div>
+                        <div class="ruta-sub">ANB-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/2" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/2">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="fila-solicitud" data-estado="Asignado">
+                    <td><span class="codigo">SOL-001</span></td>
+                    <td>Transportes El R&#xE1;pido S.A.</td>
+                    <td>
+                        <div style="font-weight:500;">Lima</div>
+                        <div class="ruta-sub"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> Arequipa</div>
+                    </td>
+                    <td>
+                        <div>Nanami Kento</div>
+                        <div class="ruta-sub">ABC-123</div>
+                    </td>
+                    <td>
+                            <span class="badge-estado badge-noemitida">
+                                <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> No emitida
+                            </span>
+                    </td>
+                    <td>
+                        <span class="badge-estado badge-asignado">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem;"></i>
+                            Asignado
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a href="/Solicitudes/Details/1" class="action-btn view">
+                                <i class="fa-regular fa-eye"></i> Ver
+                            </a>
+                            
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta solicitud?');" action="/Solicitudes/Eliminar/1">
+                                    
+                                    <button type="submit" class="action-btn delete">
+                                        <i class="fa-regular fa-trash-can"></i> Eliminar
+                                    </button>
+                                <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</div>
+
+<div class="modal fade" id="nuevaSolicitudModal" tabindex="-1" aria-labelledby="nuevaSolicitudModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius:16px; border:none;">
+            <div class="modal-header" style="border-bottom:1px solid #e2e8f0; padding:20px 24px;">
+                <h5 class="modal-title" style="font-weight:700; color:#0f172a;">
+                    <i class="fa-solid fa-plus me-2" style="color:#2563eb;"></i>Nueva Solicitud de Servicio
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/Solicitudes/RegistrarServicio">
+                <div class="modal-body" style="padding:24px;">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Cliente</label>
+                        <select name="ClienteId" class="form-control" required>
+                            <option value="">Seleccione un cliente</option>
+                                <option value="1">Transportes El R&#xE1;pido S.A.</option>
+                                <option value="2">Importaciones Garc&#xED;a EIRL</option>
+                                <option value="3">sdasdasda</option>
+                                <option value="4">Bulmur S.A.C.</option>
+                                <option value="5">Feeling SAC</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Origen</label>
+                            <input type="text" name="Origen" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Destino</label>
+                            <input type="text" name="Destino" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Peso (Kg)</label>
+                            <input type="number" step="0.01" name="PesoKg" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Tipo de Carga</label>
+                            <select name="TipoCarga" class="form-control" required>
+                                <option value="">Seleccione el tipo</option>
+                                    <option value="Carga General">Carga General</option>
+                                    <option value="Carga Refrigerada">Carga Refrigerada</option>
+                                    <option value="Carga Peligrosa">Carga Peligrosa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Monto (flete)</label>
+                            <input type="number" step="0.01" name="Monto" class="form-control" placeholder="Opcional: calcular por peso/distancia" />
+                        </div>
+                    </div>
+
+                                        <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Nombre del Receptor</label>
+                            <input type="text" name="NombreReceptor" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">DNI del Receptor</label>
+                            <input type="text" name="DniReceptor" class="form-control" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid #e2e8f0; padding:16px 24px;">
+                    <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-success-custom">
+                        <i class="fa-solid fa-check"></i> Guardar Solicitud
+                    </button>
+                </div>
+            <input name="__RequestVerificationToken" type="hidden" value="CfDJ8A0_4n92stNLhGmzwIPvgz743hxekcrC1wrv_hNcWVSzs8xn52PZMncr634PXLFRDsC02V6uwPc80udwL9-1R_q2woVpwVBo38lrURCpp39XGL0fK4_pTj1B9VcjDW1-u59ChPSF6ILZkz5qr7klmOE" /></form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filtrarTabla(estado) {
+        // Resetear estilos de todos los bloques
+        document.querySelectorAll('.stat-card').forEach(c => {
+            c.style.borderColor = '#e2e8f0';
+            c.style.backgroundColor = 'white';
+        });
+        
+        // Resaltar el bloque activo
+        const cardSeleccionada = document.getElementById('filtro-' + estado);
+        if(cardSeleccionada) {
+            cardSeleccionada.style.borderColor = '#2563eb';
+            cardSeleccionada.style.backgroundColor = '#f8fafc';
+        }
+
+        // Mostrar/Ocultar filas
+        const filas = document.querySelectorAll('.fila-solicitud');
+        filas.forEach(fila => {
+            if (estado === 'TODOS' || fila.getAttribute('data-estado') === estado) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+    }
+</script>
+                </main>
+            </div>
+
+            <footer b-f1k3rq2i7v class="py-3 text-center text-muted bg-white border-top mt-auto">
+                <small b-f1k3rq2i7v>&copy; 2026 - De la Sota SAC - <a class="text-decoration-none" href="/Home/Privacy">Privacidad</a></small>
+            </footer>
+
+        </div>
+    </div>
+
+<script src="/lib/jquery/dist/jquery.min.js"></script>
+<script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo"></script>
+
+
+</body>
+</html>

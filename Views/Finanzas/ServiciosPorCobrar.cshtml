@@ -56,7 +56,7 @@
                                data-id="@viaje.Id" 
                                data-cliente="@viaje.Cliente?.Nombre" 
                                data-codigo="@viaje.Codigo"
-                               data-total="@(viaje.Gastos?.Sum(g => g.Monto) ?? 0)" 
+                               data-total="@((viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m).ToString("F2"))" 
                                onchange="actualizarSeleccion()" />
                         <div class="servicio-item-info">
                             <div class="servicio-item-cliente">@viaje.Cliente?.Nombre</div>
@@ -68,7 +68,7 @@
                                 📅 @viaje.FechaEmision.ToString("dd/MM/yyyy")
                             </div>
                             <div class="servicio-item-total">
-                                Total: S/ @(viaje.Gastos?.Sum(g => g.Monto).ToString("F2") ?? "0.00")
+                                Total: S/ @((viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m).ToString("F2"))
                             </div>
                         </div>
                     </div>
@@ -112,7 +112,7 @@
                         📅 @viaje.FechaEmision.ToString("dd/MM/yyyy")
                     </div>
                     <div class="servicio-item-total">
-                        Total: S/ @(viaje.Gastos?.Sum(g => g.Monto).ToString("F2") ?? "0.00")
+                        Total: S/ @((viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m).ToString("F2"))
                     </div>
                 </div>
             </div>
@@ -303,13 +303,17 @@
                 .then(data => {
                     if (data && data.success && data.orden) {
                         const ord = data.orden;
-                        const total = (ord.gastos || []).reduce((s, g) => s + (g.monto || 0), 0).toFixed(2);
+                        // Usar total devuelto por el servidor si existe (puede venir de la solicitud), si no, calcular desde gastos
+                        const total = (ord.totalAPagar != null) ? Number(ord.totalAPagar).toFixed(2) : ( (ord.gastos || []).reduce((s, g) => s + (g.monto || 0), 0).toFixed(2) );
                         const fleteBase = (ord.fleteBase || 0).toFixed(2);
                         const peajeTotal = (ord.peajes || []).reduce((s, p) => s + (p.monto || 0), 0).toFixed(2);
                         let gastosHtml = '';
                         (ord.gastos || []).forEach(g => {
                             gastosHtml += `<div class="factura-info-row"><span>${g.concepto}</span><span>S/ ${parseFloat(g.monto).toFixed(2)}</span></div>`;
                         });
+
+                        // Mostrar monto solicitado si está disponible
+                        const montoSolicitadoHtml = (ord.montoSolicitado != null) ? `<div class="factura-info-row"><span>Monto solicitado</span><span>S/ ${Number(ord.montoSolicitado).toFixed(2)}</span></div>` : '';
 
                         const html = `
                             <div class="factura-section">
@@ -326,6 +330,7 @@
                                 <h3>Desglose</h3>
                                 <div class="factura-info-row"><span>Flete base</span><span>S/ ${fleteBase}</span></div>
                                 <div class="factura-info-row"><span>Sobrecostos (peajes)</span><span>S/ ${peajeTotal}</span></div>
+                                ${montoSolicitadoHtml}
                                 <div class="factura-info-row"><span class="factura-info-label">Total a facturar</span><span>S/ ${total}</span></div>
                             </div>
                             <div class="factura-section">
