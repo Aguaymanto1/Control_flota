@@ -89,6 +89,14 @@
                                 <div class="menu-left"><i class="fa-solid fa-road"></i><span>Mis Viajes</span></div>
                             </a>
                         }
+
+                        @if (User.IsInRole("AdministradorFinanzas"))
+                        {
+                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Finanzas" && ViewContext.RouteData.Values["action"]?.ToString() == "ServiciosPorCobrar" ? "active" : "")"
+                            asp-controller="Finanzas" asp-action="ServiciosPorCobrar">
+                                <div class="menu-left"><i class="fa-solid fa-money-bill-wave"></i><span>Servicios por Cobrar</span></div>
+                            </a>
+                        }
                     </div>
                 </div>
 

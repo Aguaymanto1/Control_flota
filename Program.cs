@@ -100,7 +100,7 @@ async Task CrearRolesYAdmin(IServiceProvider services)
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<Usuario>>();
 
-    string[] roles = { "Administrador", "Conductor" };
+    string[] roles = { "Administrador", "Conductor", "AdministradorFinanzas" };
     
     foreach (var role in roles)
     {
@@ -144,5 +144,40 @@ async Task CrearRolesYAdmin(IServiceProvider services)
     else
     {
         Console.WriteLine("✅ Admin ya existe");
+    }
+
+    // Crear usuario AdministradorFinanzas
+    var finanzasEmail = "Admifinanzas@gmail.com";
+    var finanzasUser = await userManager.FindByEmailAsync(finanzasEmail);
+
+    if (finanzasUser == null)
+    {
+        finanzasUser = new Usuario
+        {
+            UserName = finanzasEmail,
+            Email = finanzasEmail,
+            Estado = true,
+            EmailConfirmed = true
+        };
+
+        var resultFinanzas = await userManager.CreateAsync(finanzasUser, "Finanzas123@hola");
+
+        if (resultFinanzas.Succeeded)
+        {
+            await userManager.AddToRoleAsync(finanzasUser, "AdministradorFinanzas");
+            Console.WriteLine("✅ Administrador de Finanzas creado: finanzas@control-flota.com / Finanzas123@hola");
+        }
+        else
+        {
+            Console.WriteLine("❌ Errores al crear Finanzas:");
+            foreach (var error in resultFinanzas.Errors)
+            {
+                Console.WriteLine($"   {error.Description}");
+            }
+        }
+    }
+    else
+    {
+        Console.WriteLine("✅ Usuario de Finanzas ya existe");
     }
 }
