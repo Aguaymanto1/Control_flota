@@ -193,7 +193,7 @@ public async Task<IActionResult> Index()
             .Where(o => o.FechaEmision.Year == year && o.FechaEmision.Month == month)
             .CountAsync();
         var correlativo = count + 1;
-        var codigo = $"ORD-{year:0000}-{month:00}-{correlativo:0000}";
+        var codigo = $"ORD-{DateTime.Now:yyyyMMddHHmmssfff}";
 
         var orden = new Orden
         {
