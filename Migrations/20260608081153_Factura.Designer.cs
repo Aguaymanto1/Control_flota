@@ -3,6 +3,7 @@ using System;
 using Control_flota.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Control_flota.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608081153_Factura")]
+    partial class Factura
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.15");
@@ -45,9 +48,6 @@ namespace Control_flota.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("FechaEnvio")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("FechaPago")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaVencimiento")

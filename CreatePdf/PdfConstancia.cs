@@ -293,4 +293,151 @@ public static class PdfConstancia
 
         return pdf.GeneratePdf();
     }
+
+        // ==================== NUEVO MÉTODO PARA FACTURA CON SOBRECOSTOS ====================
+
+    public class SobrecostoItem
+    {
+        public string Concepto { get; set; } = string.Empty;
+        public decimal Monto { get; set; }
+    }
+
+    public static async Task<byte[]> GenerarFacturaConSobrecostos(
+        int ordenId,
+        List<SobrecostoItem> sobrecostos,
+        string fechaVencimiento,
+        ApplicationDbContext context)
+    {
+        var orden = await context.Ordenes
+            .Include(o => o.Cliente)
+            .Include(o => o.Gastos)
+            .Include(o => o.SolicitudServicio)
+            .FirstOrDefaultAsync(o => o.Id == ordenId);
+
+        if (orden == null) return null!;
+
+        var montoBase = orden.SolicitudServicio?.Monto ?? orden.Gastos?.Sum(g => g.Monto) ?? 0m;
+        var totalSobrecostos = sobrecostos?.Sum(s => s.Monto) ?? 0m;
+        var totalFactura = montoBase + totalSobrecostos;
+
+        DateTime fechaVenc = DateTime.TryParse(fechaVencimiento, out var fv) ? fv : DateTime.Now.AddDays(30);
+        DateTime fechaEmision = DateTime.Now;
+
+        var pdf = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(40);
+                page.DefaultTextStyle(x => x.FontFamily("Arial").FontSize(11));
+
+                page.Header().Column(col =>
+                {
+                    col.Item().Row(row =>
+                    {
+                        row.RelativeItem().Column(c =>
+                        {
+                            c.Item().Text("DE LA SOTA S.A.C.")
+                                .FontSize(20).Bold().FontColor("#1e3a5f");
+                            c.Item().Text("RUC: 20512345678")
+                                .FontSize(9).FontColor("#64748b");
+                            c.Item().Text("Factura Electrónica")
+                                .FontSize(9).FontColor("#64748b");
+                        });
+                        row.ConstantItem(80).AlignRight().Column(c =>
+                        {
+                            c.Item().Text("🚛").FontSize(36);
+                            c.Item().Text($"N°: {DateTime.Now.Year}{DateTime.Now.Month:D2}-0001")
+                                .FontSize(8).FontColor("#64748b");
+                        });
+                    });
+                    col.Item().PaddingTop(8).BorderBottom(1).BorderColor("#cbd5e1");
+                });
+
+                page.Content().PaddingTop(16).Column(col =>
+                {
+                    col.Item().Row(r =>
+                    {
+                        r.RelativeItem().Column(c =>
+                        {
+                            c.Item().Text("Señor(es):").FontSize(9).FontColor("#64748b");
+                            c.Item().Text(orden.Cliente?.Nombre ?? "-").FontSize(12).Bold();
+                            c.Item().Text($"RUC: {orden.Cliente?.Ruc ?? "-"}").FontSize(9);
+                            c.Item().Text($"Dirección: {orden.Cliente?.Direccion ?? "-"}").FontSize(9);
+                        });
+                        r.ConstantItem(180).Column(c =>
+                        {
+                            c.Item().Text("N° de Orden:").FontSize(9).FontColor("#64748b").AlignRight();
+                            c.Item().Text(orden.Codigo).FontSize(10).Bold().AlignRight();
+                            c.Item().Text($"Fecha Emisión: {fechaEmision:dd/MM/yyyy}").FontSize(9).AlignRight();
+                            c.Item().Text($"Fecha Vencimiento: {fechaVenc:dd/MM/yyyy}").FontSize(9).Bold().AlignRight().FontColor("#dc2626");
+                        });
+                    });
+
+                    col.Item().PaddingTop(12).Background("#f8fafc").Padding(10).Column(c =>
+                    {
+                        c.Item().Text("DETALLE DEL SERVICIO").FontSize(9).Bold().FontColor("#1e3a5f");
+                        c.Item().PaddingTop(6).Row(r =>
+                        {
+                            r.RelativeItem().Text("Origen:").FontSize(9).FontColor("#64748b");
+                            r.RelativeItem().Text(orden.Origen).FontSize(9);
+                        });
+                        c.Item().Row(r =>
+                        {
+                            r.RelativeItem().Text("Destino:").FontSize(9).FontColor("#64748b");
+                            r.RelativeItem().Text(orden.Destino).FontSize(9);
+                        });
+                    });
+
+                    col.Item().PaddingTop(12).Text("DESGLOSE DE LA FACTURA").FontSize(9).Bold().FontColor("#1e3a5f");
+
+                    col.Item().PaddingTop(6).Table(table =>
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn(3);
+                            columns.ConstantColumn(100);
+                        });
+
+                        table.Cell().BorderBottom(1).BorderColor("#e2e8f0").Padding(6).Text("Flete Base - Servicio de transporte").FontSize(9);
+                        table.Cell().BorderBottom(1).BorderColor("#e2e8f0").Padding(6).Text($"S/ {montoBase:F2}").AlignRight().FontSize(9).Bold();
+
+                        if (sobrecostos != null && sobrecostos.Any())
+                        {
+                            foreach (var sc in sobrecostos)
+                            {
+                                table.Cell().Padding(6).Text($"Sobrecosto: {sc.Concepto}").FontSize(9).FontColor("#475569");
+                                table.Cell().Padding(6).Text($"S/ {sc.Monto:F2}").AlignRight().FontSize(9);
+                            }
+                        }
+
+                        table.Cell().Padding(8).BorderTop(1).BorderColor("#cbd5e1").Text("TOTAL").FontSize(11).Bold();
+                        table.Cell().Padding(8).BorderTop(1).BorderColor("#cbd5e1").Text($"S/ {totalFactura:F2}").AlignRight().FontSize(14).Bold().FontColor("#059669");
+                    });
+
+                    col.Item().PaddingTop(16).Background("#fef3c7").Padding(10).Column(c =>
+                    {
+                        c.Item().Text("📌 CONDICIONES DE PAGO").FontSize(9).Bold().FontColor("#92400e");
+                        c.Item().Text($"Fecha límite de pago: {fechaVenc:dd/MM/yyyy}").FontSize(8).FontColor("#78350f");
+                        c.Item().Text("Forma de pago: Transferencia bancaria / Depósito en cuenta").FontSize(8).FontColor("#78350f");
+                        c.Item().Text("Banco: BBVA Continental - Cuenta Corriente: 0011-0456-7890123456").FontSize(8).FontColor("#78350f");
+                    });
+
+                    col.Item().PaddingTop(16).AlignCenter().Text("¡Gracias por su preferencia!").FontSize(9).FontColor("#64748b");
+                });
+
+                page.Footer().Column(col =>
+                {
+                    col.Item().BorderTop(1).BorderColor("#e2e8f0").PaddingTop(6);
+                    col.Item().Row(row =>
+                    {
+                        row.RelativeItem().Text("De La Sota S.A.C. - Todos los derechos reservados").FontSize(7).FontColor("#94a3b8");
+                        row.ConstantItem(130).Text($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}").FontSize(7).FontColor("#94a3b8").AlignRight();
+                    });
+                });
+            });
+        });
+
+        return pdf.GeneratePdf();
+    }
 }

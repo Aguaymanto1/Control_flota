@@ -13,8 +13,9 @@
     <div class="badge-rol">Administrador de Finanzas</div>
 </div>
 
-<!-- Mensaje flash (fixed, sobre modales) -->
+<!-- Mensaje flash -->
 <div id="flashMensaje" style="display:none;position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:2100;min-width:320px;max-width:90%;padding:12px;border-radius:8px;font-weight:600;background:#ecfdf5;color:#065f46;border:1px solid #bbf7d0;box-shadow:0 6px 18px rgba(2,6,23,0.2)"></div>
+
 <!-- Estadísticas -->
 <div class="stats-row">
     <div class="stat-card">
@@ -24,7 +25,6 @@
 </div>
 
 <div class="seccion-servicios">
-    <!-- Viajes Completados -->
     @if (!Model.Any())
     {
         <div class="empty-state">
@@ -36,71 +36,12 @@
     }
     else
     {
-        <!-- Botón Generar Pre - Factura -->
-        <button class="btn-generar-factura" onclick="activarModoSeleccion()">
-            📄 Marcar servicios a cobrar
-        </button>
-
-        <!-- Modo de Selección -->
-        <div class="modo-seleccion" id="modoSeleccion">
-            <div class="modo-seleccion-header">
-                <span class="modo-seleccion-info">Marca los servicios a cobrar</span>
-                <button class="btn-cancelar-seleccion" onclick="desactivarModoSeleccion()">Cancelar</button>
-            </div>
-
-            <div id="contenedorServicios">
-                @foreach (var viaje in Model)
-                {
-                    <div class="servicio-item">
-                        <input type="checkbox" class="servicio-checkbox" 
-                               data-id="@viaje.Id" 
-                               data-cliente="@viaje.Cliente?.Nombre" 
-                               data-codigo="@viaje.Codigo"
-                               data-total="@((viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m).ToString("F2"))" 
-                               onchange="actualizarSeleccion()" />
-                        <div class="servicio-item-info">
-                            <div class="servicio-item-cliente">@viaje.Cliente?.Nombre</div>
-                            <div class="servicio-item-detalles">
-                                <strong>Código:</strong> @viaje.Codigo | 
-                                <strong>Ruta:</strong> @viaje.Origen → @viaje.Destino
-                            </div>
-                            <div class="servicio-item-detalles">
-                                📅 @viaje.FechaEmision.ToString("dd/MM/yyyy")
-                            </div>
-                            <div class="servicio-item-total">
-                                Total: S/ @((viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m).ToString("F2"))
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <!-- Resumen y Botones de Acción -->
-            <div class="servicios-resumen">
-                <div class="resumen-item">
-                    <span>Servicios seleccionados:</span>
-                    <span id="cantidadServicios" style="color: #f59e0b;">0</span>
-                </div>
-                <div class="resumen-item">
-                    <span>Monto total a facturar:</span>
-                    <span id="montoTotal" style="color: #059669;">S/ 0.00</span>
-                </div>
-            </div>
-
-            <div class="acciones-seleccion">
-                <button class="btn-procesar-factura" id="btnProcesarFactura" onclick="procesarFactura()" disabled>
-                    ✓ Generar factura
-                </button>
-                <button class="btn-cancelar-seleccion" onclick="desactivarModoSeleccion()">
-                    ✕ Cancelar
-                </button>
-            </div>
-        </div>
-
-        <!-- Listado de todos los servicios (sin selección) -->
-        <h3 class="seccion-titulo" style="margin-top: 24px;">Viajes Completados</h3>
+        <h3 class="seccion-titulo">Viajes Completados</h3>
+        
         @foreach (var viaje in Model)
         {
+            var montoBase = viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m;
+            // Determinar estado de factura si existe (esto se actualizará con JavaScript)
             <div class="servicio-item">
                 <div style="flex: 1;">
                     <div class="servicio-item-cliente">@viaje.Cliente?.Nombre</div>
@@ -112,254 +53,92 @@
                         📅 @viaje.FechaEmision.ToString("dd/MM/yyyy")
                     </div>
                     <div class="servicio-item-total">
-                        Total: S/ @((viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m).ToString("F2"))
+                        Total base: S/ @montoBase.ToString("F2")
                     </div>
+                </div>
+                <div class="servicio-actions">
+                    <button class="btn-generar-factura" 
+                            data-orden-id="@viaje.Id"
+                            onclick="abrirFormularioFactura(@viaje.Id, '@viaje.Cliente?.Nombre', '@viaje.Codigo', @montoBase.ToString("F2").Replace(",", "."))">
+                        📄 Generar Factura
+                    </button>
+                    <span class="estado-badge estado-sin-facturar" id="estado-@viaje.Id">Sin facturar</span>
                 </div>
             </div>
         }
     }
 </div>
 
-<!-- Modal para ver factura -->
-<div class="modal-factura" id="modalFactura">
-    <div class="modal-content-factura">
+<!-- Modal para el formulario de factura -->
+<div class="modal-factura" id="modalFormularioFactura">
+    <div class="modal-content-factura" style="max-width: 500px;">
         <div class="modal-header-factura">
-            <h2>📄 Vista Previa de Factura</h2>
-            <button class="btn-cerrar-modal" onclick="cerrarModuloFactura()">&times;</button>
+            <h2>📄 Generar Factura</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarFormularioFactura()">&times;</button>
         </div>
-        <div class="modal-body-factura" id="contenidoFactura">
-            <!-- Contenido cargado dinámicamente -->
+        <div class="modal-body-factura">
+            <form id="formularioFactura">
+                <input type="hidden" id="facturaOrdenId" />
+                
+                <div class="form-grupo">
+                    <label>Cliente</label>
+                    <input type="text" id="facturaCliente" class="form-input" readonly disabled />
+                </div>
+                
+                <div class="form-grupo">
+                    <label>Código de Servicio</label>
+                    <input type="text" id="facturaCodigo" class="form-input" readonly disabled />
+                </div>
+                
+                <div class="form-grupo">
+                    <label>Monto Base (S/)</label>
+                    <input type="text" id="facturaMontoBase" class="form-input" readonly disabled />
+                </div>
+                
+                <div class="form-grupo">
+                    <label>Fecha de Vencimiento *</label>
+                    <input type="date" id="facturaFechaVencimiento" class="form-input" required min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+                </div>
+                
+                <div class="form-grupo">
+                    <label>Sobrecostos</label>
+                    <div id="listaSobrecostos">
+                        <div class="sobrecosto-item">
+                            <input type="text" placeholder="Concepto" class="sobrecosto-concepto" style="width: 60%;" />
+                            <input type="number" placeholder="Monto" class="sobrecosto-monto" style="width: 35%;" step="0.01" />
+                            <button type="button" class="btn-eliminar-sobrecosto" onclick="eliminarSobrecosto(this)" style="display: none;">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-agregar-sobrecosto" onclick="agregarSobrecosto()">+ Agregar sobrecosto</button>
+                </div>
+                
+                <div class="form-grupo total-section">
+                    <label>Total a Facturar (S/)</label>
+                    <div class="total-calculado" id="totalFactura">S/ 0.00</div>
+                </div>
+            </form>
         </div>
         <div class="modal-footer-factura">
-            <button class="btn-descargar" onclick="descargarFacturaPdf()">📥 Descargar Factura</button>
-            <button class="btn-enviar" onclick="enviarAlCorreo()">📧 Enviar Correo</button>
-            <button class="btn-modal-cerrar" onclick="cerrarModuloFactura()">Cerrar</button>
+            <button class="btn-guardar" onclick="guardarYEmitirFactura()">💾 Emitir Factura</button>
+            <button class="btn-modal-cerrar" onclick="cerrarFormularioFactura()">Cancelar</button>
         </div>
     </div>
 </div>
 
-<script>
-    let ordenActualId = null;
-    let serviciosSeleccionados = [];
-    let modoSeleccionActivo = false;
+<!-- Modal para vista previa de factura -->
+<div class="modal-factura" id="modalVistaFactura">
+    <div class="modal-content-factura">
+        <div class="modal-header-factura">
+            <h2>📄 Vista Previa de Factura</h2>
+            <button class="btn-cerrar-modal" onclick="cerrarVistaFactura()">&times;</button>
+        </div>
+        <div class="modal-body-factura" id="contenidoFactura"></div>
+        <div class="modal-footer-factura">
+            <button class="btn-descargar" onclick="descargarFacturaPdf()">📥 Descargar Factura</button>
+            <button class="btn-guardar" onclick="guardarYEmitirFactura()">💾 Emitir Factura</button>
+            <button class="btn-modal-cerrar" onclick="cerrarVistaFactura()">Cerrar</button>
+        </div>
+    </div>
+</div>
 
-    function showFlash(message, success = true) {
-        const flash = document.getElementById('flashMensaje');
-        if (!flash) {
-            alert(message);
-            return;
-        }
-        flash.style.display = 'block';
-        flash.style.background = success ? '#ecfdf5' : '#fff1f2';
-        flash.style.color = success ? '#065f46' : '#991b1b';
-        flash.style.border = success ? '1px solid #bbf7d0' : '1px solid #fca5a5';
-        flash.textContent = message;
-        setTimeout(() => { flash.style.display = 'none'; }, 6000);
-    }
-
-    function abrirModuloFactura(ordenId) {
-        ordenActualId = ordenId;
-        document.getElementById('modalFactura').removeAttribute('data-ids');
-        document.getElementById('modalFactura').classList.add('activo');
-        document.getElementById('contenidoFactura').innerHTML = '<p>Selecciona servicios y genera la factura para ver la vista previa.</p>';
-    }
-
-    function cerrarModuloFactura() {
-        document.getElementById('modalFactura').classList.remove('activo');
-        ordenActualId = null;
-        // limpiar ids almacenados
-        document.getElementById('modalFactura').removeAttribute('data-ids');
-    }
-
-    function descargarFacturaPdf() {
-        const modal = document.getElementById('modalFactura');
-        const ids = modal.dataset.ids;
-
-        if (ids) {
-            const selectedIds = ids.split(',').filter(id => id);
-            if (selectedIds.length === 1) {
-                window.location.href = `/Finanzas/DescargarFacturaPdf?id=${selectedIds[0]}`;
-            } else if (selectedIds.length > 1) {
-                window.location.href = `/Finanzas/DescargarFacturasZip?ids=${selectedIds.join(',')}`;
-            }
-            return;
-        }
-
-        if (ordenActualId) {
-            window.location.href = `/Finanzas/DescargarFacturaPdf?id=${ordenActualId}`;
-        } else {
-            showFlash('No hay factura seleccionada para descargar.', false);
-        }
-    }
-
-    function enviarAlCorreo() {
-        const modal = document.getElementById('modalFactura');
-        const ids = modal.dataset.ids;
-
-        if (ids) {
-            const selectedIds = ids.split(',').filter(id => id);
-            if (!selectedIds.length) {
-                showFlash('No hay facturas seleccionadas para enviar.', false);
-                return;
-            }
-
-            Promise.all(selectedIds.map(id =>
-                fetch(`/Finanzas/EnviarFacturaAlCorreo?id=${id}`, { method: 'POST' })
-                    .then(r => r.json())
-            ))
-            .then(results => {
-                const mensajes = results.map(res => res?.mensaje || 'Error').join('\n');
-                showFlash(mensajes, true);
-            })
-            .catch(() => showFlash('Error al enviar las facturas por correo.', false));
-
-            return;
-        }
-
-        if (ordenActualId) {
-            fetch(`/Finanzas/EnviarFacturaAlCorreo?id=${ordenActualId}`, { method: 'POST' })
-                .then(r => r.json())
-                .then(res => {
-                    if (!res || !res.success) showFlash(res?.mensaje || 'Envío en desarrollo', false);
-                    else showFlash(res.mensaje, true);
-                });
-        } else {
-            showFlash('No hay factura seleccionada para enviar.', false);
-        }
-    }
-
-    function activarModoSeleccion() {
-        modoSeleccionActivo = true;
-        document.getElementById('modoSeleccion').classList.add('activo');
-        // Desmarcar todos los checkboxes al activar
-        document.querySelectorAll('.servicio-checkbox').forEach(cb => cb.checked = false);
-        actualizarSeleccion();
-    }
-
-    function desactivarModoSeleccion() {
-        modoSeleccionActivo = false;
-        document.getElementById('modoSeleccion').classList.remove('activo');
-        serviciosSeleccionados = [];
-        document.querySelectorAll('.servicio-checkbox').forEach(cb => cb.checked = false);
-        actualizarSeleccion();
-    }
-
-    function actualizarSeleccion() {
-        const checkboxes = document.querySelectorAll('.servicio-checkbox:checked');
-        serviciosSeleccionados = [];
-
-        let totalMonto = 0;
-
-        checkboxes.forEach((checkbox) => {
-            const id = checkbox.dataset.id;
-            const cliente = checkbox.dataset.cliente;
-            const codigo = checkbox.dataset.codigo;
-            const total = parseFloat(checkbox.dataset.total) || 0;
-
-            serviciosSeleccionados.push({
-                id: id,
-                cliente: cliente,
-                codigo: codigo,
-                total: total
-            });
-
-            totalMonto += total;
-        });
-
-        // Actualizar resumen
-        const cantidadServicios = document.getElementById('cantidadServicios');
-        const montoTotal = document.getElementById('montoTotal');
-        const btnProcesar = document.getElementById('btnProcesarFactura');
-
-        cantidadServicios.textContent = serviciosSeleccionados.length;
-        montoTotal.textContent = 'S/ ' + totalMonto.toFixed(2);
-
-        if (serviciosSeleccionados.length > 0) {
-            btnProcesar.disabled = false;
-        } else {
-            btnProcesar.disabled = true;
-        }
-    }
-
-    function procesarFactura() {
-        if (serviciosSeleccionados.length === 0) {
-            alert('Por favor selecciona al menos un servicio');
-            return;
-        }
-
-        const ids = serviciosSeleccionados.map(s => s.id).join(',');
-        const totalMonto = serviciosSeleccionados.reduce((sum, s) => sum + s.total, 0);
-        const modal = document.getElementById('modalFactura');
-        modal.dataset.ids = ids;
-
-        if (serviciosSeleccionados.length === 1) {
-            const ordenId = serviciosSeleccionados[0].id;
-            ordenActualId = ordenId;
-            document.getElementById('contenidoFactura').innerHTML = '<p>Cargando la vista de factura...</p>';
-            document.getElementById('modalFactura').classList.add('activo');
-
-            fetch(`/Finanzas/GenerarFactura?id=${ordenId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.success && data.orden) {
-                        const ord = data.orden;
-                        // Usar total devuelto por el servidor si existe (puede venir de la solicitud), si no, calcular desde gastos
-                        const total = (ord.totalAPagar != null) ? Number(ord.totalAPagar).toFixed(2) : ( (ord.gastos || []).reduce((s, g) => s + (g.monto || 0), 0).toFixed(2) );
-                        const fleteBase = (ord.fleteBase || 0).toFixed(2);
-                        const peajeTotal = (ord.peajes || []).reduce((s, p) => s + (p.monto || 0), 0).toFixed(2);
-                        let gastosHtml = '';
-                        (ord.gastos || []).forEach(g => {
-                            gastosHtml += `<div class="factura-info-row"><span>${g.concepto}</span><span>S/ ${parseFloat(g.monto).toFixed(2)}</span></div>`;
-                        });
-
-                        // Mostrar monto solicitado si está disponible
-                        const montoSolicitadoHtml = (ord.montoSolicitado != null) ? `<div class="factura-info-row"><span>Flete base</span><span>S/ ${Number(ord.montoSolicitado).toFixed(2)}</span></div>` : '';
-
-                        const html = `
-                            <div class="factura-section">
-                                <h3>Cliente</h3>
-                                <div class="factura-info">${ord.cliente.nombre}</div>
-                            </div>
-                            <div class="factura-section">
-                                <h3>Detalles</h3>
-                                <div class="factura-info-row"><span class="factura-info-label">Código:</span><span>${ord.codigo}</span></div>
-                                <div class="factura-info-row"><span class="factura-info-label">Ruta:</span><span>${ord.origen} → ${ord.destino}</span></div>
-                                <div class="factura-info-row"><span class="factura-info-label">Fecha:</span><span>${new Date(ord.fechaEmision).toLocaleDateString()}</span></div>
-                            </div>
-                            <div class="factura-section">
-                                <h3>Desglose</h3>
-                                <div class="factura-info-row"><span>Sobrecostos (peajes)</span><span>S/ ${peajeTotal}</span></div>
-                                ${montoSolicitadoHtml}
-                                <div class="factura-info-row"><span class="factura-info-label">Total a facturar</span><span>S/ ${total}</span></div>
-                            </div>
-                            <div class="factura-section">
-                                <h3>Detalle de gastos</h3>
-                                ${gastosHtml}
-                            </div>
-                        `;
-                        document.getElementById('contenidoFactura').innerHTML = html;
-                    } else {
-                        document.getElementById('contenidoFactura').innerHTML = '<p>No se pudo cargar la factura.</p>';
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('contenidoFactura').innerHTML = '<p>Error al obtener la factura.</p>';
-                });
-
-            return;
-        }
-
-        let html = `<div class="factura-section"><h3>Resumen de Facturas</h3>`;
-        serviciosSeleccionados.forEach(s => {
-            html += `
-                <div class="factura-info-row"><span class="factura-info-label">${s.cliente}</span><span>${s.codigo} — S/ ${s.total.toFixed(2)}</span></div>
-            `;
-        });
-        html += `<div class="factura-section"><h3>Total</h3><div class="factura-info">S/ ${totalMonto.toFixed(2)}</div></div>`;
-        html += `<div style="margin-top:12px;color:#475569;font-size:0.95rem;">Seleccionaste varios servicios. Descarga o envía cada factura individualmente desde aquí.</div>`;
-        html += `</div>`;
-
-        document.getElementById('contenidoFactura').innerHTML = html;
-        document.getElementById('modalFactura').classList.add('activo');
-    }
-</script>
+<script src="/js/finanzas-servicios.js"></script>
