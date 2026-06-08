@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Control_flota.Models.Operaciones;
 using Control_flota.Models.Login;
+using Control_flota.Models.Finanzas;
 
 namespace Control_flota.Data;
 
@@ -21,6 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<Usuario>
     public DbSet<ConsumoCombustible> ConsumosCombustible => Set<ConsumoCombustible>();
     public DbSet<EstadoInicialRuta> EstadosInicialesRuta => Set<EstadoInicialRuta>();
     public DbSet<Inspeccion> Inspecciones => Set<Inspeccion>();
+    public DbSet<Factura> Facturas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
