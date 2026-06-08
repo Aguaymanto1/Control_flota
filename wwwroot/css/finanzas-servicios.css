@@ -519,3 +519,133 @@
     color: #dc2626;
     border-bottom-color: #fecaca;
 }
+
+/* Estilos para los filtros */
+.filtros-section {
+    margin-bottom: 24px;
+}
+
+.filtros-container {
+    background: var(--azul-hielo);
+    border-radius: 12px;
+    padding: 20px 24px;
+    border: 1px solid var(--azul-claro);
+}
+
+.filtros-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filtro-grupo label {
+    font-weight: 600;
+    color: var(--azul-profundo);
+    font-size: 0.9rem;
+}
+
+.filtro-select,
+.filtro-input {
+    padding: 10px 12px;
+    border: 1px solid var(--azul-claro);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--texto-oscuro);
+    transition: all 0.2s ease;
+}
+
+.filtro-select:focus,
+.filtro-input:focus {
+    outline: none;
+    border-color: var(--azul-profundo);
+    box-shadow: 0 0 0 3px rgba(59, 110, 160, 0.1);
+}
+
+.filtro-botones {
+    display: flex;
+    gap: 12px;
+    justify-self: end;
+}
+
+.btn-filtrar {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--azul-profundo) 0%, var(--azul-institucional) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.btn-filtrar:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--azul-marino) 0%, var(--azul-claro) 100%);
+    box-shadow: 0 4px 12px rgba(59, 110, 160, 0.3);
+}
+
+.btn-limpiar {
+    padding: 10px 20px;
+    background: #f3f4f6;
+    color: var(--texto-oscuro);
+    border: 1px solid var(--gris-borde);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.btn-limpiar:hover {
+    background: #e5e7eb;
+    border-color: var(--texto-claro);
+}
+
+.btn-filtro {
+    padding: 10px 18px;
+    background: #eff6ff;
+    color: var(--azul-profundo);
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn-filtro:hover {
+    background: #dbeafe;
+    transform: translateY(-1px);
+}
+
+.btn-filtro.activo {
+    background: linear-gradient(135deg, var(--azul-profundo) 0%, var(--azul-claro) 100%);
+    color: white;
+    border-color: transparent;
+}
+
+/* Responsive para filtros */
+@media (max-width: 768px) {
+    .filtros-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .filtro-botones {
+        flex-direction: column;
+    }
+    
+    .btn-filtrar,
+    .btn-limpiar,
+    .btn-filtro {
+        width: 100%;
+    }
+}

@@ -236,16 +236,66 @@ namespace Control_flota.Controllers
             }
         }
 
-        public async Task<IActionResult> ServiciosPorCobrar()
+        [HttpGet]
+        public async Task<IActionResult> ServiciosPorCobrar(int? clienteId = null, bool ordenPorVencimiento = false, bool facturasPendientes = false)
         {
             var viajesCompletados = await _context.Ordenes
                 .Include(o => o.Cliente)
                 .Include(o => o.Gastos)
                 .Include(o => o.SolicitudServicio)
                 .Where(o => o.Estado == "Completado")
-                .OrderByDescending(o => o.FechaEmision)
                 .ToListAsync();
 
+            var facturas = await _context.Facturas.ToListAsync();
+            var facturasPorOrden = facturas
+                .GroupBy(f => f.OrdenId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(f => f.Id).First());
+
+            if (clienteId.HasValue && clienteId > 0)
+            {
+                viajesCompletados = viajesCompletados
+                    .Where(o => o.ClienteId == clienteId)
+                    .ToList();
+            }
+
+            if (facturasPendientes)
+            {
+                var fechaHoy = DateTime.Today;
+                var ordenesPendientes = facturas
+                    .Where(f => f.Estado == "Emitida" && f.FechaPago == null && f.FechaVencimiento >= fechaHoy)
+                    .Select(f => f.OrdenId)
+                    .ToHashSet();
+
+                viajesCompletados = viajesCompletados
+                    .Where(o => ordenesPendientes.Contains(o.Id))
+                    .ToList();
+            }
+
+            if (ordenPorVencimiento)
+            {
+                viajesCompletados = viajesCompletados
+                    .OrderBy(o => facturasPorOrden.ContainsKey(o.Id)
+                        ? facturasPorOrden[o.Id].FechaVencimiento
+                        : o.FechaEmision.AddDays(30))
+                    .ThenByDescending(o => o.FechaEmision)
+                    .ToList();
+            }
+            else
+            {
+                viajesCompletados = viajesCompletados
+                    .OrderByDescending(o => o.FechaEmision)
+                    .ToList();
+            }
+
+            var clientes = await _context.Clientes
+                .OrderBy(c => c.Nombre)
+                .ToListAsync();
+
+            ViewBag.Clientes = clientes;
+            ViewBag.ClienteSeleccionado = clienteId;
+            ViewBag.OrdenPorVencimiento = ordenPorVencimiento;
+            ViewBag.FacturasPendientes = facturasPendientes;
+            ViewBag.FacturasPorOrden = facturasPorOrden;
             ViewBag.TotalViajesCompletados = viajesCompletados.Count;
             ViewBag.TotalGastosRegistrados = await _context.GastosRuta.CountAsync();
 
