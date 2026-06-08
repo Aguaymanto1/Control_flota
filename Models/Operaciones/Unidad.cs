@@ -48,4 +48,7 @@ public class Unidad
     public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
     public string Actividad { get; set; } = "Libre";
+
+    [Required(ErrorMessage = "El kilometraje es obligatorio.")]
+    public int KilometrajeActual { get; set; } = 0;
 }

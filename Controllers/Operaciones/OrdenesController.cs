@@ -24,61 +24,61 @@ public class OrdenesController : Controller
     }
 
     // Lista general de órdenes y solicitudes pendientes en despacho
-  public async Task<IActionResult> Index(string? buscar, bool busquedaRealizada = false)
-{
-    ViewBag.Clientes = _context.Clientes.ToList();
-
-    ViewBag.TipoCargaOptions = new List<string>
+    public async Task<IActionResult> Index(string? buscar, bool busquedaRealizada = false)
     {
-        "Carga General",
-        "Carga Refrigerada",
-        "Carga Peligrosa"
-    };
+        ViewBag.Clientes = _context.Clientes.ToList();
 
-    var queryOrdenes = _context.Ordenes
-        .Include(o => o.Cliente)
-        .AsQueryable();
+        ViewBag.TipoCargaOptions = new List<string>
+        {
+            "Carga General",
+            "Carga Refrigerada",
+            "Carga Peligrosa"
+        };
 
-    // Solo filtrar cuando realmente se presionó Buscar
-    if (busquedaRealizada)
-    {
-        if (string.IsNullOrWhiteSpace(buscar))
+        var queryOrdenes = _context.Ordenes
+            .Include(o => o.Cliente)
+            .AsQueryable();
+
+        // Solo filtrar cuando realmente se presionó Buscar
+        if (busquedaRealizada)
         {
-            queryOrdenes = queryOrdenes.Where(o => false);
+            if (string.IsNullOrWhiteSpace(buscar))
+            {
+                queryOrdenes = queryOrdenes.Where(o => false);
+            }
+            else
+            {
+                queryOrdenes = queryOrdenes.Where(o =>
+                    (o.Cliente != null && o.Cliente.Nombre.Contains(buscar)) ||
+                    o.Origen.Contains(buscar) ||
+                    o.Destino.Contains(buscar));
+            }
         }
-        else
+
+        var ordenes = await queryOrdenes
+            .OrderByDescending(o => o.FechaEmision)
+            .ToListAsync();
+
+        var solicitudesPendientes = await _context.SolicitudesServicio
+            .Include(s => s.Cliente)
+            .Include(s => s.Conductor)
+            .Include(s => s.Unidad)
+            .Where(s => s.EstadoSolicitud == "Pendiente de Asignación"
+                     || s.EstadoSolicitud == "Pendiente")
+            .OrderByDescending(s => s.FechaDespacho)
+            .ToListAsync();
+
+        var model = new DespachoViewModel
         {
-            queryOrdenes = queryOrdenes.Where(o =>
-                (o.Cliente != null && o.Cliente.Nombre.Contains(buscar)) ||
-                o.Origen.Contains(buscar) ||
-                o.Destino.Contains(buscar));
-        }
+            Ordenes = ordenes,
+            SolicitudesPendientes = solicitudesPendientes
+        };
+
+        ViewBag.BusquedaRealizada = busquedaRealizada;
+        ViewBag.Buscar = buscar;
+
+        return View(model);
     }
-
-    var ordenes = await queryOrdenes
-        .OrderByDescending(o => o.FechaEmision)
-        .ToListAsync();
-
-    var solicitudesPendientes = await _context.SolicitudesServicio
-        .Include(s => s.Cliente)
-        .Include(s => s.Conductor)
-        .Include(s => s.Unidad)
-        .Where(s => s.EstadoSolicitud == "Pendiente de Asignación"
-                 || s.EstadoSolicitud == "Pendiente")
-        .OrderByDescending(s => s.FechaDespacho)
-        .ToListAsync();
-
-    var model = new DespachoViewModel
-    {
-        Ordenes = ordenes,
-        SolicitudesPendientes = solicitudesPendientes
-    };
-
-    ViewBag.BusquedaRealizada = busquedaRealizada;
-    ViewBag.Buscar = buscar;
-
-    return View(model);
-}
 
     // Detalle de orden (Vista del Administrador)
     public async Task<IActionResult> Details(int id)
@@ -273,7 +273,7 @@ public class OrdenesController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "Conductor")]
-    public async Task<IActionResult> FinalizarRuta(int ordenId, string recepcionistaNombre, string recepcionistaDni, string? fotoFinal)
+    public async Task<IActionResult> FinalizarRuta(int ordenId, string recepcionistaNombre, string recepcionistaDni, string? fotoFinal, int kilometrajeFinal)
     {
         var orden = await _context.Ordenes.FindAsync(ordenId);
         if (orden == null) return NotFound();
@@ -313,6 +313,23 @@ public class OrdenesController : Controller
             TempData["Error"] = "Los datos del recepcionista no coinciden con la solicitud de servicio.";
             return RedirectToAction(nameof(PanelConductor));
         }
+
+        // ==========================================
+        // === INICIO DE LÓGICA HU-014 ===
+        // ==========================================
+        var estadoInicial = await _context.EstadosInicialesRuta
+            .Where(e => e.OrdenId == ordenId)
+            .OrderByDescending(e => e.FechaRegistro)
+            .FirstOrDefaultAsync();
+
+        if (estadoInicial != null && kilometrajeFinal < estadoInicial.KilometrajeInicial)
+        {
+            TempData["Error"] = $"El kilometraje final ({kilometrajeFinal}) no puede ser menor al inicial ({estadoInicial.KilometrajeInicial}).";
+            return RedirectToAction(nameof(PanelConductor));
+        }
+        // ==========================================
+        // === FIN DE LÓGICA HU-014 ===
+        // ==========================================
 
         string? rutaFotoFinal = null;
         if (!string.IsNullOrWhiteSpace(fotoFinal) && fotoFinal.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
@@ -356,6 +373,7 @@ public class OrdenesController : Controller
             }
         }
 
+        //sdsd
         orden.Estado = "Completado";
         _context.Update(orden);
 
@@ -366,15 +384,22 @@ public class OrdenesController : Controller
             solicitud.Conductor.Actividad = "Libre";
             _context.Update(solicitud.Conductor);
         }
+
         if (solicitud.Unidad != null)
         {
             solicitud.Unidad.Actividad = "Libre";
+            // === LÓGICA HU-014: Asignamos el nuevo kilometraje a la unidad ===
+            solicitud.Unidad.KilometrajeActual = kilometrajeFinal; 
             _context.Update(solicitud.Unidad);
         }
 
         await _context.SaveChangesAsync();
 
-        TempData["Exito"] = rutaFotoFinal != null ? "Ruta finalizada y evidencia guardada." : "Ruta finalizada. No se guardó evidencia final.";
+        // === LÓGICA HU-014: Modificamos el mensaje para cumplir el criterio de aceptación ===
+        TempData["Exito"] = rutaFotoFinal != null 
+            ? "Ruta finalizada, evidencia guardada y registro de kilometraje almacenado." 
+            : "Ruta finalizada y registro de kilometraje almacenado. No se guardó evidencia final.";
+            
         return RedirectToAction(nameof(PanelConductor));
     }
 

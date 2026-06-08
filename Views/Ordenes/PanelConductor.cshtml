@@ -88,13 +88,11 @@
     </div>
 }
 
-<!-- HEADER -->
 <div style="margin-bottom:24px;">
     <h2 style="font-size:1.75rem; font-weight:700; color:#0f172a; margin:0;">Mis Viajes</h2>
     <p class="page-subtitle">Panel del conductor — órdenes asignadas</p>
 </div>
 
-<!-- STATS -->
 <div class="stats-row">
     <div class="stat-card">
         <div class="stat-icon blue"><i class="fa-regular fa-file-lines"></i></div>
@@ -128,7 +126,6 @@
     </div>
 </div>
 
-<!-- TABLA -->
 <div class="table-card">
     @if (!Model.Any())
     {
@@ -154,7 +151,7 @@
             @foreach (var orden in Model)
             {
                 string badgeClass = orden.Estado switch {
-                    "Emitida"     => "badge-emitida",
+                    "Emitida"    => "badge-emitida",
                     "En Tránsito" => "badge-transito",
                     "Completado"  => "badge-completado",
                     _ => "badge-emitida"
@@ -180,7 +177,6 @@
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             @if (orden.Estado == "Emitida")
                             {
-                                <!-- Botón que abre modal para ingresar datos iniciales -->
                                 <button type="button" class="action-btn btn-iniciar" style="width:100%; justify-content:center;" data-bs-toggle="modal" data-bs-target="#iniciarModal" data-ordenid="@orden.Id" data-codigo="@orden.Codigo">
                                     <i class="fa-solid fa-play"></i> Iniciar Ruta
                                 </button>
@@ -229,7 +225,6 @@
     }
 </div>
 
-<!-- Modal: Iniciar Ruta - datos iniciales -->
 <div class="modal fade" id="iniciarModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -269,7 +264,6 @@
     </div>
 </div>
 
-<!-- Modal: Finalizar Ruta - validación de recepcionista -->
 <div class="modal fade" id="finalizarModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -294,6 +288,14 @@
                         <input type="text" name="recepcionistaDni" id="recepcionistaDni" class="form-control" pattern="\d{8}" required placeholder="Ej. 12345678" />
                         <div class="form-text text-danger" id="recepcionistaDniError" style="display:none;">Ingrese un DNI válido de 8 dígitos.</div>
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kilometraje Final de la Unidad</label>
+                        <input type="number" name="kilometrajeFinal" id="kilometrajeFinal" class="form-control" required min="0" placeholder="Ej. 120500" />
+                        <div class="form-text text-danger" id="kmFinalError" style="display:none;">Ingrese un kilometraje válido (mayor o igual a cero).</div>
+                        <div class="form-text text-muted" style="font-size:0.8rem;">Recuerda: El kilometraje final no puede ser menor al inicial con el que arrancaste.</div>
+                    </div>
+
                     <div class="alert alert-info" role="alert" style="font-size:0.9rem; margin-bottom:0;">
                         Se validará el nombre y DNI del recepcionista con los datos registrados en la solicitud de servicio.
                     </div>
@@ -318,7 +320,6 @@
     </div>
 </div>
 
-<!-- Modales para cámara y previsualización (solo conductor) -->
 <div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -360,7 +361,6 @@
 <button id="openPreviewModalBtn" type="button" data-bs-toggle="modal" data-bs-target="#previewFotoModal" style="display:none;"></button>
 <button id="openFinalizarModalBtn" type="button" data-bs-toggle="modal" data-bs-target="#finalizarModal" style="display:none;"></button>
 
-<!-- Modal: REPORTAR INCIDENCIA-->
 <div class="modal fade" id="incidenciaModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -455,8 +455,6 @@
     </div>
 </div>
 
-<!-- Modales para cámara y previsualización (solo conductor) -->
-
 <script>
     var skipFinalizarReset = false;
     
@@ -468,6 +466,10 @@
     var recepcionistaNombreError = document.getElementById('recepcionistaNombreError');
     var recepcionistaDniError = document.getElementById('recepcionistaDniError');
     var finalizarSubmit = document.getElementById('finalizarSubmit');
+    
+    // VARIABLES PARA HU-014
+    var kilometrajeFinalInput = document.getElementById('kilometrajeFinal');
+    var kmFinalError = document.getElementById('kmFinalError');
 
     // Función global para validar modal de finalización
     function validarFinalizarModal(){
@@ -476,19 +478,22 @@
         var nombreVal = (recepcionistaNombre.value || '').trim();
         var dniVal = (recepcionistaDni.value || '').trim();
         var fotoVal = (fotoFinalInput && fotoFinalInput.value) ? (fotoFinalInput.value || '').trim() : '';
+        var kmFinalVal = (kilometrajeFinalInput && kilometrajeFinalInput.value) ? kilometrajeFinalInput.value.trim() : '';
+        
         var nombreValido = /^[A-Za-zÀ-ÿÑñ ]{3,}$/.test(nombreVal);
         var dniValido = /^\d{8}$/.test(dniVal);
         var fotoValida = fotoVal.length > 0;
+        var kmFinalValido = kmFinalVal !== '' && /^\d+$/.test(kmFinalVal) && parseInt(kmFinalVal, 10) >= 0;
 
         if(recepcionistaNombreError){
-            if(!nombreValido){
+            if(!nombreValido && nombreVal !== ''){
                 recepcionistaNombreError.style.display = 'block';
             } else {
                 recepcionistaNombreError.style.display = 'none';
             }
         }
         if(recepcionistaDniError){
-            if(!dniValido){
+            if(!dniValido && dniVal !== ''){
                 recepcionistaDniError.style.display = 'block';
             } else {
                 recepcionistaDniError.style.display = 'none';
@@ -501,8 +506,15 @@
                 fotoFinalError.style.display = 'none';
             }
         }
+        if(kmFinalError){
+            if(!kmFinalValido && kmFinalVal !== ''){
+                kmFinalError.style.display = 'block';
+            } else {
+                kmFinalError.style.display = 'none';
+            }
+        }
 
-        finalizarSubmit.disabled = !(nombreValido && dniValido && fotoValida);
+        finalizarSubmit.disabled = !(nombreValido && dniValido && fotoValida && kmFinalValido);
     }
     
     (function(){
@@ -572,10 +584,12 @@
                 }
                 if(recepcionistaNombre) recepcionistaNombre.value = '';
                 if(recepcionistaDni) recepcionistaDni.value = '';
+                if(kilometrajeFinalInput) kilometrajeFinalInput.value = '';
                 validarFinalizarModal();
             });
             if(recepcionistaNombre) recepcionistaNombre.addEventListener('input', validarFinalizarModal);
             if(recepcionistaDni) recepcionistaDni.addEventListener('input', validarFinalizarModal);
+            if(kilometrajeFinalInput) kilometrajeFinalInput.addEventListener('input', validarFinalizarModal);
         }
 
         combustibleInput.addEventListener('input', validarModal);
@@ -600,10 +614,6 @@
             var openCameraModalBtn = document.getElementById('openCameraModalBtn');
             var openPreviewModalBtn = document.getElementById('openPreviewModalBtn');
             var openFinalizarModalBtn = document.getElementById('openFinalizarModalBtn');
-            
-            console.log('Camera init - btnTomarFoto:', !!btnTomarFoto, 'cameraModalEl:', !!cameraModalEl, 
-                        'previewModalEl:', !!previewModalEl, 'openCameraModalBtn:', !!openCameraModalBtn,
-                        'openPreviewModalBtn:', !!openPreviewModalBtn, 'openFinalizarModalBtn:', !!openFinalizarModalBtn);
             
             if(!btnTomarFoto || !cameraModalEl || !previewModalEl || !openCameraModalBtn || !openPreviewModalBtn || !openFinalizarModalBtn){
                 console.error('Camera: Falta un elemento requerido');
@@ -672,7 +682,6 @@
             }
 
             btnTomarFoto.addEventListener('click', function(){ 
-                console.log('btnTomarFoto clicked');
                 startCamera(); 
             });
 
