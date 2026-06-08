@@ -45,7 +45,7 @@ namespace Control_flota.Controllers
             return View(orden);
         }
 
-        // Acción para generar la pre-factura con desglose matemático
+        // Acción para generar la factura con desglose matemático
         [HttpGet]
         public async Task<IActionResult> GenerarFactura(int id)
         {
@@ -166,6 +166,8 @@ namespace Control_flota.Controllers
             {
                 var orden = await _context.Ordenes
                     .Include(o => o.Cliente)
+                    .Include(o => o.Gastos)
+                    .Include(o => o.SolicitudServicio)
                     .FirstOrDefaultAsync(o => o.Id == id);
 
                 if (orden == null)
@@ -177,6 +179,14 @@ namespace Control_flota.Controllers
                 var pdfBytes = await PdfConstancia.GenerarFactura(id, _context);
                 if (pdfBytes == null || pdfBytes.Length == 0)
                     return Json(new { success = false, mensaje = "Error al generar el PDF" });
+
+                var gastos = orden.Gastos?.ToList() ?? new List<Control_flota.Models.Operaciones.GastoRuta>();
+                var peajeTotal = gastos
+                    .Where(g => g.Concepto.Contains("peaje", StringComparison.OrdinalIgnoreCase))
+                    .Sum(g => g.Monto);
+                var montoSolicitud = orden.SolicitudServicio?.Monto;
+                var fleteBase = montoSolicitud ?? gastos.Sum(g => g.Monto) - peajeTotal;
+                if (fleteBase < 0) fleteBase = 0;
 
                 var mensajeHtml = $@"
                     <html>
@@ -201,6 +211,7 @@ namespace Control_flota.Controllers
                                 <p>Adjunto encontrarás la factura correspondiente al servicio.</p>
                                 <p><strong>Orden:</strong> {orden.Codigo}</p>
                                 <p><strong>Ruta:</strong> {orden.Origen} → {orden.Destino}</p>
+                                <p><strong>Flete base:</strong> S/ {fleteBase:F2}</p>
                                 <p><strong>Fecha:</strong> {orden.FechaEmision:dd/MM/yyyy HH:mm}</p>
                                 <p>Gracias por confiar en nosotros.</p>
                                 <p>Saludos cordiales,<br><strong>Departamento de Finanzas</strong></p>

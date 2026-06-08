@@ -89,7 +89,7 @@
 
             <div class="acciones-seleccion">
                 <button class="btn-procesar-factura" id="btnProcesarFactura" onclick="procesarFactura()" disabled>
-                    ✓ Generar pre-factura
+                    ✓ Generar factura
                 </button>
                 <button class="btn-cancelar-seleccion" onclick="desactivarModoSeleccion()">
                     ✕ Cancelar
@@ -313,7 +313,7 @@
                         });
 
                         // Mostrar monto solicitado si está disponible
-                        const montoSolicitadoHtml = (ord.montoSolicitado != null) ? `<div class="factura-info-row"><span>Monto solicitado</span><span>S/ ${Number(ord.montoSolicitado).toFixed(2)}</span></div>` : '';
+                        const montoSolicitadoHtml = (ord.montoSolicitado != null) ? `<div class="factura-info-row"><span>Flete base</span><span>S/ ${Number(ord.montoSolicitado).toFixed(2)}</span></div>` : '';
 
                         const html = `
                             <div class="factura-section">
@@ -328,7 +328,6 @@
                             </div>
                             <div class="factura-section">
                                 <h3>Desglose</h3>
-                                <div class="factura-info-row"><span>Flete base</span><span>S/ ${fleteBase}</span></div>
                                 <div class="factura-info-row"><span>Sobrecostos (peajes)</span><span>S/ ${peajeTotal}</span></div>
                                 ${montoSolicitadoHtml}
                                 <div class="factura-info-row"><span class="factura-info-label">Total a facturar</span><span>S/ ${total}</span></div>

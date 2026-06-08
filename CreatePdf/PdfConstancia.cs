@@ -168,6 +168,7 @@ public static class PdfConstancia
         var orden = await context.Ordenes
             .Include(o => o.Cliente)
             .Include(o => o.Gastos)
+            .Include(o => o.SolicitudServicio)
             .FirstOrDefaultAsync(o => o.Id == ordenId);
 
         if (orden == null) return null!;
@@ -179,8 +180,11 @@ public static class PdfConstancia
 
         var peajeTotal = peajes.Sum(g => g.Monto);
         var totalGastos = gastos.Sum(g => g.Monto);
-        var baseFlete = totalGastos - peajeTotal;
+        var montoSolicitud = orden.SolicitudServicio?.Monto;
+        var baseFlete = montoSolicitud ?? totalGastos - peajeTotal;
         if (baseFlete < 0) baseFlete = 0;
+
+        var totalFactura = baseFlete + peajeTotal;
 
         var pdf = Document.Create(container =>
         {
@@ -198,7 +202,7 @@ public static class PdfConstancia
                         {
                             c.Item().Text("DE LA SOTA S.A.C.")
                                 .FontSize(20).Bold().FontColor("#002d62");
-                            c.Item().Text("Factura de Venta - Pre-factura")
+                            c.Item().Text("Factura de Venta - factura")
                                 .FontSize(10).FontColor("#64748b");
                         });
                         row.ConstantItem(80).AlignRight().Column(c =>
@@ -240,6 +244,14 @@ public static class PdfConstancia
                             r.RelativeItem().Text("Flete base").FontColor("#334155");
                             r.ConstantItem(120).AlignRight().Text($"S/ {baseFlete:F2}").Bold();
                         });
+                        if (montoSolicitud.HasValue)
+                        {
+                            c.Item().PaddingTop(4).Row(r =>
+                            {
+                                r.RelativeItem().Text("Monto solicitado").FontColor("#334155");
+                                r.ConstantItem(120).AlignRight().Text($"S/ {montoSolicitud.Value:F2}").Bold();
+                            });
+                        }
                         c.Item().PaddingTop(4).Row(r =>
                         {
                             r.RelativeItem().Text("Sobrecostos (peajes)").FontColor("#334155");
@@ -248,7 +260,7 @@ public static class PdfConstancia
                         c.Item().PaddingTop(4).Row(r =>
                         {
                             r.RelativeItem().Text("Total a facturar").FontColor("#0f172a").Bold();
-                            r.ConstantItem(120).AlignRight().Text($"S/ {totalGastos:F2}").Bold();
+                            r.ConstantItem(120).AlignRight().Text($"S/ {totalFactura:F2}").Bold();
                         });
                     });
 
@@ -267,7 +279,7 @@ public static class PdfConstancia
                         });
                     }
 
-                    col.Item().PaddingTop(24).Text("Observación: Esta es una pre-factura con desglose de flete base y peajes.")
+                    col.Item().PaddingTop(24).Text("Observación: Esta es una factura con desglose de flete base y peajes.")
                         .FontSize(9).FontColor("#475569");
                 });
 

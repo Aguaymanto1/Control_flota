@@ -505,6 +505,8 @@ public class OrdenesController : Controller
         {
             var orden = await _context.Ordenes
                 .Include(o => o.Cliente)
+                .Include(o => o.Gastos)
+                .Include(o => o.SolicitudServicio)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (orden == null)
@@ -516,6 +518,14 @@ public class OrdenesController : Controller
             var pdfBytes = await PdfConstancia.Generar(id, _context);
             if (pdfBytes == null || pdfBytes.Length == 0)
                 return Json(new { success = false, message = "Error al generar el PDF" });
+
+            var gastos = orden.Gastos?.ToList() ?? new List<Control_flota.Models.Operaciones.GastoRuta>();
+            var peajeTotal = gastos
+                .Where(g => g.Concepto.Contains("peaje", StringComparison.OrdinalIgnoreCase))
+                .Sum(g => g.Monto);
+            var montoSolicitud = orden.SolicitudServicio?.Monto;
+            var fleteBase = montoSolicitud ?? gastos.Sum(g => g.Monto) - peajeTotal;
+            if (fleteBase < 0) fleteBase = 0;
 
             // HTML del correo
             var mensajeHtml = $@"
@@ -541,6 +551,7 @@ public class OrdenesController : Controller
                             <p>Adjunto encontrará la constancia de su servicio de transporte.</p>
                             <p><strong>📄 Orden:</strong> {orden.Codigo}</p>
                             <p><strong>📍 Ruta:</strong> {orden.Origen} → {orden.Destino}</p>
+                            <p><strong>💰 Flete base:</strong> S/ {fleteBase:F2}</p>
                             <p><strong>📅 Fecha:</strong> {orden.FechaEmision:dd/MM/yyyy HH:mm}</p>
                             <p><strong>📊 Estado:</strong> {orden.Estado}</p>
                             <p>Saludos cordiales,<br><strong>Departamento de Logística</strong></p>
