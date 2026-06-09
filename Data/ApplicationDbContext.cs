@@ -23,6 +23,7 @@ public class ApplicationDbContext : IdentityDbContext<Usuario>
     public DbSet<EstadoInicialRuta> EstadosInicialesRuta => Set<EstadoInicialRuta>();
     public DbSet<Inspeccion> Inspecciones => Set<Inspeccion>();
     public DbSet<Factura> Facturas { get; set; }
+    public DbSet<EntregaEpp> EntregasEpp { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

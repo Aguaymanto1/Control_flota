@@ -202,6 +202,17 @@
         color: #1e293b;
     }
 
+    /* NUEVO ESTILO PARA EL BOTON EPP */
+    .action-btn.epp {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    .action-btn.epp:hover {
+        background: #ffedd5;
+        color: #c2410c;
+    }
+
     .action-btn.delete {
         background: #fef2f2;
         color: #dc2626;
@@ -228,6 +239,14 @@
     var total = Model.Count();
     var activos = Model.Count(c => c.EstadoOperativo == "Activo");
     var ocupados = Model.Count(c => c.Actividad == "Ocupado");
+}
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i>@TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
 
 <div class="conductores-header">
@@ -317,6 +336,10 @@
                         </td>
                         <td>
                             <div style="display:flex; gap:6px;">
+                                <a href="@Url.Action("EntregarEpp", new { id = conductor.Id })" class="action-btn epp">
+                                    <i class="fa-solid fa-helmet-safety"></i> Entregar EPP
+                                </a>
+
                                 <a href="@Url.Action("Edit", new { id = conductor.Id })" class="action-btn edit">
                                     <i class="fa-regular fa-pen-to-square"></i> Editar
                                 </a>

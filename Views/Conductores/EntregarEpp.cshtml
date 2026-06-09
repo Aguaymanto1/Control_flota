@@ -1,0 +1,136 @@
+@model Control_flota.Models.Operaciones.EntregaEpp
+@{
+    ViewData["Title"] = "Entregar EPP";
+}
+
+<div class="container mt-4">
+    <h2>Registro de Entrega de EPP</h2>
+    <p class="text-muted">Conductor: <strong>@ViewBag.ConductorNombre</strong> | DNI: @ViewBag.ConductorDni</p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card shadow-sm p-4 mt-3">
+        <form asp-action="EntregarEpp" method="post" id="formEpp">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ConductorId" />
+            <input type="hidden" asp-for="FirmaDigitalBase64" id="FirmaDigitalBase64" />
+
+            <h5 class="mb-3">1. Seleccione los equipos a entregar:</h5>
+            <div class="form-check form-switch mb-2">
+                <input class="form-check-input fs-5" type="checkbox" asp-for="EntregoCasco">
+                <label class="form-check-label fs-5 ms-2" asp-for="EntregoCasco">Casco de Seguridad</label>
+            </div>
+            <div class="form-check form-switch mb-2">
+                <input class="form-check-input fs-5" type="checkbox" asp-for="EntregoBotas">
+                <label class="form-check-label fs-5 ms-2" asp-for="EntregoBotas">Botas de Seguridad</label>
+            </div>
+            <div class="form-check form-switch mb-4">
+                <input class="form-check-input fs-5" type="checkbox" asp-for="EntregoChaleco">
+                <label class="form-check-label fs-5 ms-2" asp-for="EntregoChaleco">Chaleco Reflectivo</label>
+            </div>
+
+            <h5 class="mb-3">2. Firma de Recepción (Obligatorio):</h5>
+            <div class="border rounded bg-light text-center p-2 mb-3" style="touch-action: none;">
+                <canvas id="pizarraFirma" width="400" height="200" style="border: 2px dashed #ccc; background-color: #fff; width: 100%; max-width: 500px;"></canvas>
+            </div>
+            
+            <div class="d-flex justify-content-between mb-4" style="max-width: 500px; margin: 0 auto;">
+                <button type="button" class="btn btn-outline-danger" id="btnLimpiarFirma">
+                    <i class="fa-solid fa-eraser"></i> Limpiar Firma
+                </button>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100" id="btnGuardar">
+                <i class="fa-solid fa-save"></i> Guardar Registro y Firma
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Lógica de la pizarra de firma (Soporta Mouse y Pantalla Táctil)
+        const canvas = document.getElementById('pizarraFirma');
+        const ctx = canvas.getContext('2d');
+        const btnLimpiar = document.getElementById('btnLimpiarFirma');
+        const formEpp = document.getElementById('formEpp');
+        const inputFirma = document.getElementById('FirmaDigitalBase64');
+        
+        let dibujando = false;
+        let firmaVacia = true;
+
+        // Configuración del trazo
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 3;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+
+        // Ajustar coordenadas relativas al canvas
+        function obtenerPosicion(evento) {
+            const rect = canvas.getBoundingClientRect();
+            let x, y;
+            if (evento.touches) {
+                x = evento.touches[0].clientX - rect.left;
+                y = evento.touches[0].clientY - rect.top;
+            } else {
+                x = evento.clientX - rect.left;
+                y = evento.clientY - rect.top;
+            }
+            return { x, y };
+        }
+
+        // Eventos para iniciar, dibujar y detener
+        function iniciarDibujo(e) {
+            e.preventDefault();
+            dibujando = true;
+            firmaVacia = false;
+            const pos = obtenerPosicion(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function dibujar(e) {
+            if (!dibujando) return;
+            e.preventDefault();
+            const pos = obtenerPosicion(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        function detenerDibujo(e) {
+            e.preventDefault();
+            dibujando = false;
+            ctx.closePath();
+        }
+
+        // Mouse
+        canvas.addEventListener('mousedown', iniciarDibujo);
+        canvas.addEventListener('mousemove', dibujar);
+        canvas.addEventListener('mouseup', detenerDibujo);
+        canvas.addEventListener('mouseout', detenerDibujo);
+
+        // Pantalla Táctil (Tablets/Celulares)
+        canvas.addEventListener('touchstart', iniciarDibujo, { passive: false });
+        canvas.addEventListener('touchmove', dibujar, { passive: false });
+        canvas.addEventListener('touchend', detenerDibujo, { passive: false });
+
+        // Limpiar
+        btnLimpiar.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            firmaVacia = true;
+        });
+
+        // Capturar la firma en Base64 antes de enviar el formulario
+        formEpp.addEventListener('submit', function(e) {
+            if (firmaVacia) {
+                e.preventDefault();
+                alert('El conductor debe firmar para confirmar la recepción.');
+            } else {
+                inputFirma.value = canvas.toDataURL('image/png');
+            }
+        });
+    </script>
+}

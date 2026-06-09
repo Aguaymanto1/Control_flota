@@ -354,5 +354,44 @@ public async Task<IActionResult> Delete(int id)
             TempData["Exito"] = $"Vigencia de {conductor.Nombres} {conductor.Apellidos} actualizada correctamente.";
             return RedirectToAction(nameof(AlertasLicencias));
         }
+        // ==================== HU-027: ENTREGAR EPP ====================
+
+        // GET: Vista para entregar EPP y firmar
+        [HttpGet]
+        public async Task<IActionResult> EntregarEpp(int id)
+        {
+            var conductor = await _context.Conductores.FindAsync(id);
+            if (conductor == null) return NotFound();
+
+            ViewBag.ConductorNombre = $"{conductor.Nombres} {conductor.Apellidos}";
+            ViewBag.ConductorDni = conductor.Dni;
+
+            var entrega = new EntregaEpp { ConductorId = id };
+            return View(entrega);
+        }
+
+        // POST: Guardar la entrega y la firma
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EntregarEpp(EntregaEpp entrega)
+        {
+            if (string.IsNullOrWhiteSpace(entrega.FirmaDigitalBase64))
+            {
+                TempData["Error"] = "El conductor debe firmar en la pantalla para guardar el registro.";
+                return RedirectToAction(nameof(EntregarEpp), new { id = entrega.ConductorId });
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.EntregasEpp.Add(entrega);
+                await _context.SaveChangesAsync();
+
+                TempData["Exito"] = "Entrega de EPP registrada y firmada correctamente.";
+                return RedirectToAction(nameof(Index)); 
+            }
+
+            TempData["Error"] = "Ocurrió un error al validar los datos.";
+            return RedirectToAction(nameof(EntregarEpp), new { id = entrega.ConductorId });
+        }
     }
 }
