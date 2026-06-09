@@ -24,6 +24,52 @@
     </div>
 </div>
 
+@{
+    bool ordenPorVencimiento = ViewBag.OrdenPorVencimiento ?? false;
+    bool facturasPendientes = ViewBag.FacturasPendientes ?? false;
+    var facturasPorOrden = ViewBag.FacturasPorOrden as Dictionary<int, Control_flota.Models.Finanzas.Factura>
+        ?? new Dictionary<int, Control_flota.Models.Finanzas.Factura>();
+}
+
+<!-- Filtros -->
+<div class="filtros-section">
+    <div class="filtros-container">
+        <form method="get" asp-action="ServiciosPorCobrar" id="formFiltros" class="filtros-form">
+            <input type="hidden" id="ordenPorVencimiento" name="ordenPorVencimiento" value="@ordenPorVencimiento" />
+            <input type="hidden" id="facturasPendientes" name="facturasPendientes" value="@facturasPendientes" />
+
+            <div class="filtro-grupo">
+                <label for="clienteId"> Filtrar por Cliente:</label>
+                <select id="clienteId" name="clienteId" class="filtro-select" onchange="this.form.submit()">
+                    <option value="">-- Todos los Clientes --</option>
+                    @foreach (var cliente in (IEnumerable<Control_flota.Models.Operaciones.Cliente>)ViewBag.Clientes)
+                    {
+                        if ((int?)ViewBag.ClienteSeleccionado == cliente.Id)
+                        {
+                            <option value="@cliente.Id" selected>@cliente.Nombre</option>
+                        }
+                        else
+                        {
+                            <option value="@cliente.Id">@cliente.Nombre</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filtros-botones">
+                <a class="btn-filtro @(ordenPorVencimiento ? "activo" : "")" 
+                   href="@Url.Action("ServiciosPorCobrar", new { clienteId = ViewBag.ClienteSeleccionado, ordenPorVencimiento = !ordenPorVencimiento, facturasPendientes = facturasPendientes })">
+                     Vencimiento
+                </a>
+                <a class="btn-filtro @(facturasPendientes ? "activo" : "")" 
+                   href="@Url.Action("ServiciosPorCobrar", new { clienteId = ViewBag.ClienteSeleccionado, ordenPorVencimiento = ordenPorVencimiento, facturasPendientes = !facturasPendientes })">
+                     Facturas pendientes
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="seccion-servicios">
     @if (!Model.Any())
     {
@@ -41,7 +87,18 @@
         @foreach (var viaje in Model)
         {
             var montoBase = viaje.SolicitudServicio?.Monto ?? viaje.Gastos?.Sum(g => g.Monto) ?? 0m;
-            // Determinar estado de factura si existe (esto se actualizará con JavaScript)
+            var factura = facturasPorOrden.ContainsKey(viaje.Id) ? facturasPorOrden[viaje.Id] : null;
+            var fechaVencimiento = factura?.FechaVencimiento ?? viaje.FechaEmision.AddDays(30);
+            var estadoFactura = factura == null
+                ? "Sin facturar"
+                : factura.FechaPago == null && factura.Estado == "Emitida"
+                    ? "Pendiente"
+                    : factura.Estado;
+            var estadoClass = factura == null
+                ? "estado-sin-facturar"
+                : factura.FechaPago == null && factura.Estado == "Emitida"
+                    ? "estado-pendiente"
+                    : factura.Estado.ToLowerInvariant().Replace(" ", "-");
             <div class="servicio-item">
                 <div style="flex: 1;">
                     <div class="servicio-item-cliente">@viaje.Cliente?.Nombre</div>
@@ -50,7 +107,10 @@
                         <strong>Ruta:</strong> @viaje.Origen → @viaje.Destino
                     </div>
                     <div class="servicio-item-detalles">
-                        📅 @viaje.FechaEmision.ToString("dd/MM/yyyy")
+                        📅 Emisión: @viaje.FechaEmision.ToString("dd/MM/yyyy")
+                    </div>
+                    <div class="servicio-item-detalles">
+                        ⏳ Vencimiento: @fechaVencimiento.ToString("dd/MM/yyyy")
                     </div>
                     <div class="servicio-item-total">
                         Total base: S/ @montoBase.ToString("F2")
@@ -62,7 +122,7 @@
                             onclick="abrirFormularioFactura(@viaje.Id, '@viaje.Cliente?.Nombre', '@viaje.Codigo', @montoBase.ToString("F2").Replace(",", "."))">
                         📄 Generar Factura
                     </button>
-                    <span class="estado-badge estado-sin-facturar" id="estado-@viaje.Id">Sin facturar</span>
+                    <span class="estado-badge @estadoClass" id="estado-@viaje.Id">@estadoFactura</span>
                 </div>
             </div>
         }
@@ -142,3 +202,4 @@
 </div>
 
 <script src="/js/finanzas-servicios.js"></script>
+<script src="/js/filtros-finanzas.js"></script>
