@@ -1,0 +1,153 @@
+@model IEnumerable<Control_flota.Models.Operaciones.Orden>
+@{
+    ViewData["Title"] = "Panel SST";
+    var estadosIniciales = ViewBag.EstadosIniciales as List<Control_flota.Models.Operaciones.EstadoInicialRuta>;
+    int limiteHoras = ViewBag.LimiteHoras;
+}
+
+<style>
+    .page-subtitle { color: #64748b; margin: 4px 0 0; font-size: 0.9rem; }
+    .table-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .table-card table { margin: 0; }
+    .table-card thead th {
+        background: #f8fafc; color: #475569; font-size: 0.75rem;
+        font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+        padding: 13px 20px; border-bottom: 1px solid #e2e8f0; border-top: none;
+    }
+    .table-card tbody td {
+        padding: 14px 20px; color: #1e293b; font-size: 0.875rem;
+        vertical-align: middle; border-bottom: 1px solid #f1f5f9;
+    }
+    .table-card tbody tr:last-child td { border-bottom: none; }
+    .badge-alerta { background: #fee2e2; color: #dc2626; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display:inline-flex; align-items:center; gap:5px; animation: pulsar 1.2s infinite; }
+    .badge-ok { background: #f0fdf4; color: #16a34a; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display:inline-flex; align-items:center; gap:5px; }
+    .badge-warning { background: #fff7ed; color: #ea580c; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display:inline-flex; align-items:center; gap:5px; }
+    @@keyframes pulsar { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+    .action-btn { border: none; padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+    .btn-parada { background: #dc2626; color: white; }
+    .btn-parada:hover { background: #b91c1c; }
+    .btn-disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+</style>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="fa-solid fa-circle-check me-2"></i>@TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div style="margin-bottom:24px;">
+    <h2 style="font-size:1.75rem; font-weight:700; color:#0f172a; margin:0;">Panel SST</h2>
+    <p class="page-subtitle">Monitoreo de horas de conducción — Límite: @limiteHoras horas continuas</p>
+</div>
+
+<div class="table-card">
+    @if (!Model.Any())
+    {
+        <div style="text-align:center; padding:60px; color:#94a3b8;">
+            <i class="fa-solid fa-road" style="font-size:2.5rem; display:block; margin-bottom:12px;"></i>
+            <p>No hay conductores en ruta en este momento.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Orden</th>
+                    <th>Conductor</th>
+                    <th>Ruta</th>
+                    <th>Inicio de Ruta</th>
+                    <th>Horas en Ruta</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var orden in Model)
+            {
+                var estadoInicial = estadosIniciales?
+                    .Where(e => e.OrdenId == orden.Id)
+                    .OrderByDescending(e => e.FechaRegistro)
+                    .FirstOrDefault();
+
+                var fechaInicio = estadoInicial?.FechaRegistro ?? orden.FechaEmision;
+                var horasEnRuta = (DateTime.UtcNow - fechaInicio).TotalHours;
+                var horasTexto = $"{(int)horasEnRuta}h {(int)((horasEnRuta % 1) * 60)}m";
+                var superaLimite = horasEnRuta >= limiteHoras;
+                var cercaLimite = horasEnRuta >= (limiteHoras - 1) && !superaLimite;
+                var yaNotificado = orden.NotificacionesParada?.Any(n => !n.Leida) ?? false;
+
+                <tr style="@(superaLimite ? "background:#fff5f5;" : "")">
+                    <td><span style="font-weight:700; font-family:monospace;">@orden.Codigo</span></td>
+                    <td>
+                        <div style="font-weight:600;">@orden.Conductor?.Nombres @orden.Conductor?.Apellidos</div>
+                        <div style="font-size:0.8rem; color:#94a3b8;">@orden.Conductor?.Celular</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:500;">@orden.Origen</div>
+                        <div style="font-size:0.8rem; color:#94a3b8;"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> @orden.Destino</div>
+                    </td>
+                    <td>@fechaInicio.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td style="font-weight:700; font-size:1rem; color:@(superaLimite ? "#dc2626" : cercaLimite ? "#ea580c" : "#16a34a");">
+                        @horasTexto
+                    </td>
+                    <td>
+                        @if (superaLimite)
+                        {
+                            <span class="badge-alerta">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Descanso Requerido
+                            </span>
+                        }
+                        else if (cercaLimite)
+                        {
+                            <span class="badge-warning">
+                                <i class="fa-solid fa-clock"></i> Cerca del límite
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-ok">
+                                <i class="fa-solid fa-circle-check"></i> Normal
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @if (superaLimite && !yaNotificado)
+                        {
+                            <form method="post" asp-action="NotificarParada" asp-controller="Sst">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="ordenId" value="@orden.Id" />
+                                <input type="hidden" name="conductorId" value="@orden.ConductorId" />
+                                <button type="submit" class="action-btn btn-parada">
+                                    <i class="fa-solid fa-hand"></i> Notificar Parada
+                                </button>
+                            </form>
+                        }
+                        else if (yaNotificado)
+                        {
+                            <span class="action-btn btn-disabled">
+                                <i class="fa-solid fa-bell"></i> Notificado
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="action-btn btn-disabled">
+                                <i class="fa-solid fa-check"></i> Sin alerta
+                            </span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>

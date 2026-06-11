@@ -132,25 +132,43 @@ public class OrdenesController : Controller
     }
 
     // Panel del conductor - solo sus órdenes
-    [Authorize(Roles = "Conductor")]
-    public async Task<IActionResult> PanelConductor()
+   [Authorize(Roles = "Conductor")]
+public async Task<IActionResult> PanelConductor()
+{
+    var user = await _context.Users
+        .Include(u => u.Conductor)
+        .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
+
+    if (user?.Conductor == null)
+        return RedirectToAction("Index", "Home");
+
+    var ordenes = await _context.Ordenes
+        .Include(o => o.Cliente)
+        .Include(o => o.Gastos)
+        .Where(o => o.ConductorId == user.Conductor.Id)
+        .OrderByDescending(o => o.FechaEmision)
+        .ToListAsync();
+
+    // Verificar si hay notificación de parada pendiente para este conductor
+    var tieneNotificacion = await _context.NotificacionesParada
+        .AnyAsync(n => n.ConductorId == user.Conductor.Id && n.Leida == false);
+
+    if (tieneNotificacion)
     {
-        var user = await _context.Users
-            .Include(u => u.Conductor)
-            .FirstOrDefaultAsync(u => u.UserName == User.Identity!.Name);
-
-        if (user?.Conductor == null)
-            return RedirectToAction("Index", "Home");
-
-        var ordenes = await _context.Ordenes
-            .Include(o => o.Cliente)
-            .Include(o => o.Gastos)
-            .Where(o => o.ConductorId == user.Conductor.Id)
-            .OrderByDescending(o => o.FechaEmision)
+        // Marcar como leída para que no aparezca de nuevo
+        var notificaciones = await _context.NotificacionesParada
+            .Where(n => n.ConductorId == user.Conductor.Id && n.Leida == false)
             .ToListAsync();
 
-        return View(ordenes);
+        foreach (var n in notificaciones)
+            n.Leida = true;
+
+        await _context.SaveChangesAsync();
+        ViewBag.NotificacionParada = true;
     }
+
+    return View(ordenes);
+}
 
     // Iniciar Ruta
     [HttpPost]

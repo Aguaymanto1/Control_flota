@@ -33,6 +33,7 @@ public class Orden
     public int? ConductorId { get; set; }
     public virtual Conductor? Conductor { get; set; }
     public virtual ICollection<GastoRuta> Gastos { get; set; } = new List<GastoRuta>();
+    public virtual ICollection<NotificacionParada> NotificacionesParada { get; set; } = new List<NotificacionParada>();
     public virtual ICollection<EvidenciaRuta> Evidencias { get; set; } = new List<EvidenciaRuta>();
 
     public string? UltimaCiudad { get; set; }

@@ -12,18 +12,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-//relacion usuario , role================================================
 builder.Services.AddIdentity<Usuario, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-//============================================================
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 QuestPDF.Settings.License = LicenseType.Community;
 
-
-//Configuracion Resend=========================================================
 builder.Services.AddOptions();
 builder.Services.AddHttpClient<ResendClient>();
 builder.Services.Configure<ResendClientOptions>(o =>
@@ -39,9 +35,6 @@ var cultureInfo = new System.Globalization.CultureInfo("es-PE");
 
 cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
 cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
-
-
-
 
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
@@ -74,11 +67,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Crear roles y admin
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    // Asegurar que la base de datos exista y las tablas básicas estén creadas (útil en desarrollo)
     try
     {
         var db = services.GetRequiredService<ApplicationDbContext>();
@@ -100,7 +91,7 @@ async Task CrearRolesYAdmin(IServiceProvider services)
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<Usuario>>();
 
-    string[] roles = { "Administrador", "Conductor", "AdministradorFinanzas" };
+    string[] roles = { "Administrador", "Conductor", "AdministradorFinanzas", "SST" };
     
     foreach (var role in roles)
     {
@@ -111,6 +102,7 @@ async Task CrearRolesYAdmin(IServiceProvider services)
         }
     }
 
+    // Administrador principal
     var adminEmail = "administrador234@gmail.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     
@@ -124,7 +116,6 @@ async Task CrearRolesYAdmin(IServiceProvider services)
             EmailConfirmed = true
         };
         
-        // 🔴 CONTRASEÑA SIMPLE (sin @)
         var result = await userManager.CreateAsync(adminUser, "Admin123@hola");
         
         if (result.Succeeded)
@@ -136,9 +127,7 @@ async Task CrearRolesYAdmin(IServiceProvider services)
         {
             Console.WriteLine("❌ Errores:");
             foreach (var error in result.Errors)
-            {
                 Console.WriteLine($"   {error.Description}");
-            }
         }
     }
     else
@@ -146,7 +135,7 @@ async Task CrearRolesYAdmin(IServiceProvider services)
         Console.WriteLine("✅ Admin ya existe");
     }
 
-    // Crear usuario AdministradorFinanzas
+    // Administrador Finanzas
     var finanzasEmail = "Admifinanzas@gmail.com";
     var finanzasUser = await userManager.FindByEmailAsync(finanzasEmail);
 
@@ -165,19 +154,50 @@ async Task CrearRolesYAdmin(IServiceProvider services)
         if (resultFinanzas.Succeeded)
         {
             await userManager.AddToRoleAsync(finanzasUser, "AdministradorFinanzas");
-            Console.WriteLine("✅ Administrador de Finanzas creado: finanzas@control-flota.com / Finanzas123@hola");
+            Console.WriteLine("✅ Administrador de Finanzas creado: Admifinanzas@gmail.com / Finanzas123@hola");
         }
         else
         {
             Console.WriteLine("❌ Errores al crear Finanzas:");
             foreach (var error in resultFinanzas.Errors)
-            {
                 Console.WriteLine($"   {error.Description}");
-            }
         }
     }
     else
     {
         Console.WriteLine("✅ Usuario de Finanzas ya existe");
+    }
+
+    // Usuario SST
+    var sstEmail = "SST@gmail.com";
+    var sstUser = await userManager.FindByEmailAsync(sstEmail);
+
+    if (sstUser == null)
+    {
+        sstUser = new Usuario
+        {
+            UserName = sstEmail,
+            Email = sstEmail,
+            Estado = true,
+            EmailConfirmed = true
+        };
+
+        var resultSst = await userManager.CreateAsync(sstUser, "SST123@hola");
+
+        if (resultSst.Succeeded)
+        {
+            await userManager.AddToRoleAsync(sstUser, "SST");
+            Console.WriteLine("✅ Usuario SST creado: SST@gmail.com / SST123@hola");
+        }
+        else
+        {
+            Console.WriteLine("❌ Errores al crear SST:");
+            foreach (var error in resultSst.Errors)
+                Console.WriteLine($"   {error.Description}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("✅ Usuario SST ya existe");
     }
 }
