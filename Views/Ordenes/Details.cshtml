@@ -246,7 +246,39 @@
         </div>
     }
 </div>
-
+@if (Model.Evidencias != null && Model.Evidencias.Any())
+{
+    <div class="info-card" style="grid-column: 1 / -1;">
+        <div class="card-title-custom">
+            <i class="fa-solid fa-images" style="color: #7c3aed;"></i> Evidencias durante la Ruta
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:16px; margin-top:8px;">
+            @foreach (var ev in Model.Evidencias)
+            {
+                <div style="text-align:center;">
+                    <a href="@ev.RutaImagen" target="_blank">
+                        <img src="@ev.RutaImagen"
+                             style="width:180px; height:130px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0; display:block;" />
+                    </a>
+                    <span style="font-size:0.75rem; color:#94a3b8; margin-top:4px; display:block;">
+                        @ev.FechaRegistro.ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+}
+else if (Model.Estado == "En Tránsito" || Model.Estado == "Completado")
+{
+    <div class="info-card" style="grid-column: 1 / -1;">
+        <div class="card-title-custom">
+            <i class="fa-solid fa-images" style="color: #7c3aed;"></i> Evidencias durante la Ruta
+        </div>
+        <p style="color:#94a3b8; font-size:0.9rem; margin:0;">
+            El conductor aún no ha subido evidencias para esta orden.
+        </p>
+    </div>
+}
 @if (Model.Gastos != null && Model.Gastos.Any())
 {
     <div class="card shadow-sm mb-4" style="border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden;">
