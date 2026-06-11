@@ -2,12 +2,15 @@
 @{
     ViewData["Title"] = "Panel SST";
     var estadosIniciales = ViewBag.EstadosIniciales as List<Control_flota.Models.Operaciones.EstadoInicialRuta>;
+    var ordenesCompletadas = ViewBag.OrdenesCompletadas as List<Control_flota.Models.Operaciones.Orden>;
+    var incidencias = ViewBag.Incidencias as List<Control_flota.Models.Operaciones.IncidenciaRuta>;
     int limiteHoras = ViewBag.LimiteHoras;
 }
 
 <style>
     .page-subtitle { color: #64748b; margin: 4px 0 0; font-size: 0.9rem; }
-    .table-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .section-title { font-size:1.1rem; font-weight:700; color:#0f172a; margin: 24px 0 12px; display:flex; align-items:center; gap:8px; }
+    .table-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
     .table-card table { margin: 0; }
     .table-card thead th {
         background: #f8fafc; color: #475569; font-size: 0.75rem;
@@ -22,10 +25,14 @@
     .badge-alerta { background: #fee2e2; color: #dc2626; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display:inline-flex; align-items:center; gap:5px; animation: pulsar 1.2s infinite; }
     .badge-ok { background: #f0fdf4; color: #16a34a; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display:inline-flex; align-items:center; gap:5px; }
     .badge-warning { background: #fff7ed; color: #ea580c; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display:inline-flex; align-items:center; gap:5px; }
+    .badge-sinincidencias { background: #f0fdf4; color: #16a34a; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display:inline-flex; align-items:center; gap:5px; }
+    .badge-conincidencias { background: #fff5f5; color: #dc2626; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display:inline-flex; align-items:center; gap:5px; }
     @@keyframes pulsar { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
-    .action-btn { border: none; padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+    .action-btn { border: none; padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; text-decoration:none; }
     .btn-parada { background: #dc2626; color: white; }
     .btn-parada:hover { background: #b91c1c; }
+    .btn-certificado { background: #2563eb; color: white; }
+    .btn-certificado:hover { background: #1d4ed8; color: white; }
     .btn-disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
 </style>
 
@@ -46,14 +53,20 @@
 
 <div style="margin-bottom:24px;">
     <h2 style="font-size:1.75rem; font-weight:700; color:#0f172a; margin:0;">Panel SST</h2>
-    <p class="page-subtitle">Monitoreo de horas de conducción — Límite: @limiteHoras horas continuas</p>
+    <p class="page-subtitle">Seguridad y Salud en el Trabajo — Monitoreo y certificación de rutas</p>
+</div>
+
+
+<div class="section-title">
+    <i class="fa-solid fa-road" style="color:#ea580c;"></i> Conductores en Ruta
+    <span style="font-size:0.8rem; color:#94a3b8; font-weight:400;">Límite: @limiteHoras horas continuas</span>
 </div>
 
 <div class="table-card">
     @if (!Model.Any())
     {
-        <div style="text-align:center; padding:60px; color:#94a3b8;">
-            <i class="fa-solid fa-road" style="font-size:2.5rem; display:block; margin-bottom:12px;"></i>
+        <div style="text-align:center; padding:40px; color:#94a3b8;">
+            <i class="fa-solid fa-road" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
             <p>No hay conductores en ruta en este momento.</p>
         </div>
     }
@@ -142,6 +155,83 @@
                         {
                             <span class="action-btn btn-disabled">
                                 <i class="fa-solid fa-check"></i> Sin alerta
+                            </span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+
+<div class="section-title">
+    <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> Viajes Completados — Certificación SST
+</div>
+
+<div class="table-card">
+    @if (ordenesCompletadas == null || !ordenesCompletadas.Any())
+    {
+        <div style="text-align:center; padding:40px; color:#94a3b8;">
+            <i class="fa-solid fa-circle-check" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
+            <p>No hay viajes completados aún.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Orden</th>
+                    <th>Conductor</th>
+                    <th>Ruta</th>
+                    <th>Cliente</th>
+                    <th>Incidencias</th>
+                    <th>Certificado</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var orden in ordenesCompletadas)
+            {
+                var tieneIncidencias = incidencias?.Any(i => i.OrdenId == orden.Id) ?? false;
+
+                <tr>
+                    <td><span style="font-weight:700; font-family:monospace;">@orden.Codigo</span></td>
+                    <td>
+                        <div style="font-weight:600;">@orden.Conductor?.Nombres @orden.Conductor?.Apellidos</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:500;">@orden.Origen</div>
+                        <div style="font-size:0.8rem; color:#94a3b8;"><i class="fa-solid fa-arrow-down" style="font-size:0.65rem;"></i> @orden.Destino</div>
+                    </td>
+                    <td>@orden.Cliente?.Nombre</td>
+                    <td>
+                        @if (tieneIncidencias)
+                        {
+                            <span class="badge-conincidencias">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Con incidencias
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-sinincidencias">
+                                <i class="fa-solid fa-circle-check"></i> Sin incidencias
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @if (!tieneIncidencias)
+                        {
+                            <a href="@Url.Action("GenerarCertificadoSST", "Sst", new { ordenId = orden.Id })"
+                               class="action-btn btn-certificado">
+                                <i class="fa-solid fa-file-shield"></i> Generar Certificado SST
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="action-btn btn-disabled">
+                                <i class="fa-solid fa-ban"></i> No disponible
                             </span>
                         }
                     </td>
