@@ -194,6 +194,13 @@
                                              data-ordenid="@orden.Id">
                                         <i class="fa-solid fa-triangle-exclamation"></i> Reportar Incidencia
                                     </button>
+                                    <button type="button" class="action-btn"
+        style="background:#ede9fe; color:#7c3aed; width:100%; justify-content:center;"
+        data-bs-toggle="modal"
+        data-bs-target="#evidenciaModal"
+        data-ordenid="@orden.Id">
+    <i class="fa-solid fa-camera"></i> Tomar Evidencias
+</button>
                                     <form method="post" asp-action="ReportarUbicacion" asp-route-id="@orden.Id"
                                         style="display:flex; gap:4px;">
                                         @Html.AntiForgeryToken()
@@ -454,6 +461,47 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="evidenciaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="SubirEvidencia" method="post" enctype="multipart/form-data" id="formEvidencia">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ordenId" id="evidenciaOrdenId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fa-solid fa-camera me-2"></i> Tomar Evidencias
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="font-size:0.85rem; color:#64748b;">
+                        Puedes subir máximo <strong>3 fotos</strong> de evidencia durante la ruta.
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label">Seleccionar foto</label>
+                        <input type="file" name="foto" id="evidenciaFoto"
+                               class="form-control" accept="image/*" required />
+                    </div>
+                    <div id="evidenciaPreview" style="display:none; margin-top:10px; text-align:center;">
+                        <img id="evidenciaImgPreview" src=""
+                             style="max-width:100%; max-height:200px; border-radius:8px; border:1px solid #e2e8f0;" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubirEvidencia">
+                        <i class="fa-solid fa-upload me-1"></i> Subir Foto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 <script>
     var skipFinalizarReset = false;
@@ -795,5 +843,32 @@ if (incidenciaModal) {
 
         });
 
+}
+
+// Modal de evidencias
+var evidenciaModal = document.getElementById('evidenciaModal');
+if (evidenciaModal) {
+    evidenciaModal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget;
+        var ordenId = button.getAttribute('data-ordenid');
+        document.getElementById('evidenciaOrdenId').value = ordenId;
+        document.getElementById('evidenciaFoto').value = '';
+        document.getElementById('evidenciaPreview').style.display = 'none';
+        document.getElementById('evidenciaImgPreview').src = '';
+    });
+
+    document.getElementById('evidenciaFoto').addEventListener('change', function() {
+        var file = this.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('evidenciaImgPreview').src = e.target.result;
+                document.getElementById('evidenciaPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('evidenciaPreview').style.display = 'none';
+        }
+    });
 }
 </script>

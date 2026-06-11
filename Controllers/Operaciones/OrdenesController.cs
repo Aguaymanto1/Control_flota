@@ -83,11 +83,11 @@ public class OrdenesController : Controller
     // Detalle de orden (Vista del Administrador)
     public async Task<IActionResult> Details(int id)
     {
-        var orden = await _context.Ordenes
-            .Include(o => o.Cliente)
-            .Include(o => o.Gastos)
-            .FirstOrDefaultAsync(o => o.Id == id);
-
+       var orden = await _context.Ordenes
+    .Include(o => o.Cliente)
+    .Include(o => o.Gastos)
+    .Include(o => o.Evidencias)
+    .FirstOrDefaultAsync(o => o.Id == id);
         if (orden == null)
             return NotFound();
 
@@ -672,4 +672,75 @@ public class OrdenesController : Controller
         TempData["Exito"] = "Alerta registrada correctamente.";
         return RedirectToAction(nameof(PanelConductor));
     }
+
+
+    // HU-029: Subir evidencias durante la ruta (máximo 3 por orden)
+    
+[HttpPost]
+[ValidateAntiForgeryToken]
+[Authorize(Roles = "Conductor")]
+public async Task<IActionResult> SubirEvidencia(int ordenId, IFormFile foto)
+{
+    var orden = await _context.Ordenes
+        .Include(o => o.Evidencias)
+        .FirstOrDefaultAsync(o => o.Id == ordenId);
+
+    if (orden == null) return NotFound();
+
+    if (orden.Estado != "En Tránsito")
+    {
+        TempData["Error"] = "Solo puedes subir evidencias en una orden En Tránsito.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+    var totalEvidencias = orden.Evidencias?.Count ?? 0;
+    if (totalEvidencias >= 3)
+    {
+        TempData["Error"] = "Ya alcanzaste el máximo de 3 evidencias para esta orden.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+    if (foto == null || foto.Length == 0)
+    {
+        TempData["Error"] = "Debes seleccionar una foto.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+    if (foto.Length > 5 * 1024 * 1024)
+    {
+        TempData["Error"] = "La imagen supera el peso máximo de 5MB permitido.";
+        return RedirectToAction(nameof(PanelConductor));
+    }
+
+    var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "evidencias");
+    Directory.CreateDirectory(folder);
+    var fileName = $"orden-{ordenId}-ev-{Guid.NewGuid()}{Path.GetExtension(foto.FileName)}";
+    var path = Path.Combine(folder, fileName);
+
+    using (var stream = new FileStream(path, FileMode.Create))
+    {
+        await foto.CopyToAsync(stream);
+    }
+
+    var evidencia = new EvidenciaRuta
+    {
+        OrdenId = ordenId,
+        RutaImagen = "/evidencias/" + fileName,
+        FechaRegistro = DateTime.UtcNow
+    };
+
+    _context.EvidenciasRuta.Add(evidencia);
+    await _context.SaveChangesAsync();
+
+    TempData["Exito"] = "Evidencia subida correctamente.";
+    return RedirectToAction(nameof(PanelConductor));
+}
+
+    
+
+
+
+
+
+
 }
