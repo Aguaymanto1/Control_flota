@@ -309,7 +309,7 @@
                                 <a href="@Url.Action("Details", "Ordenes", new { id = orden.Id })" class="action-btn view">
                                     <i class="fa-regular fa-eye"></i> Ver
                                 </a>
-                                <form method="post" asp-action="Eliminar" asp-route-id="@orden.Id"
+                                <form method="post" asp-action="EliminarOrden" asp-route-id="@orden.Id"
                                       style="display:inline;" onsubmit="return confirm('¿Eliminar esta orden?');">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="action-btn delete">

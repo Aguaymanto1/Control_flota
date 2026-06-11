@@ -379,8 +379,7 @@ public IActionResult AsignarFlota(int SolicitudId, int ConductorId, int UnidadId
 
     _context.SaveChanges();
 
-    TempData["Success"] =
-        "Flota asignada correctamente.";
+    TempData["Exito"] = "Flota asignada correctamente.";
 
     return RedirectToAction("Index");
 }

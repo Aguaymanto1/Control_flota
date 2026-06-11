@@ -753,8 +753,44 @@ public async Task<IActionResult> SubirEvidencia(int ordenId, IFormFile foto)
     TempData["Exito"] = "Evidencia subida correctamente.";
     return RedirectToAction(nameof(PanelConductor));
 }
+   //eliminar orden//
+    [HttpPost]
+[ValidateAntiForgeryToken]
+[Authorize(Roles = "Administrador")]
+public async Task<IActionResult> EliminarOrden(int id)
+{
+    var orden = await _context.Ordenes.FindAsync(id);
+    if (orden == null) return NotFound();
 
-    
+    if (orden.Estado == "En Tránsito")
+    {
+        TempData["Error"] = "No puedes eliminar una orden que está En Tránsito.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // Revertir la solicitud a su estado anterior
+    var solicitud = await _context.SolicitudesServicio
+        .Include(s => s.Conductor)
+        .Include(s => s.Unidad)
+        .FirstOrDefaultAsync(s => s.Id == orden.SolicitudServicioId);
+
+    if (solicitud != null)
+    {
+        solicitud.EstadoSolicitud = "Pendiente de Asignación";
+
+        if (solicitud.Conductor != null)
+            solicitud.Conductor.Actividad = "Libre";
+
+        if (solicitud.Unidad != null)
+            solicitud.Unidad.Actividad = "Libre";
+    }
+
+    _context.Ordenes.Remove(orden);
+    await _context.SaveChangesAsync();
+
+    TempData["Exito"] = "Orden eliminada correctamente. La solicitud volvió a estado Pendiente.";
+    return RedirectToAction(nameof(Index));
+}
 
 
 
