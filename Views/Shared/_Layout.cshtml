@@ -97,6 +97,14 @@
                                 <div class="menu-left"><i class="fa-solid fa-money-bill-wave"></i><span>Servicios por Cobrar</span></div>
                             </a>
                         }
+
+                        @if (User.IsInRole("SST"))
+{
+    <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Sst" ? "active" : "")"
+    asp-controller="Sst" asp-action="Index">
+        <div class="menu-left"><i class="fa-solid fa-shield-halved"></i><span>Panel SST</span></div>
+    </a>
+}
                     </div>
                 </div>
 
