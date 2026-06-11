@@ -75,11 +75,6 @@
                                      <span>Incidencias</span>
                                 </div>
                             </a>
-                            <a class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "EnDesarrollo" && ViewContext.RouteData.Values["action"]?.ToString() == "Finanzas" ? "active" : "")"
-                            asp-controller="EnDesarrollo" asp-action="Finanzas">
-                                <div class="menu-left"><i class="fa-solid fa-filter"></i><span>Finanzas</span></div>
-                                <div class="badge-menu">2</div>
-                            </a>
                         }
 
                         @if (User.IsInRole("Conductor"))

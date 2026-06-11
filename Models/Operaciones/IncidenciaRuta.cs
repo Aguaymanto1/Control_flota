@@ -28,6 +28,7 @@ namespace Control_flota.Models.Operaciones
         public double? Latitud { get; set; }
 
         public double? Longitud { get; set; }
+        public string? UbicacionTexto { get; set; }
 
         public DateTime FechaReporte { get; set; } = DateTime.Now;
 
